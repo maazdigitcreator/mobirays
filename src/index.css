@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+@layer utilities {
+    .latest-products-clip {
+        clip-path: polygon(0% 0%, calc(100% - 40px) 0%, 100% 100%, 0% 100%);
+        padding-right: 35px;
+    }
+
+    @media (min-width: 768px) {
+        .latest-products-clip {
+            clip-path: polygon(0% 0%, calc(100% - 70px) 0%, 100% 100%, 0% 100%);
+            padding-right: 70px;
+        }
+    }
+
+    .latest-news-clip {
+        clip-path: polygon(0% 100%, 50px 0%, calc(100% - 50px) 0%, 100% 100%);
+        transition: none !important;
+        backface-visibility: hidden;
+        -webkit-font-smoothing: antialiased;
+        transform: translateZ(0);
+        padding-left: 90px;
+        padding-right: 90px;
+    }
+
+    @media (min-width: 768px) {
+        .latest-news-clip {
+            clip-path: polygon(0% 100%, 60px 0%, calc(100% - 60px) 0%, 100% 100%);
+            padding-left: 120px;
+            padding-right: 120px;
+        }
+    }
+
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+}
