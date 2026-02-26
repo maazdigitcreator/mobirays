@@ -147,7 +147,7 @@ const Videos = () => {
     return (
         <div className="w-full">
 
-            <div className='flex'>
+            <div className='flex gap-2'>
                 <div className="w-full lg:w-1/3 hidden lg:block">
                     <div className='flex flex-col gap-2 sm:h-120 h-auto'>
                         {/* Left Large Banner */}
