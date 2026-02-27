@@ -119,10 +119,23 @@ const LatestProducts = ({ title, products, itemImage, limit, useDummyData = fals
                                 onClick={() => handleProductClick(product)}
                             >
                                 <div className="relative mb-3 flex justify-center items-center p-2 bg-blue-50/50 rounded-lg h-48 transition-transform group-hover:scale-105">
-                                    {product.isComingSoon && (
+                                    {product.isComingSoon ? (
                                         <div className="absolute -top-2 sm:-top-4.5 right-0 z-10 scale-90 sm:scale-100">
                                             <div className="bg-[#FF0008] text-white text-[14px] font-semibold px-1.5 py-0.5 rounded-md relative shadow-lg whitespace-nowrap">
                                                 Coming Soon
+                                                {/* Speech Bubble Tail */}
+                                                <div
+                                                    className="absolute -bottom-3 right-4 w-0 h-0 
+                                                    border-l-[0px] border-l-transparent 
+                                                    border-r-[10px] border-r-transparent 
+                                                    border-t-[12px] border-t-[#FF0008]"
+                                                ></div>
+                                            </div>
+                                        </div>
+                                    ) : product.isNew && (
+                                        <div className="absolute -top-2 sm:-top-4.5 right-0 z-10 scale-90 sm:scale-100">
+                                            <div className="bg-[#FF0008] text-white text-[14px] font-semibold px-4 py-0.5 rounded-md relative shadow-lg whitespace-nowrap">
+                                                New
                                                 {/* Speech Bubble Tail */}
                                                 <div
                                                     className="absolute -bottom-3 right-4 w-0 h-0 

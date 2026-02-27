@@ -33,9 +33,17 @@ import RelatedNews from '../components/SidebarSections/RelatedNews'
 const MobileSpecs = () => {
     const { productSlug } = useParams();
     const location = useLocation();
-    const productData = location.state?.product;
-    const { allNews, allReviews, allBanners } = useData();
+    const { allProducts, allNews, allReviews, allBanners, loading: contextLoading } = useData();
     const [pageBanners, setPageBanners] = useState({});
+    const [productData, setProductData] = useState(location.state?.product || null);
+
+    // If product data is missing (e.g. on direct navigation/refresh), find it in allProducts
+    useEffect(() => {
+        if (!productData && allProducts.length > 0) {
+            const found = allProducts.find(p => p.slug === productSlug);
+            if (found) setProductData(found);
+        }
+    }, [allProducts, productSlug, productData]);
 
     useEffect(() => {
         if (allBanners.length > 0) {
@@ -48,20 +56,24 @@ const MobileSpecs = () => {
         }
     }, [allBanners]);
 
-    // Define related news and reviews
-    const relatedNews = React.useMemo(() => {
+    // Define related news and reviews with unique names to avoid shadowing components
+    const filteredRelatedNews = React.useMemo(() => {
         if (!productData?.name) return [];
+        const pName = productData.name.toLowerCase().trim();
         return allNews.filter(n =>
-            (n.name && n.name.toLowerCase().includes(productData.name.toLowerCase())) ||
-            (n.title && n.title.toLowerCase().includes(productData.name.toLowerCase()))
+            (n.is_products === 1 && n.products && n.products.toLowerCase().trim() === pName) ||
+            (n.name && n.name.toLowerCase().includes(pName)) ||
+            (n.title && n.title.toLowerCase().includes(pName))
         );
     }, [allNews, productData]);
 
-    const relatedReviews = React.useMemo(() => {
+    const filteredRelatedReviews = React.useMemo(() => {
         if (!productData?.name) return [];
+        const pName = productData.name.toLowerCase().trim();
         return allReviews.filter(r =>
-            (r.name && r.name.toLowerCase().includes(productData.name.toLowerCase())) ||
-            (r.subtitle && r.subtitle.toLowerCase().includes(productData.name.toLowerCase()))
+            (r.is_products === 1 && r.products && r.products.toLowerCase().trim() === pName) ||
+            (r.name && r.name.toLowerCase().includes(pName)) ||
+            (r.subtitle && r.subtitle.toLowerCase().includes(pName))
         );
     }, [allReviews, productData]);
 
@@ -445,7 +457,7 @@ const MobileSpecs = () => {
                             paddingLeft="0px"
                             paddingRight="60px"
                             limit={4}
-                            newsData={relatedNews}
+                            newsData={filteredRelatedNews}
                             emptyMessage="This product has no related news yet."
                         />
                     </div>
@@ -458,7 +470,7 @@ const MobileSpecs = () => {
                             paddingLeft="0px"
                             paddingRight="60px"
                             limit={6}
-                            reviewsData={relatedReviews}
+                            reviewsData={filteredRelatedReviews}
                             emptyMessage="This product has no reviews yet."
                         />
                     </div>

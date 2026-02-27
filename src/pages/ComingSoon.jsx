@@ -27,53 +27,44 @@ const ComingSoon = () => {
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://mobirays.voucherndeals.com';
 
     useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true);
+        const fetchItems = async (url, setter) => {
             try {
-                // Fetch Phones
-                const phonesRes = await fetch(`${apiBaseUrl}/api/v1/products/phoneComingsoon`);
-                const phonesData = await phonesRes.json();
-                if (phonesData && phonesData.data) {
-                    setPhones(mapProducts(phonesData.data));
-                }
-
-                // Fetch Tablets
-                const tabletsRes = await fetch(`${apiBaseUrl}/api/v1/products/tabletComingsoon`);
-                const tabletsData = await tabletsRes.json();
-                if (tabletsData && tabletsData.data) {
-                    setTablets(mapProducts(tabletsData.data));
-                }
-
-                // Fetch Smartwatches
-                const watchesRes = await fetch(`${apiBaseUrl}/api/v1/products/watchesComingsoon`);
-                const watchesData = await watchesRes.json();
-                if (watchesData && watchesData.data) {
-                    setWatches(mapProducts(watchesData.data));
-                }
-
-            } catch (error) {
-                console.error("Error fetching Coming Soon data:", error);
-            } finally {
-                setLoading(false);
+                const res = await fetch(url);
+                const data = await res.json();
+                if (data?.data) setter(mapProducts(data.data));
+            } catch (e) {
+                console.error(`Error fetching ${url}:`, e);
             }
         };
 
-        fetchData();
-    }, []);
-
-    useEffect(() => {
-        fetch(`${apiBaseUrl}/api/v1/banner`)
-            .then(res => res.json())
-            .then(data => {
+        const fetchBanners = async () => {
+            try {
+                const res = await fetch(`${apiBaseUrl}/api/v1/banner`);
+                const data = await res.json();
                 const allBanners = Array.isArray(data.data) ? data.data : [];
-                const map = {};
+                const bannerMap = {};
                 ['comingsoon_banner_1', 'comingsoon_banner_2', 'comingsoon_banner_3'].forEach(loc => {
                     const b = allBanners.find(b => b.location === loc);
-                    if (b?.image) map[loc] = b.image;
+                    if (b?.image) bannerMap[loc] = b.image;
                 });
-                setPageBanners(map);
-            })
-            .catch(() => { });
+                setPageBanners(bannerMap);
+            } catch (e) {
+                console.error("Error fetching banners:", e);
+            }
+        };
+
+        const fetchData = async () => {
+            setLoading(true);
+            await Promise.all([
+                fetchItems(`${apiBaseUrl}/api/v1/products/phoneComingsoon`, setPhones),
+                fetchItems(`${apiBaseUrl}/api/v1/products/tabletComingsoon`, setTablets),
+                fetchItems(`${apiBaseUrl}/api/v1/products/watchesComingsoon`, setWatches),
+                fetchBanners()
+            ]);
+            setLoading(false);
+        };
+
+        fetchData();
     }, []);
 
     // Helper to map API data to component expectation
