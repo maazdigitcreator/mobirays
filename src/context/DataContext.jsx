@@ -55,7 +55,7 @@ export const DataProvider = ({ children }) => {
                 fetch(`${apiBaseUrl}/api/v1/products/allProducts`),
                 fetch(`${apiBaseUrl}/api/v1/posts`),
                 fetch(`${apiBaseUrl}/api/v1/reviews/allReviews`),
-                fetch(`${apiBaseUrl}/api/v1/brand/allBrands`),
+                fetch(`${apiBaseUrl}/api/v1/brands/allBrands`),
                 fetch(`${apiBaseUrl}/api/v1/banner?per_page=100`)
             ]);
 

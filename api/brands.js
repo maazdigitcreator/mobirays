@@ -12,7 +12,7 @@ export default async function handler(req, res) {
 
     try {
         // Fetch from the actual API
-        const response = await fetch('https://mobirays.voucherndeals.com/api/v1/brand/allBrands');
+        const response = await fetch('https://mobirays.voucherndeals.com/api/v1/brands/allBrands');
         const data = await response.json();
 
         // Return the data

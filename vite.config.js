@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/api/v1/brand/allBrands': {
+      '/api/v1/brands/allBrands': {
         target: 'https://mobirays.voucherndeals.com',
         changeOrigin: true,
         secure: false,
