@@ -17,6 +17,7 @@ import SidebarStats from '../components/SidebarSections/SidebarStats';
 import SidebarBanner2 from '../components/SidebarSections/SidebarBanner2';
 import SidebarLatestModels from '../components/SidebarSections/SidebarLatestModels';
 import SidebarBrands from '../components/SidebarSections/SidebarBrands';
+import BannerAd from '../components/BannerAd';
 
 const SingleNewsDetail = () => {
     const location = useLocation();
@@ -29,7 +30,7 @@ const SingleNewsDetail = () => {
             const map = {};
             ['subnews_banner_1', 'subnews_banner_2', 'subnews_banner_3'].forEach(loc => {
                 const b = allBanners.find(b => b.location === loc);
-                if (b?.image) map[loc] = b.image;
+                if (b) map[loc] = b;
             });
             setPageBanners(map);
         }
@@ -144,7 +145,7 @@ const SingleNewsDetail = () => {
                             </div> */}
                             {pageBanners['subnews_banner_1'] && (
                                 <div className="md:col-span-3 mb-6 overflow-hidden">
-                                    <img className='mt-7 w-auto sm:w-full h-[200px] sm:h-auto' src={pageBanners['subnews_banner_1']} alt="News Detail Banner 1" />
+                                    <BannerAd banner={pageBanners['subnews_banner_1']} className="mt-7 w-auto sm:w-full h-[200px] sm:h-auto" />
                                 </div>
                             )}
 
@@ -284,7 +285,7 @@ const SingleNewsDetail = () => {
 
                             {pageBanners['subnews_banner_2'] && (
                                 <div className="md:col-span-3 mb-6 overflow-hidden">
-                                    <img className='mt-7 w-auto sm:w-full h-[200px] sm:h-auto' src={pageBanners['subnews_banner_2']} alt="News Detail Banner 2" />
+                                    <BannerAd banner={pageBanners['subnews_banner_2']} className="mt-7 w-auto sm:w-full h-[200px] sm:h-auto" />
                                 </div>
                             )}
 
@@ -301,7 +302,7 @@ const SingleNewsDetail = () => {
             </div>
             {pageBanners['subnews_banner_3'] && (
                 <div className="md:col-span-3 mb-6 overflow-hidden">
-                    <img className='mt-7 w-auto sm:w-full h-[200px] sm:h-auto' src={pageBanners['subnews_banner_3']} alt="News Detail Banner 3" />
+                    <BannerAd banner={pageBanners['subnews_banner_3']} className="mt-7 w-auto sm:w-full h-[200px] sm:h-auto" />
                 </div>
             )}
             <div>

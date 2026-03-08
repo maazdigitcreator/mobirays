@@ -18,6 +18,7 @@ import SidebarBanner2 from '../components/SidebarSections/SidebarBanner2';
 import SidebarBanner3 from '../components/SidebarSections/SidebarBanner3';
 import watchImg from '../assets/watchImg.png';
 import HeroBanner from '../components/Layout/HeroBanner';
+import BannerAd from '../components/BannerAd';
 
 const Home = () => {
     const { allBanners } = useData();
@@ -28,7 +29,7 @@ const Home = () => {
             const map = {};
             ['home_banner_1', 'home_banner_2', 'home_banner_3'].forEach(loc => {
                 const b = allBanners.find(b => b.location === loc);
-                if (b?.image) map[loc] = b.image;
+                if (b) map[loc] = b;
             });
             setHomeBanners(map);
         }
@@ -67,13 +68,13 @@ const Home = () => {
                             <ProductsSectionButton showMoreLink="/phones" comingSoonLink="/coming-soon" />
                         </div>
 
-                        {homeBanners['home_banner_1'] && <img className='mt-7 h-[200px] w-auto sm:w-full hidden sm:block' src={homeBanners['home_banner_1']} alt="Home Banner 1" />}
+                        {homeBanners['home_banner_1'] && <div className='mt-7 hidden sm:block'><BannerAd banner={homeBanners['home_banner_1']} className='h-[200px] sm:w-full' /></div>}
                         <div className='mt-10'>
                             <LatestProducts title="Latest Tabs" itemImage={tabImg} category="Tablets" />
                             <ProductsSectionButton showMoreLink="/tablets" comingSoonLink="/coming-soon" />
                         </div>
 
-                        {homeBanners['home_banner_2'] && <img className='mt-7 h-[200px] w-auto sm:w-full hidden sm:block' src={homeBanners['home_banner_2']} alt="Home Banner 2" />}
+                        {homeBanners['home_banner_2'] && <div className='mt-7 hidden sm:block'><BannerAd banner={homeBanners['home_banner_2']} className='h-[200px] sm:w-full' /></div>}
                         <div className='mt-10'>
                             <LatestProducts title="Latest Smartwatches" itemImage={watchImg} category="Smartwatches" />
                             <ProductsSectionButton showMoreLink="/smartwatches" comingSoonLink="/coming-soon" />
@@ -81,7 +82,7 @@ const Home = () => {
 
                     </div>
                 </div>
-                {homeBanners['home_banner_3'] && <img className='mt-7 h-[200px] w-auto sm:w-full h-[200px] sm:h-auto' src={homeBanners['home_banner_3']} alt="Home Banner 3" />}
+                {homeBanners['home_banner_3'] && <div className='mt-7'><BannerAd banner={homeBanners['home_banner_3']} className='h-[200px] sm:h-auto sm:w-full' /></div>}
                 <div className='mt-10'>
                     <LatestNews title="Latest News" gridCols="sm:grid-cols-3" limit={6} />
                 </div>

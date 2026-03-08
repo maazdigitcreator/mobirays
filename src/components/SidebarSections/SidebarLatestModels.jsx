@@ -3,7 +3,7 @@ import React from 'react';
 const SidebarLatestModels = () => {
     return (
         <div>
-            <div className="bg-[#0580A5] text-white px-4 py-2 flex justify-between items-center text-lg">
+            <div className="bg-[#0580A5] text-white px-4 py-2 mb-2 flex justify-between items-center text-lg">
                 <span>Latest Mobile Phone Models</span>
             </div>
             <div className="text-sm">

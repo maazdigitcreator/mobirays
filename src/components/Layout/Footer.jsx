@@ -7,7 +7,7 @@ const Footer = () => {
         <footer className="bg-[#FFF] pt-8 pb-6">
             {/* Disclaimer Section */}
             <div className="text-center px-4 mb-6">
-                <p className="text-gray-700 text-sm max-w-4xl mx-auto leading-relaxed">
+                <p className="text-gray-700 text-[24px] max-w-[90%] mx-auto leading-relaxed">
                     Disclaimer. Mobile Prices are updated daily from local Pakistani Mobile shops & Mobile dealers in Pakistan but we
                     can not guarantee that the information (Prices) on this page is 100% correct (Human error is possible). Always visit
                     your local shop for exact mobile prices. *Above mobile prices and rates are only valid in Pakistan
@@ -85,12 +85,12 @@ const Footer = () => {
             {/* Copyright */}
             <div className="text-center mb-4 px-4">
                 <p className="text-gray-600 text-xs">
-                    Copyright © 2026 www.mobirays.com.pk. All Rights Reserved.
+                    Copyright © 2026 www.mobirays.com. All Rights Reserved.
                 </p>
             </div>
 
             {/* App Store Badges */}
-            <div className="flex justify-center gap-3 px-4">
+            {/* <div className="flex justify-center gap-3 px-4">
                 <a href="#" className="block">
                     <img
                         src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
@@ -105,7 +105,7 @@ const Footer = () => {
                         className="h-10"
                     />
                 </a>
-            </div>
+            </div> */}
         </footer>
     );
 };

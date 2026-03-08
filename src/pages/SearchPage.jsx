@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import LatestProducts from '../components/LatestProducts';
 import ProductsSectionButton from '../components/ProductsSectionButton';
@@ -9,6 +9,7 @@ import HeroBanner from '../components/Layout/HeroBanner';
 import mobileImg from '../assets/mobileImg.jpg';
 import tabImg from '../assets/tabImg.jpg';
 import watchImg from '../assets/watchImg.png';
+import BannerAd from '../components/BannerAd';
 
 // Sidebar Components
 import SidebarIntro from '../components/SidebarSections/SidebarIntro';
@@ -25,6 +26,7 @@ const SearchPage = () => {
     const location = useLocation();
     const { allProducts, allNews, allReviews, loading } = useData();
     const [searchQuery, setSearchQuery] = useState('');
+    const resultsRef = useRef(null);
 
     // Filtered data states
     const [phones, setPhones] = useState([]);
@@ -45,7 +47,7 @@ const SearchPage = () => {
                 const map = {};
                 ['searchpage_banner_1', 'searchpage_banner_2', 'searchpage_banner_3'].forEach(loc => {
                     const b = allBanners.find(b => b.location === loc);
-                    if (b?.image) map[loc] = b.image;
+                    if (b) map[loc] = b;
                 });
                 setPageBanners(map);
             } catch (error) {
@@ -113,6 +115,13 @@ const SearchPage = () => {
         setReviews(filteredReviews);
     };
 
+    // Auto-scroll to results when searching
+    useEffect(() => {
+        if (!loading && searchQuery && resultsRef.current) {
+            resultsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, [loading, searchQuery]);
+
     if (loading) {
         return <div className="text-center py-20">Searching for "{searchQuery}"...</div>;
     }
@@ -141,7 +150,7 @@ const SearchPage = () => {
                     <div className="w-full lg:w-3/4">
                         <HeroBanner />
 
-                        <div className="mb-4">
+                        <div className="mb-4" ref={resultsRef}>
                             <h1 className="text-2xl font-bold px-4">Search Results for "{searchQuery}"</h1>
                         </div>
 
@@ -155,7 +164,7 @@ const SearchPage = () => {
                             </div>
                         )}
 
-                        {phones.length > 0 && pageBanners['searchpage_banner_1'] && <img className='mt-7 h-[200px] w-auto sm:w-full hidden sm:block' src={pageBanners['searchpage_banner_1']} alt="" />}
+                        {phones.length > 0 && pageBanners['searchpage_banner_1'] && <div className='mt-7 hidden sm:block'><BannerAd banner={pageBanners['searchpage_banner_1']} className='h-[200px] sm:w-full' /></div>}
 
                         {/* Tabs Section */}
                         {tablets.length > 0 && (
@@ -167,7 +176,7 @@ const SearchPage = () => {
                             </div>
                         )}
 
-                        {tablets.length > 0 && pageBanners['searchpage_banner_2'] && <img className='mt-7 h-[200px] w-auto sm:w-full hidden sm:block' src={pageBanners['searchpage_banner_2']} alt="" />}
+                        {tablets.length > 0 && pageBanners['searchpage_banner_2'] && <div className='mt-7 hidden sm:block'><BannerAd banner={pageBanners['searchpage_banner_2']} className='h-[200px] sm:w-full' /></div>}
 
                         {/* Smartwatches Section */}
                         {watches.length > 0 && (
@@ -184,7 +193,7 @@ const SearchPage = () => {
                             <div className="p-4 text-gray-500">No products found matching "{searchQuery}".</div>
                         )}
 
-                        {pageBanners['searchpage_banner_3'] && <img className='mt-7 h-[200px] w-auto sm:w-full sm:h-auto' src={pageBanners['searchpage_banner_3']} alt="" />}
+                        {pageBanners['searchpage_banner_3'] && <div className='mt-7'><BannerAd banner={pageBanners['searchpage_banner_3']} className='h-[200px] sm:h-auto sm:w-full' /></div>}
 
                         {/* News Section */}
                         <div className='mt-10'>

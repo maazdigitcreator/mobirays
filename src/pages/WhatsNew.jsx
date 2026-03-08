@@ -5,6 +5,8 @@ import Pagination from '../components/Pagination';
 import LatestNews from '../components/LatestNews';
 import LatestReviews from '../components/LatestReviews';
 import HeroBanner from '../components/Layout/HeroBanner';
+import BannerAd from '../components/BannerAd';
+import { useData } from '../context/DataContext';
 import mobileImg from '../assets/mobileImg.jpg';
 import tabImg from '../assets/tabImg.jpg';
 import watchImg from '../assets/watchImg.png';
@@ -118,7 +120,7 @@ const WhatsNew = () => {
                             />}
                         </div>
 
-                        {pageBanners['whatsnew_banner_1'] && <img className='mt-7 h-[200px] w-auto sm:w-full hidden sm:block' src={pageBanners['whatsnew_banner_1']} alt="WhatsNew Banner 1" />}
+                        {pageBanners['whatsnew_banner_1'] && <div className='mt-7 hidden sm:block'><BannerAd banner={pageBanners['whatsnew_banner_1']} className='h-[200px] sm:w-full' /></div>}
 
                         {/* Tablets Section */}
                         <div className='mt-10'>
@@ -130,7 +132,7 @@ const WhatsNew = () => {
                             />}
                         </div>
 
-                        {pageBanners['whatsnew_banner_2'] && <img className='mt-7 h-[200px] w-auto sm:w-full hidden sm:block' src={pageBanners['whatsnew_banner_2']} alt="WhatsNew Banner 2" />}
+                        {pageBanners['whatsnew_banner_2'] && <div className='mt-7 hidden sm:block'><BannerAd banner={pageBanners['whatsnew_banner_2']} className='h-[200px] sm:w-full' /></div>}
 
                         {/* Smartwatches Section */}
                         <div className='mt-10'>
@@ -144,7 +146,7 @@ const WhatsNew = () => {
 
                     </div>
                 </div>
-                {pageBanners['whatsnew_banner_3'] && <img className='mt-7 h-[200px] w-auto sm:w-full h-[200px] sm:h-auto' src={pageBanners['whatsnew_banner_3']} alt="WhatsNew Banner 3" />}
+                {pageBanners['whatsnew_banner_3'] && <div className='mt-7'><BannerAd banner={pageBanners['whatsnew_banner_3']} className='h-[200px] sm:h-auto sm:w-full' /></div>}
                 <div className='mt-10'>
                     <LatestNews title="Latest News" gridCols="sm:grid-cols-3" limit={6} />
                 </div>

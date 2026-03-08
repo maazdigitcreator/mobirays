@@ -51,23 +51,74 @@ export const DataProvider = ({ children }) => {
 
         try {
             // Fetch all data in parallel
-            const [productsRes, newsRes, reviewsRes, brandsRes, bannersRes] = await Promise.all([
+            const [
+                productsRes, newsRes, reviewsRes, brandsRes, bannersRes,
+                phoneComingsoonRes, tabletComingsoonRes, watchesComingsoonRes,
+                phoneWhatsNewRes, tabletWhatsNewRes, watchesWhatsNewRes
+            ] = await Promise.all([
                 fetch(`${apiBaseUrl}/api/v1/products/allProducts`),
                 fetch(`${apiBaseUrl}/api/v1/posts`),
                 fetch(`${apiBaseUrl}/api/v1/reviews/allReviews`),
                 fetch(`${apiBaseUrl}/api/v1/brands/allBrands`),
-                fetch(`${apiBaseUrl}/api/v1/banner?per_page=100`)
+                fetch(`${apiBaseUrl}/api/v1/banner?per_page=100`),
+                fetch(`${apiBaseUrl}/api/v1/products/phoneComingsoon`),
+                fetch(`${apiBaseUrl}/api/v1/products/tabletComingsoon`),
+                fetch(`${apiBaseUrl}/api/v1/products/watchesComingsoon`),
+                fetch(`${apiBaseUrl}/api/v1/products/phoneWhatsNew`),
+                fetch(`${apiBaseUrl}/api/v1/products/tabletWhatsNew`),
+                fetch(`${apiBaseUrl}/api/v1/products/watchesWhatsNew`)
             ]);
 
-            const [productsData, newsData, reviewsData, brandsData, bannersData] = await Promise.all([
-                productsRes.json(),
-                newsRes.json(),
-                reviewsRes.json(),
-                brandsRes.json(),
-                bannersRes.json()
+            const [
+                productsData, newsData, reviewsData, brandsData, bannersData,
+                phoneComingsoonData, tabletComingsoonData, watchesComingsoonData,
+                phoneWhatsNewData, tabletWhatsNewData, watchesWhatsNewData
+            ] = await Promise.all([
+                productsRes.json(), newsRes.json(), reviewsRes.json(), brandsRes.json(), bannersRes.json(),
+                phoneComingsoonRes.json(), tabletComingsoonRes.json(), watchesComingsoonRes.json(),
+                phoneWhatsNewRes.json(), tabletWhatsNewRes.json(), watchesWhatsNewRes.json()
             ]);
 
-            const products = productsData?.data || [];
+            // Extract IDs for Coming Soon and New products
+            const comingSoonIds = new Set([
+                ...(phoneComingsoonData?.data?.map(p => p.id) || []),
+                ...(tabletComingsoonData?.data?.map(p => p.id) || []),
+                ...(watchesComingsoonData?.data?.map(p => p.id) || [])
+            ]);
+
+            const whatsNewIds = new Set([
+                ...(phoneWhatsNewData?.data?.map(p => p.id) || []),
+                ...(tabletWhatsNewData?.data?.map(p => p.id) || []),
+                ...(watchesWhatsNewData?.data?.map(p => p.id) || [])
+            ]);
+
+            const rawProducts = productsData?.data || [];
+
+            // Enrich products with flag data
+            const products = rawProducts.map(product => {
+                const prodType = product.product_type || '';
+
+                // If product_type is "General", explicitly disable bubbles
+                if (prodType === 'General') {
+                    return { ...product, is_coming_soon: false, is_new: false };
+                }
+
+                // Determine flags based on endpoint IDs, existing flags, OR product_type string
+                const isComingSoon = comingSoonIds.has(product.id) ||
+                    product.is_coming_soon === 1 ||
+                    prodType === 'Coming Soon';
+
+                const isNew = whatsNewIds.has(product.id) ||
+                    product.is_new === 1 ||
+                    prodType === "What's New";
+
+                return {
+                    ...product,
+                    is_coming_soon: isComingSoon,
+                    is_new: isNew
+                };
+            });
+
             const news = newsData?.data || [];
             const reviews = reviewsData?.data || [];
             const brands = brandsData?.data || [];

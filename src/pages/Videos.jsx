@@ -5,6 +5,8 @@ import HeroBanner from '../components/Layout/HeroBanner'
 import { Search } from 'lucide-react'
 import shareIcon from "../assets/shareIcon.png"
 import Sidebar from '../components/Layout/Sidebar'
+import BannerAd from '../components/BannerAd'
+import { useData } from '../context/DataContext'
 import Banner1 from '../assets/homeBannerSM1.png'
 import Banner2 from '../assets/homeBannerSM2.png'
 import homeBanner3 from '../assets/homeBanner3.png'
@@ -245,7 +247,7 @@ const Videos = () => {
                         <div className="mt-8">
                             {pageBanners['videos_banner_1'] && (
                                 <div className='mb-8'>
-                                    <img className='w-full h-auto' src={pageBanners['videos_banner_1']} alt="Banner" />
+                                    <BannerAd banner={pageBanners['videos_banner_1']} />
                                 </div>
                             )}
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -261,7 +263,7 @@ const Videos = () => {
                         <div className="mt-8 mb-10">
                             {pageBanners['videos_banner_2'] && (
                                 <div className='mb-8'>
-                                    <img className='w-full h-auto' src={pageBanners['videos_banner_2']} alt="Banner" />
+                                    <BannerAd banner={pageBanners['videos_banner_2']} />
                                 </div>
                             )}
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

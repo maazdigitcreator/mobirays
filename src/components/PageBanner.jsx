@@ -1,6 +1,6 @@
-import React from 'react';
+import BannerAd from './BannerAd';
 
-const PageBanner = ({ heading, bannerImage }) => {
+const PageBanner = ({ heading, banner }) => {
     return (
         <div className="w-full mb-2">
             {/* Heading Section */}
@@ -21,16 +21,10 @@ const PageBanner = ({ heading, bannerImage }) => {
                 </div>
             </div>
 
-            {/* Banner Image */}
-            {bannerImage && (
-                <div className="w-full">
-                    <img
-                        src={bannerImage}
-                        alt={heading}
-                        className="w-full h-[65vh] object-cover object-center"
-                    />
-                </div>
-            )}
+            {/* Banner Ad */}
+            <div className="w-full">
+                <BannerAd banner={banner} className="h-[65vh]" />
+            </div>
         </div>
     );
 };

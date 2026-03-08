@@ -104,7 +104,7 @@ const MobileSpecs = () => {
                     <MobileSpecsDetail productData={productData} />
 
                     {/* Specifications Table */}
-                    <div className="mt-4">
+                    <div className="mt-4 ">
                         <SpecificationsTable productData={productData} />
                     </div>
 

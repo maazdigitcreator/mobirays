@@ -24,7 +24,7 @@ const Layout = ({ children }) => {
             <Navbar />
             {bannerImg && (
                 <div className="w-full bg-white flex justify-center px-2 py-1 sm:p-0">
-                    <img src={bannerImg} alt="Main Banner" className="w-full h-auto" />
+                    <img src={bannerImg} alt="Main Banner" className="w-full h-50 sm:h-auto" />
                 </div>
             )}
             <main className="flex-grow bg-white">

@@ -19,6 +19,8 @@ import SidebarStats from '../components/SidebarSections/SidebarStats';
 import SidebarLatestModels from '../components/SidebarSections/SidebarLatestModels';
 import SidebarBanner1 from '../components/SidebarSections/SidebarBanner1';
 import SidebarBanner2 from '../components/SidebarSections/SidebarBanner2';
+import SidebarBanner3 from '../components/SidebarSections/SidebarBanner3';
+import BannerAd from '../components/BannerAd';
 import { filterProductsByCategory } from '../utils/filterHelpers';
 import { useData } from '../context/DataContext';
 
@@ -56,7 +58,7 @@ const Tablets = () => {
             const map = {};
             ['tablets_banner_1', 'tablets_banner_2'].forEach(loc => {
                 const b = allBanners.find(b => b.location === loc);
-                if (b?.image) map[loc] = b.image;
+                if (b) map[loc] = b;
             });
             setPageBanners(map);
         }
@@ -76,7 +78,7 @@ const Tablets = () => {
                             <SidebarStats />
                             <SidebarBanner2 />
                             <SidebarLatestModels />
-                            <SidebarBanner2 />
+                            <SidebarBanner3 />
                         </div>
                     </div>
                 </div>
@@ -97,7 +99,7 @@ const Tablets = () => {
                             />
                         )}
                     </div>
-                    {pageBanners['tablets_banner_1'] && <img className='mt-7 h-[200px] w-auto sm:w-full' src={pageBanners['tablets_banner_1']} alt="Tablets Banner 1" />}
+                    {pageBanners['tablets_banner_1'] && <div className='mt-7'><BannerAd banner={pageBanners['tablets_banner_1']} className='h-[200px] sm:w-full' /></div>}
                     <div className='mt-10'>
                         <LatestNews
                             title="News"
@@ -129,7 +131,7 @@ const Tablets = () => {
 
 
             <div className="md:col-span-3 mb-6 overflow-hidden">
-                {pageBanners['tablets_banner_2'] && <img className='mt-7 w-auto sm:w-full h-[200px] sm:h-auto' src={pageBanners['tablets_banner_2']} alt="Tablets Banner 2" />}
+                {pageBanners['tablets_banner_2'] && <BannerAd banner={pageBanners['tablets_banner_2']} className="mt-7 h-[200px] sm:h-auto sm:w-full" />}
             </div>
 
             <ComingSoonMobiles title="Coming Soon Tablets" itemImage={tabImg} />

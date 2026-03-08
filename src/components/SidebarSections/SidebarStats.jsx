@@ -5,7 +5,7 @@ const SidebarStats = () => {
         <div className="flex flex-col gap-6">
             {/* Devices | Visitors */}
             <div>
-                <div className="bg-[#0580A5] text-white px-4 py-2 flex justify-between items-center text-lg">
+                <div className="bg-[#0580A5] text-white px-4 py-2 mb-2 flex justify-between items-center text-lg">
                     <span>Devices</span>
                     <div className="h-4 w-[1px] bg-white/50 mx-2"></div>
                     <span>Visitors</span>
@@ -25,7 +25,7 @@ const SidebarStats = () => {
 
             {/* Devices | Likes */}
             <div>
-                <div className="bg-[#0580A5] text-white px-4 py-2 flex justify-between items-center text-lg">
+                <div className="bg-[#0580A5] text-white px-4 py-2 mb-2 flex justify-between items-center text-lg">
                     <span>Devices</span>
                     <div className="h-4 w-[1px] bg-white/50 mx-2"></div>
                     <span>Likes</span>

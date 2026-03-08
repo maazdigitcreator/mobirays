@@ -1,22 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useData } from '../../context/DataContext';
+import BannerAd from '../BannerAd';
 
 const SidebarBanner1 = () => {
     const { allBanners } = useData();
-    const [imgSrc, setImgSrc] = useState(null);
+    const [banner, setBanner] = useState(null);
 
     useEffect(() => {
         if (allBanners.length > 0) {
-            const b = allBanners.find(b => b.location === 'sidebar_banner_1');
-            if (b?.image) setImgSrc(b.image);
+            const b = allBanners.find(b => b.location === 'sidebar_banner_3');
+            if (b) setBanner(b);
         }
     }, [allBanners]);
 
-    if (!imgSrc) return null;
+    if (!banner) return null;
 
     return (
         <div>
-            <img className='w-full' src={imgSrc} alt="Sidebar Banner" />
+            <BannerAd banner={banner} />
         </div>
     );
 };

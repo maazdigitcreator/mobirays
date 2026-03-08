@@ -24,7 +24,7 @@ const SidebarBrands = () => {
                             <Link
                                 key={brand.id || idx}
                                 to={`/brand/${brandSlug}`}
-                                className="bg-white hover:bg-[#0580A533] transition-colors duration-300 ease-in-out aspect-square flex items-center justify-center p-1 hover:shadow-inner cursor-pointer border border-[#0580A5]"
+                                className="bg-white hover:bg-[#0580A533] transition-colors duration-300 ease-in-out aspect-square flex items-center justify-center p-1 hover:shadow-inner cursor-pointer border border-[#0580A5] border-2"
                             >
                                 {brand.image ? (
                                     <img

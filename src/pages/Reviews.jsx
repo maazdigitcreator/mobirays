@@ -23,6 +23,7 @@ import { useData } from '../context/DataContext';
 import SidebarBrands from '../components/SidebarSections/SidebarBrands';
 import shareIcon from '../assets/shareIcon.png'
 import compareIcon from '../assets/compareIcon.png'
+import BannerAd from '../components/BannerAd'
 
 const Reviews = () => {
     const location = useLocation();
@@ -72,11 +73,48 @@ const Reviews = () => {
             const map = {};
             ['reviews_banner_1', 'reviews_banner_2', 'reviews_banner_3', 'reviews_banner_4'].forEach(loc => {
                 const b = allBanners.find(b => b.location === loc);
-                if (b?.image) map[loc] = b.image;
+                if (b) map[loc] = b;
             });
             setPageBanners(map);
         }
     }, [allBanners]);
+
+    const formatUrl = (url) => {
+        if (!url) return '';
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+            return url;
+        }
+        return `https://${url}`;
+    };
+
+    const Banner1Content = () => {
+        const b = pageBanners['reviews_banner_1'];
+        if (!b) return null;
+
+        const content = (
+            <div
+                className="w-full sm:h-[55vh] relative bg-cover bg-top bg-gray-100"
+                style={{ backgroundImage: `url(${b.image})` }}
+            >
+                <div className="absolute bg-white/60 bottom-0 left-0 right-0 flex flex-col sm:flex-row items-center justify-between gap-4 p-4 sm:px-6 sm:py-5">
+                    <div className="flex w-full gap-5 items-center justify-end">
+                        <Link to="/comparison" className="">
+                            <img src={compareIcon} alt="Compare" className="w-8 h-8 sm:w-10 sm:h-10 invert cursor-pointer" />
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        );
+
+        if (b.url) {
+            return (
+                <a href={formatUrl(b.url)} target="_blank" rel="noopener noreferrer" className="block w-full cursor-pointer hover:opacity-90 transition-opacity">
+                    {content}
+                </a>
+            );
+        }
+        return content;
+    };
 
     return (
         <div>
@@ -126,22 +164,7 @@ const Reviews = () => {
                         </div>
 
                         {/* Hero Section with Background Image */}
-                        <div
-                            className="w-full sm:h-[55vh] relative bg-cover bg-top bg-gray-100"
-                            style={pageBanners['reviews_banner_1'] ? { backgroundImage: `url(${pageBanners['reviews_banner_1']})` } : {}}
-                        >
-                            {/* Bottom Section - Search Bar and Icons */}
-                            <div className="absolute bg-white/60 bottom-0 left-0 right-0 flex flex-col sm:flex-row items-center justify-between gap-4 p-4 sm:px-6 sm:py-5">
-
-                                {/* Icons Row - Right Side */}
-                                <div className="flex w-full gap-5 items-center justify-end">
-                                    <Link to="/comparison" className="">
-                                        <img src={compareIcon} alt="Compare" className="w-8 h-8 sm:w-10 sm:h-10 invert cursor-pointer" />
-                                    </Link>
-
-                                </div>
-                            </div>
-                        </div>
+                        <Banner1Content />
                     </div>
 
                     {loading ? (
@@ -172,7 +195,7 @@ const Reviews = () => {
 
                             {/* Banner 1 */}
                             {pageBanners['reviews_banner_2'] && (
-                                <img className='mb-4 w-full h-auto' src={pageBanners['reviews_banner_2']} alt="Banner" />
+                                <BannerAd banner={pageBanners['reviews_banner_2']} className="mb-4" />
                             )}
 
                             {/* Next 3 Reviews */}
@@ -195,7 +218,7 @@ const Reviews = () => {
 
                             {/* Banner 2 */}
                             {displayedReviews.length > 6 && pageBanners['reviews_banner_3'] && (
-                                <img className='mb-4 w-full h-auto' src={pageBanners['reviews_banner_3']} alt="Banner" />
+                                <BannerAd banner={pageBanners['reviews_banner_3']} className="mb-4" />
                             )}
 
                             {/* Last 3 Reviews (or more if page size > 9, but likely 9 or 10) */}
@@ -232,7 +255,7 @@ const Reviews = () => {
             {/* Full Width Banner */}
             {pageBanners['reviews_banner_4'] && (
                 <div className="w-full mb-6 overflow-hidden">
-                    <img className='mt-7 w-full h-auto' src={pageBanners['reviews_banner_4']} alt="Full Width Banner" />
+                    <BannerAd banner={pageBanners['reviews_banner_4']} className="mt-7" />
                 </div>
             )}
 

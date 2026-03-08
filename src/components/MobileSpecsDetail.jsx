@@ -57,10 +57,10 @@ const MobileSpecsDetail = ({ productData }) => {
             dimensions: specs?.body || specs?.dimensions || "208g, 8.1mm thickness",
         },
         prices: [
-            { country: "US", flag: usFlag, amount: prices?.usd ? `$${prices.usd}` : "$999" },
-            { country: "EU", flag: europeFlag, amount: prices?.eu ? `€${prices.eu}` : "€949" },
-            { country: "IN", flag: indiaFlag, amount: prices?.inr ? `₹${prices.inr}` : "₹77,999" },
-            { country: "PK", flag: pakistanFlag, amount: prices?.pkr ? `PKR ${prices.pkr}` : "PKR 179,999" },
+            { country: "US", flag: usFlag, amount: (prices?.usd !== null && prices?.usd !== undefined) ? `$${prices.usd}` : null },
+            { country: "EU", flag: europeFlag, amount: (prices?.eu !== null && prices?.eu !== undefined) ? `€${prices.eu}` : null },
+            { country: "IN", flag: indiaFlag, amount: (prices?.inr !== null && prices?.inr !== undefined) ? `₹${prices.inr}` : null },
+            { country: "PK", flag: pakistanFlag, amount: (prices?.pkr !== null && prices?.pkr !== undefined) ? `PKR ${prices.pkr}` : null },
         ]
     };
 
@@ -119,12 +119,12 @@ const MobileSpecsDetail = ({ productData }) => {
             <div
                 className="w-full overflow-hidden pt-3 pb-7"
                 style={{
-                    background: `linear-gradient(90deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.7) 40%, ${backgroundColor} 100%)`
+                    background: `linear-gradient(90deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.7) 5%, ${backgroundColor} 100%)`
                 }}
             >
                 <div className="flex flex-col justify-between items-center md:flex-row gap-6 mx-2">
                     {/* Left Side - Device Image */}
-                    <div className="grid grid-cols-1">
+                    <div className="grid grid-cols-1 relative">
 
                         <img width={400}
                             src={device.image}

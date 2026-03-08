@@ -142,7 +142,7 @@ const SpecificationsTable = ({ productData }) => {
                                     </div>
 
                                     {/* Value Cell - White background */}
-                                    <div className="flex border border-2 border-[#0580A5] px-3 py-0 flex items-center mt-3 h-[100%] w-[75%] left-44.5">
+                                    <div className="flex border border-2 border-[#0580A5] px-3 py-0 flex items-center mt-3 h-[100%] w-[100%] left-44.5">
                                         <span className="text-black text-xs sm:text-base font-medium">{spec.value}</span>
                                     </div>
                                 </div>

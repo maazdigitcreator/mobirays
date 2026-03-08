@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import Logo from "../../assets/Logo.png";
+import WhatsNewImg from "../../assets/whatsnew.png";
 import SearchModal from "./SearchModal";
 import MobileSidebar from "./MobileSidebar";
 import MobileMenu from "./MobileMenu";
@@ -104,20 +105,20 @@ const Header = () => {
 
                         <div>
                             <Link to="/whats-new">
-                                <h2
-                                    className="text-base font-semibold italic hover:cursor-pointer"
+                                <div
+                                    className="hover:cursor-pointer"
                                     style={{
-                                        animation: 'colorToggle 2s steps(1, end) infinite',
+                                        animation: 'blinkToggle 2s steps(1, end) infinite',
                                     }}
                                 >
                                     <style>{`
-        @keyframes colorToggle {
-            0%, 49.99% { color: #FF0008; }
-            50%, 100% { color: #FFF; }
-        }
-    `}</style>
-                                    Whats New?
-                                </h2>
+                                        @keyframes blinkToggle {
+                                            0%, 49.99% { opacity: 1; }
+                                            50%, 100% { opacity: 0; }
+                                        }
+                                    `}</style>
+                                    <img src={WhatsNewImg} alt="Whats New?" className="h-14 w-auto" />
+                                </div>
                             </Link>
                         </div>
 
@@ -181,7 +182,7 @@ const Header = () => {
                 </div>
 
                 <div className="px-4 py-3 sm:bg-white search-container bg-[#0891b2]">
-                    <div className="flex gap-7 items-center justify-between">
+                    <div className="flex gap-4 items-center justify-between">
                         {/* Search Input - Same as Desktop */}
                         <div className="relative flex-1">
                             <div className="flex items-center border bg-white border-[#0891b2] overflow-hidden">

@@ -26,7 +26,7 @@ const SingleReview = ({ title, rating, image, customHeight }) => {
                     {/* Rating Badge */}
                     <div
                         className="absolute top-0 right-0 text-white font-bold p-2 text-lg"
-                        style={{ backgroundColor: color }}
+                        style={{ backgroundColor: `${color}a6` }}
                     >
                         {finalRating.toFixed(1)}
                     </div>

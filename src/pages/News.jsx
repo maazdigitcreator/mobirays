@@ -17,6 +17,7 @@ import SidebarBanner2 from '../components/SidebarSections/SidebarBanner2'
 import SidebarStats from '../components/SidebarSections/SidebarStats'
 import SidebarLatestModels from '../components/SidebarSections/SidebarLatestModels'
 import { useData } from '../context/DataContext';
+import BannerAd from '../components/BannerAd'
 
 const News = () => {
     const location = useLocation();
@@ -30,7 +31,7 @@ const News = () => {
             const map = {};
             ['news_banner_1', 'news_banner_2', 'news_banner_3'].forEach(loc => {
                 const b = allBanners.find(b => b.location === loc);
-                if (b?.image) map[loc] = b.image;
+                if (b) map[loc] = b;
             });
             setPageBanners(map);
         }
@@ -202,7 +203,7 @@ const News = () => {
                     {/* First Banner */}
                     {pageBanners['news_banner_1'] && (
                         <div className="md:col-span-3 mb-6 overflow-hidden">
-                            <img className='mt-7 w-auto sm:w-full h-[200px] sm:h-auto' src={pageBanners['news_banner_1']} alt="News Banner 1" />
+                            <BannerAd banner={pageBanners['news_banner_1']} className="mt-7 w-auto sm:w-full h-[200px] sm:h-auto" />
                         </div>
                     )}
 
@@ -227,7 +228,7 @@ const News = () => {
                     {/* Second Banner */}
                     {pageBanners['news_banner_2'] && (
                         <div className="md:col-span-3 mb-6 overflow-hidden">
-                            <img className='mt-7 w-auto sm:w-full h-[200px] sm:h-auto' src={pageBanners['news_banner_2']} alt="News Banner 2" />
+                            <BannerAd banner={pageBanners['news_banner_2']} className="mt-7 w-auto sm:w-full h-[200px] sm:h-auto" />
                         </div>
                     )}
 
@@ -263,7 +264,7 @@ const News = () => {
                     )}
                     {pageBanners['news_banner_3'] && (
                         <div className="md:col-span-3 mb-6 overflow-hidden">
-                            <img className='mt-7 w-auto sm:w-full h-[200px] sm:h-auto' src={pageBanners['news_banner_3']} alt="News Banner 3" />
+                            <BannerAd banner={pageBanners['news_banner_3']} className="mt-7 w-auto sm:w-full h-[200px] sm:h-auto" />
                         </div>
                     )}
                 </div>

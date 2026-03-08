@@ -121,10 +121,12 @@ const SidebarFilters = () => {
                     }}
                 >
                     <button
-                        className={`w-full flex hover:cursor-pointer items-center justify-between px-4 py-3 text-white transition-colors bg-[#0580A5] border-b border-[#0891b2]/30 hover:bg-[#0891b2]`}
+                        className={`w-full flex hover:cursor-pointer items-center justify-between text-white transition-colors bg-[#0580A5] border-b border-[#0891b2]/30 hover:bg-[#0891b2]`}
                     >
-                        <div className="flex items-center gap-3 ">
-                            {filter.icon}
+                        <div className="flex items-center gap-3">
+                            <span className='bg-[#03708F] p-3'>
+                                {filter.icon}
+                            </span>
                             <span className="font-medium text-lg">{filter.label}</span>
                             {(() => {
                                 const groupCount = ['Phones', 'Tabs', 'Watches'].reduce((sum, title) => {
@@ -137,10 +139,10 @@ const SidebarFilters = () => {
                                 ) : null;
                             })()}
                         </div>
-                        <ChevronDown
+                        {/* <ChevronDown
                             size={20}
                             className={`transform transition-transform duration-500 ${openSections[filter.id] ? 'rotate-180' : 'rotate-0'}`}
-                        />
+                        /> */}
                     </button>
 
                     {/* Expanded Content with Smooth Animation */}

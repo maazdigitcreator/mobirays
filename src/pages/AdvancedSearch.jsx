@@ -27,29 +27,44 @@ const SectionHeader = ({ title }) => (
 
 /* ────────────── Dual Range Slider Styles (injected once) ────────────── */
 const sliderCSS = `
-.dual-range-wrap { position: relative; height: 24px; display: flex; align-items: center; }
+.dual-range-wrap { position: relative; height: 24px; display: flex; align-items: center; width: 100%; }
 .dual-range-wrap input[type=range] {
   -webkit-appearance: none; appearance: none;
   position: absolute; width: 100%; height: 4px;
   background: transparent; pointer-events: none; margin: 0; top: 50%; transform: translateY(-50%);
+  z-index: 10;
 }
-.dual-range-wrap .range-min { z-index: 3; }
-.dual-range-wrap .range-max { z-index: 4; }
-.dual-range-wrap .range-min.on-top { z-index: 5; }
-.dual-range-wrap input[type=range]::-webkit-slider-runnable-track { height: 4px; background: #0580A5; border-radius: 4px; }
+.dual-range-wrap .range-min { z-index: 11; }
+.dual-range-wrap .range-max { z-index: 12; }
+.dual-range-wrap .range-min.on-top { z-index: 13; }
+
+/* Hide default track background since we use a custom one */
+.dual-range-wrap input[type=range]::-webkit-slider-runnable-track { height: 4px; background: transparent; }
+.dual-range-wrap input[type=range]::-moz-range-track { height: 4px; background: transparent; }
+
 .dual-range-wrap input[type=range]::-webkit-slider-thumb {
   -webkit-appearance: none; appearance: none;
   width: 16px; height: 16px; border-radius: 50%;
   background: #0580A5; border: 3px solid #b0dde9;
   box-shadow: 0 1px 3px rgba(0,0,0,.2);
-  cursor: pointer; pointer-events: auto; margin-top: -6px;
+  cursor: pointer; pointer-events: auto;
+  margin-top: -6px; /* (Track height 4px / 2) - (Thumb height 16px / 2) = -6px */
 }
-.dual-range-wrap input[type=range]::-moz-range-track { height: 4px; background: #0580A5; border-radius: 4px; }
 .dual-range-wrap input[type=range]::-moz-range-thumb {
   width: 16px; height: 16px; border-radius: 50%;
   background: #0580A5; border: 3px solid #b0dde9;
   box-shadow: 0 1px 3px rgba(0,0,0,.2);
   cursor: pointer; pointer-events: auto;
+  border: none; /* Firefox specific fix */
+}
+
+.slider-track {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 100%; height: 4px; background: #e0e0e0; border-radius: 4px; z-index: 1;
+}
+.slider-highlight {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  height: 4px; background: #034D63; border-radius: 4px; z-index: 2;
 }
 `;
 
@@ -125,6 +140,14 @@ const SliderRow = ({ label, minValue, maxValue, onMinChange, onMaxChange, min = 
                     className="w-[50px] text-[11px] text-center py-[5px] outline-none text-black font-normal"
                 />
                 <div className="flex-1 dual-range-wrap">
+                    <div className="slider-track"></div>
+                    <div
+                        className="slider-highlight"
+                        style={{
+                            left: `${((clampedMin - min) / (max - min)) * 100}%`,
+                            width: `${((clampedMax - clampedMin) / (max - min)) * 100}%`
+                        }}
+                    ></div>
                     <input
                         type="range"
                         className={`range-min${clampedMin >= mid ? ' on-top' : ''}`}
@@ -174,6 +197,14 @@ const LabelSliderRow = ({ label, minValue, maxValue, onMinChange, onMaxChange, p
             </span>
             <span className="text-[11px] text-gray-500 px-1 whitespace-nowrap">{prefix}{minValue || '0'}</span>
             <div className="flex-1 dual-range-wrap">
+                <div className="slider-track"></div>
+                <div
+                    className="slider-highlight"
+                    style={{
+                        left: `${((clampedMin - min) / (max - min)) * 100}%`,
+                        width: `${((clampedMax - clampedMin) / (max - min)) * 100}%`
+                    }}
+                ></div>
                 <input
                     type="range"
                     className={`range-min${clampedMin >= mid ? ' on-top' : ''}`}
@@ -660,7 +691,7 @@ const AdvancedSearch = () => {
                     {searchResults !== null && (
                         <div className="mb-8">
                             <LatestProducts
-                                title={`Search Results (${searchResults.length} found)`}
+                                title={`Search Results(${searchResults.length} found)`}
                                 products={searchResults}
                             />
                             {searchResults.length === 0 && (
