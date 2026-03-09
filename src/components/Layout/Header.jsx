@@ -7,13 +7,16 @@ import {
     Youtube,
     Rss,
     LogIn,
+    LogOut,
     UserPlus,
+    User,
     Menu,
     MoreVertical,
     MoreHorizontal,
     X,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/useAuth";
 import Logo from "../../assets/Logo.png";
 import WhatsNewImg from "../../assets/whatsnew.png";
 import SearchModal from "./SearchModal";
@@ -26,6 +29,12 @@ const Header = () => {
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const navigate = useNavigate();
+    const { user, logout } = useAuth();
+
+    const handleLogout = async () => {
+        await logout();
+        navigate('/');
+    };
 
     const handleSearch = () => {
         if (searchQuery.trim()) {
@@ -139,14 +148,30 @@ const Header = () => {
                             <a href="#" className="p-2 bg-[#fff] border-2 border-[#0580A5] text-[#0580A5]">
                                 <Rss size={25} />
                             </a>
-                            <div className="ml-2 flex gap-3 p-2 bg-[#fff] border-2 border-[#0580A5]">
-                                <a href="#" className="p-0 bg-[#fff] text-[#0580A5]">
-                                    <LogIn size={25} />
-                                </a>
-                                <Link to="/signup" className="p-0 bg-[#fff] text-[#0580A5]">
-                                    <UserPlus size={25} />
-                                </Link>
-                            </div>
+                            {user ? (
+                                <div className="ml-2 flex items-center gap-3 p-2 bg-[#fff] border-2 border-[#0580A5]">
+                                    <User size={22} className="text-[#0580A5]" />
+                                    <span className="text-[#0580A5] text-sm font-medium max-w-[100px] truncate">
+                                        {user.name || user.email}
+                                    </span>
+                                    <button
+                                        onClick={handleLogout}
+                                        className="text-[#0580A5] hover:text-red-500 transition-colors cursor-pointer"
+                                        title="Logout"
+                                    >
+                                        <LogOut size={22} />
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="ml-2 flex gap-3 p-2 bg-[#fff] border-2 border-[#0580A5]">
+                                    <Link to="/login" className="p-0 bg-[#fff] text-[#0580A5]">
+                                        <LogIn size={25} />
+                                    </Link>
+                                    <Link to="/signup" className="p-0 bg-[#fff] text-[#0580A5]">
+                                        <UserPlus size={25} />
+                                    </Link>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -171,14 +196,30 @@ const Header = () => {
                     </Link>
 
                     {/* Login/Account Icons */}
-                    <div className="flex items-center gap-2 border-2 border-[#0580A5]">
-                        <a href="#" className="p-1 text-[#0580A5] rounded">
-                            <LogIn size={25} />
-                        </a>
-                        <Link to="/signup" className="p-1 text-[#0580A5] rounded">
-                            <UserPlus size={25} />
-                        </Link>
-                    </div>
+                    {user ? (
+                        <div className="flex items-center gap-2 border-2 border-[#0580A5] px-2 py-1">
+                            <User size={22} className="text-[#0580A5]" />
+                            <span className="text-[#0580A5] text-xs font-medium max-w-[70px] truncate">
+                                {user.name || user.email}
+                            </span>
+                            <button
+                                onClick={handleLogout}
+                                className="text-[#0580A5] hover:text-red-500 transition-colors cursor-pointer"
+                                title="Logout"
+                            >
+                                <LogOut size={22} />
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-2 border-2 border-[#0580A5]">
+                            <Link to="/login" className="p-1 text-[#0580A5] rounded">
+                                <LogIn size={25} />
+                            </Link>
+                            <Link to="/signup" className="p-1 text-[#0580A5] rounded">
+                                <UserPlus size={25} />
+                            </Link>
+                        </div>
+                    )}
                 </div>
 
                 <div className="px-4 py-3 sm:bg-white search-container bg-[#0891b2]">

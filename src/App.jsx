@@ -29,9 +29,11 @@ import Comparison from './pages/Comparison';
 import SearchPage from './pages/SearchPage';
 import AdvancedSearch from './pages/AdvancedSearch';
 import { DataProvider } from './context/DataContext';
+import { AuthProvider } from './context/AuthContext';
 
 function App() {
   return (
+    <AuthProvider>
     <DataProvider>
       <BrowserRouter>
         <Layout>
@@ -67,6 +69,7 @@ function App() {
         </Layout>
       </BrowserRouter>
     </DataProvider>
+    </AuthProvider>
   );
 }
 

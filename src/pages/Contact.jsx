@@ -3,9 +3,61 @@ import PageBanner from '../components/PageBanner'
 import SidebarBrands from '../components/SidebarSections/SidebarBrands'
 import SidebarFilters from '../components/SidebarSections/SidebarFilters'
 import SidebarBanner1 from '../components/SidebarSections/SidebarBanner1'
+import { contactService } from '../services/contactService'
 
 const Contact = () => {
     const [pageBanners, setPageBanners] = useState({});
+    const [form, setForm] = useState({
+        name: '',
+        email: '',
+        phone: '',
+        content: '',
+    });
+    const [status, setStatus] = useState({
+        loading: false,
+        error: '',
+        success: '',
+    });
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setForm(prev => ({ ...prev, [name]: value }));
+    };
+
+    const getErrorMessage = (error) => {
+        const apiError = error?.data || error;
+        if (apiError?.errors) {
+            const firstError = Object.values(apiError.errors).flat()[0];
+            if (firstError) return firstError;
+        }
+        return apiError?.message || 'Failed to submit contact form. Please try again.';
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setStatus({ loading: true, error: '', success: '' });
+
+        try {
+            await contactService.store(form);
+            setStatus({
+                loading: false,
+                error: '',
+                success: 'Thanks for contacting us. We received your message.',
+            });
+            setForm({
+                name: '',
+                email: '',
+                phone: '',
+                content: '',
+            });
+        } catch (error) {
+            setStatus({
+                loading: false,
+                error: getErrorMessage(error),
+                success: '',
+            });
+        }
+    };
 
     useEffect(() => {
         const fetchBanners = async () => {
@@ -80,7 +132,19 @@ const Contact = () => {
                             <div className="w-full bg-[#F0F0F0] p-8">
                                 <h2 className="text-[32px] font-bold text-black mb-6">Contact Form</h2>
 
-                                <form className="space-y-6">
+                                {status.error && (
+                                    <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 text-sm">
+                                        {status.error}
+                                    </div>
+                                )}
+
+                                {status.success && (
+                                    <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 text-sm">
+                                        {status.success}
+                                    </div>
+                                )}
+
+                                <form className="space-y-6" onSubmit={handleSubmit}>
                                     {/* Name Field */}
                                     <div>
                                         <label className="block text-black mb-2 text-[24px]">
@@ -88,6 +152,10 @@ const Contact = () => {
                                         </label>
                                         <input
                                             type="text"
+                                            name="name"
+                                            value={form.name}
+                                            onChange={handleChange}
+                                            required
                                             className="w-full px-4 py-3 border-1 border-[#0580A5] bg-white focus:outline-none focus:border-[#0580A5]"
                                             placeholder=""
                                         />
@@ -100,6 +168,10 @@ const Contact = () => {
                                         </label>
                                         <input
                                             type="email"
+                                            name="email"
+                                            value={form.email}
+                                            onChange={handleChange}
+                                            required
                                             className="w-full px-4 py-3 border-1 border-[#0580A5] bg-white focus:outline-none focus:border-[#0580A5]"
                                             placeholder=""
                                         />
@@ -112,6 +184,10 @@ const Contact = () => {
                                         </label>
                                         <input
                                             type="tel"
+                                            name="phone"
+                                            value={form.phone}
+                                            onChange={handleChange}
+                                            required
                                             className="w-full px-4 py-3 border-1 border-[#0580A5] bg-white focus:outline-none focus:border-[#0580A5]"
                                             placeholder=""
                                         />
@@ -124,6 +200,10 @@ const Contact = () => {
                                         </label>
                                         <textarea
                                             rows="6"
+                                            name="content"
+                                            value={form.content}
+                                            onChange={handleChange}
+                                            required
                                             className="w-full px-4 py-3 border-1 border-[#0580A5] bg-white focus:outline-none focus:border-[#0580A5] resize-none"
                                             placeholder=""
                                         ></textarea>
@@ -133,9 +213,10 @@ const Contact = () => {
                                     <div className="flex justify-end">
                                         <button
                                             type="submit"
-                                            className="bg-[#0580A5] text-white px-12 py-3 text-lg font-semibold hover:bg-[#046a8a] cursor-pointer transition-colors"
+                                            disabled={status.loading}
+                                            className="bg-[#0580A5] text-white px-12 py-3 text-lg font-semibold hover:bg-[#046a8a] cursor-pointer transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                                         >
-                                            Submit
+                                            {status.loading ? 'Submitting...' : 'Submit'}
                                         </button>
                                     </div>
                                 </form>

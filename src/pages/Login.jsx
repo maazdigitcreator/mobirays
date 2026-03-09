@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
 import Sidebar3 from '../components/Layout/Sidebar3'
 import AllBrandsHero from '../components/AllBrandsHero'
 import BrandsGrid from '../components/BrandsGrid'
@@ -11,9 +12,35 @@ import SidebarIntro from '../components/SidebarSections/SidebarIntro'
 import SidebarBrands from '../components/SidebarSections/SidebarBrands'
 import SidebarFilters from '../components/SidebarSections/SidebarFilters'
 import SidebarStats from '../components/SidebarSections/SidebarStats'
+import { useAuth } from '../context/useAuth'
 
 const Login = () => {
     const [pageBanners, setPageBanners] = useState({});
+    const [form, setForm] = useState({ email: '', password: '' });
+    const [status, setStatus] = useState({ error: '', loading: false });
+
+    const { login, user } = useAuth();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (user) navigate('/dashboard');
+    }, [user, navigate]);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setForm(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setStatus({ error: '', loading: true });
+        try {
+            await login(form.email, form.password);
+            navigate('/dashboard');
+        } catch (err) {
+            setStatus({ error: err?.message || 'Invalid email or password. Please try again.', loading: false });
+        }
+    };
 
     useEffect(() => {
         const fetchBanners = async () => {
@@ -67,7 +94,13 @@ const Login = () => {
                             <div className="w-full bg-[#F0F0F0] p-8">
                                 <h2 className="text-[32px] font-bold text-black mb-6">Login</h2>
 
-                                <form className="space-y-6">
+                                {status.error && (
+                                    <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 text-sm">
+                                        {status.error}
+                                    </div>
+                                )}
+
+                                <form className="space-y-6" onSubmit={handleSubmit}>
                                     {/* Email Field */}
                                     <div>
                                         <label className="block text-black text-[24px] mb-2">
@@ -75,6 +108,10 @@ const Login = () => {
                                         </label>
                                         <input
                                             type="email"
+                                            name="email"
+                                            value={form.email}
+                                            onChange={handleChange}
+                                            required
                                             className="w-full px-4 py-3 border-1 border-[#0580A5] bg-white focus:outline-none focus:border-[#0580A5]"
                                             placeholder=""
                                         />
@@ -87,6 +124,10 @@ const Login = () => {
                                         </label>
                                         <input
                                             type="password"
+                                            name="password"
+                                            value={form.password}
+                                            onChange={handleChange}
+                                            required
                                             className="w-full px-4 py-3 border-1 border-[#0580A5] bg-white focus:outline-none focus:border-[#0580A5]"
                                             placeholder=""
                                         />
@@ -96,12 +137,23 @@ const Login = () => {
                                     <div className="flex justify-end">
                                         <button
                                             type="submit"
-                                            className="bg-[#0580A5] text-white px-12 py-3 text-lg font-semibold hover:bg-[#046a8a] cursor-pointer transition-colors"
+                                            disabled={status.loading}
+                                            className="bg-[#0580A5] text-white px-12 py-3 text-lg font-semibold hover:bg-[#046a8a] cursor-pointer transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                                         >
-                                            Login
+                                            {status.loading ? 'Logging in...' : 'Login'}
                                         </button>
                                     </div>
                                 </form>
+
+                                <p className="mt-6 text-base text-black">
+                                    No account yet? No worries.{" "}
+                                    <Link
+                                        to="/signup"
+                                        className="font-semibold text-[#0580A5] hover:text-[#046a8a] underline underline-offset-2"
+                                    >
+                                        Go to Sign Up
+                                    </Link>
+                                </p>
                             </div>
                         </div>
 
