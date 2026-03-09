@@ -23,7 +23,7 @@ const Login = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (user) navigate('/dashboard');
+        if (user) navigate('/wishlist');
     }, [user, navigate]);
 
     const handleChange = (e) => {
@@ -36,7 +36,7 @@ const Login = () => {
         setStatus({ error: '', loading: true });
         try {
             await login(form.email, form.password);
-            navigate('/dashboard');
+            navigate('/wishlist');
         } catch (err) {
             setStatus({ error: err?.message || 'Invalid email or password. Please try again.', loading: false });
         }
