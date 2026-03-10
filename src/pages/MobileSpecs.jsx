@@ -13,6 +13,8 @@ import LatestReviews from '../components/LatestReviews'
 import HeroBanner from '../components/Layout/HeroBanner'
 import homeBannerSM2 from '../assets/homeBannerSM2.png'
 import mobileImg from '../assets/mobileImg.jpg'
+import tabImg from '../assets/tabImg.jpg'
+import watchImg from '../assets/watchImg.png'
 import MobileSpecsDetail from '../components/MobileSpecsDetail'
 import SpecificationsTable from '../components/SpecificationsTable'
 import cartIcon from '../assets/cartIcon.png'
@@ -76,6 +78,32 @@ const MobileSpecs = () => {
             (r.subtitle && r.subtitle.toLowerCase().includes(pName))
         );
     }, [allReviews, productData]);
+
+    const comingSoonConfig = React.useMemo(() => {
+        const category = productData?.product_category?.toLowerCase();
+
+        if (category && category.includes('watch')) {
+            return {
+                itemImage: watchImg,
+                title: 'Coming Soon Smartwatches',
+                endpoint: '/api/v1/products/watchesComingsoon',
+            };
+        }
+
+        if (category.includes('tab') || category.includes('pad')) {
+            return {
+                itemImage: tabImg,
+                title: 'Coming Soon Tablets',
+                endpoint: '/api/v1/products/tabletComingsoon',
+            };
+        }
+
+        return {
+            itemImage: mobileImg,
+            title: 'Coming Soon Mobiles',
+            endpoint: '/api/v1/products/phoneComingsoon',
+        };
+    }, [productData?.product_category]);
 
     return (
         <div>
@@ -484,7 +512,7 @@ const MobileSpecs = () => {
 
             {pageBanners['mobilespecifications_banner_3'] && <img className='mt-7 w-auto sm:w-full h-[200px] sm:h-auto' src={pageBanners['mobilespecifications_banner_3']} alt="Mobile Specs Banner 3" />}
 
-            <ComingSoonMobiles title="Coming Soon Mobiles" itemImage={mobileImg} />
+            <ComingSoonMobiles title={comingSoonConfig.title} itemImage={comingSoonConfig.itemImage} endpoint={comingSoonConfig.endpoint} />
 
         </div>
     )
