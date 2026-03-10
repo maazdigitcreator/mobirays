@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { productService } from '../services/productService';
 
 const DataContext = createContext();
 
@@ -10,7 +11,7 @@ export const useData = () => {
     return context;
 };
 
-const CACHE_KEY = 'mobirays_api_cache_v1';
+const CACHE_KEY = 'mobirays_api_cache_v2';
 
 export const DataProvider = ({ children }) => {
     const [allProducts, setAllProducts] = useState([]);
@@ -52,11 +53,11 @@ export const DataProvider = ({ children }) => {
         try {
             // Fetch all data in parallel
             const [
-                productsRes, newsRes, reviewsRes, brandsRes, bannersRes,
+                rawProducts, newsRes, reviewsRes, brandsRes, bannersRes,
                 phoneComingsoonRes, tabletComingsoonRes, watchesComingsoonRes,
                 phoneWhatsNewRes, tabletWhatsNewRes, watchesWhatsNewRes
             ] = await Promise.all([
-                fetch(`${apiBaseUrl}/api/v1/products/allProducts`),
+                productService.getAllProducts(100),
                 fetch(`${apiBaseUrl}/api/v1/posts`),
                 fetch(`${apiBaseUrl}/api/v1/reviews/allReviews`),
                 fetch(`${apiBaseUrl}/api/v1/brands/allBrands`),
@@ -70,11 +71,11 @@ export const DataProvider = ({ children }) => {
             ]);
 
             const [
-                productsData, newsData, reviewsData, brandsData, bannersData,
+                newsData, reviewsData, brandsData, bannersData,
                 phoneComingsoonData, tabletComingsoonData, watchesComingsoonData,
                 phoneWhatsNewData, tabletWhatsNewData, watchesWhatsNewData
             ] = await Promise.all([
-                productsRes.json(), newsRes.json(), reviewsRes.json(), brandsRes.json(), bannersRes.json(),
+                newsRes.json(), reviewsRes.json(), brandsRes.json(), bannersRes.json(),
                 phoneComingsoonRes.json(), tabletComingsoonRes.json(), watchesComingsoonRes.json(),
                 phoneWhatsNewRes.json(), tabletWhatsNewRes.json(), watchesWhatsNewRes.json()
             ]);
@@ -91,8 +92,6 @@ export const DataProvider = ({ children }) => {
                 ...(tabletWhatsNewData?.data?.map(p => p.id) || []),
                 ...(watchesWhatsNewData?.data?.map(p => p.id) || [])
             ]);
-
-            const rawProducts = productsData?.data || [];
 
             // Enrich products with flag data
             const products = rawProducts.map(product => {

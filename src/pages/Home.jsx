@@ -64,19 +64,19 @@ const Home = () => {
 
 
                         <div>
-                            <LatestProducts title="Latest Phones" itemImage={mobileImg} category="Mobile Phones" />
+                            <LatestProducts title="Latest Phones" itemImage={mobileImg} category="Mobile Phones" limit={24} />
                             <ProductsSectionButton showMoreLink="/phones" comingSoonLink="/coming-soon" />
                         </div>
 
                         {homeBanners['home_banner_1'] && <div className='mt-7 hidden sm:block'><BannerAd banner={homeBanners['home_banner_1']} className='h-[200px] sm:w-full' /></div>}
                         <div className='mt-10'>
-                            <LatestProducts title="Latest Tabs" itemImage={tabImg} category="Tablets" />
+                            <LatestProducts title="Latest Tabs" itemImage={tabImg} category="Tablets" limit={24} />
                             <ProductsSectionButton showMoreLink="/tablets" comingSoonLink="/coming-soon" />
                         </div>
 
                         {homeBanners['home_banner_2'] && <div className='mt-7 hidden sm:block'><BannerAd banner={homeBanners['home_banner_2']} className='h-[200px] sm:w-full' /></div>}
                         <div className='mt-10'>
-                            <LatestProducts title="Latest Smartwatches" itemImage={watchImg} category="Smartwatches" />
+                            <LatestProducts title="Latest Smartwatches" itemImage={watchImg} category="Smartwatches" limit={24} />
                             <ProductsSectionButton showMoreLink="/smartwatches" comingSoonLink="/coming-soon" />
                         </div>
 

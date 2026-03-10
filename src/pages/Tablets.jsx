@@ -2,15 +2,10 @@ import React, { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
 import LatestProducts from '../components/LatestProducts'
-import Pagination from '../components/Pagination'
 import ComingSoonMobiles from '../components/ComingSoonMobiles'
-import ProductsSectionButton from '../components/ProductsSectionButton'
-import homeBanner3 from '../assets/homeBanner3.png'
-import sidebarBanner2 from '../assets/sidebarBanner2.jpg';
 import LatestNews from '../components/LatestNews'
 import LatestReviews from '../components/LatestReviews'
 import HeroBanner from '../components/Layout/HeroBanner'
-import homeBannerSM2 from '../assets/homeBannerSM2.png'
 import tabImg from '../assets/tabImg.jpg'
 import SidebarIntro from '../components/SidebarSections/SidebarIntro';
 import SidebarBrands from '../components/SidebarSections/SidebarBrands';
@@ -26,9 +21,7 @@ import { useData } from '../context/DataContext';
 
 const Tablets = () => {
     const location = useLocation();
-    const { allProducts: cachedProducts, allBanners, loading } = useData();
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 48; // 8 rows * 6 columns
+    const { allProducts: cachedProducts, allBanners } = useData();
 
     // Filter for Tablets from cached data
     const allProducts = React.useMemo(() => {
@@ -42,14 +35,6 @@ const Tablets = () => {
     const displayedProducts = searchQuery
         ? allProducts.filter(p => p.name.toLowerCase().includes(searchQuery))
         : allProducts;
-
-    const totalPages = Math.ceil(displayedProducts.length / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const currentProducts = displayedProducts.slice(startIndex, startIndex + itemsPerPage);
-
-    const handlePageChange = (page) => {
-        setCurrentPage(page);
-    };
 
     const [pageBanners, setPageBanners] = useState({});
 
@@ -90,14 +75,13 @@ const Tablets = () => {
 
 
                     <div>
-                        <LatestProducts title={searchQuery ? `Search Results for "${searchQuery}"` : "Latest Tabs"} products={currentProducts} itemImage={tabImg} />
-                        {displayedProducts.length > itemsPerPage && (
-                            <Pagination
-                                currentPage={currentPage}
-                                totalPages={totalPages}
-                                onPageChange={handlePageChange}
-                            />
-                        )}
+                        <LatestProducts
+                            title={searchQuery ? `Search Results for "${searchQuery}"` : "Latest Tabs"}
+                            products={displayedProducts}
+                            itemImage={tabImg}
+                            enablePagination
+                            itemsPerPage={48}
+                        />
                     </div>
                     {pageBanners['tablets_banner_1'] && <div className='mt-7'><BannerAd banner={pageBanners['tablets_banner_1']} className='h-[200px] sm:w-full' /></div>}
                     <div className='mt-10'>

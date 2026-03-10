@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import MobileImg from '../assets/mobileImg.jpg'
 import { createSlug } from '../utils/urlHelper'
 import { useData } from '../context/DataContext';
+import Pagination from './Pagination';
 
-const LatestProducts = ({ title, products, itemImage, limit, useDummyData = false, category }) => {
+const LatestProducts = ({ title, products, itemImage, limit, useDummyData = false, category, enablePagination = false, itemsPerPage = 24}) => {
     console.log('LatestProducts Render:', { title, hasProducts: !!products, productCount: products ? products.length : 0, useDummyData, category });
     const navigate = useNavigate();
     const { allProducts: cachedProducts } = useData();
     const [apiProducts, setApiProducts] = React.useState([]);
+    const [currentPage, setCurrentPage] = React.useState(1);
 
     // Dummy data for tabs and smartwatches (fallback)
     const dummyProducts = [
@@ -64,6 +66,17 @@ const LatestProducts = ({ title, products, itemImage, limit, useDummyData = fals
 
     // Apply limit if specified
     const limitedProducts = limit ? displayProducts.slice(0, limit) : displayProducts;
+    const shouldPaginate = enablePagination && !limit;
+    const totalPages = shouldPaginate
+        ? Math.ceil(limitedProducts.length / itemsPerPage)
+        : 1;
+    const paginatedProducts = shouldPaginate
+        ? limitedProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+        : limitedProducts;
+
+    React.useEffect(() => {
+        setCurrentPage(1);
+    }, [title, category, limitedProducts.length]);
 
     const handleProductClick = (product) => {
         // Get the actual image being displayed (product.image or itemImage or MobileImg)
@@ -112,7 +125,7 @@ const LatestProducts = ({ title, products, itemImage, limit, useDummyData = fals
                     <div className="text-center py-10 text-gray-500">No products found in this category.</div>
                 ) : (
                     <div className="grid grid-cols-3 sm:grid-cols-2 px-2 sm:gap-y-10 gap-y-12 md:grid-cols-4 lg:grid-cols-6 gap-4 mt-10">
-                        {limitedProducts.map((product) => (
+                        {paginatedProducts.map((product) => (
                             <div
                                 key={product.id}
                                 className="flex flex-col group cursor-pointer gap-y-4 sm:gap-y-0"
@@ -158,6 +171,14 @@ const LatestProducts = ({ title, products, itemImage, limit, useDummyData = fals
                             </div>
                         ))}
                     </div>
+                )}
+
+                {shouldPaginate && totalPages > 1 && (
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                    />
                 )}
             </div>
         </div>
