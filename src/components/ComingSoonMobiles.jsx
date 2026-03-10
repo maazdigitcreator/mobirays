@@ -3,8 +3,8 @@ import { Link, useNavigate } from 'react-router-dom' // Added useNavigate
 import MobileImg from '../assets/mobileImg.jpg'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { createSlug } from '../utils/urlHelper' // Import createSlug
-
-const ComingSoonMobiles = ({ title, itemImage }) => {
+const END_POINT = '/api/v1/products/phoneComingsoon';
+const ComingSoonMobiles = ({ title, itemImage, endpoint = END_POINT}) => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [itemsToShow, setItemsToShow] = useState(6);
     const [isDesktop, setIsDesktop] = useState(false);
@@ -15,8 +15,8 @@ const ComingSoonMobiles = ({ title, itemImage }) => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://mobirays.voucherndeals.com';
-                const response = await fetch(`${apiBaseUrl}/api/v1/products/phoneComingsoon`);
+                const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+                const response = await fetch(`${apiBaseUrl}${endpoint}`);
                 const data = await response.json();
                 if (data && data.data) {
                     setProducts(data.data);
@@ -29,7 +29,7 @@ const ComingSoonMobiles = ({ title, itemImage }) => {
         };
 
         fetchProducts();
-    }, []);
+    }, [endpoint]);
 
     useEffect(() => {
         const handleResize = () => {

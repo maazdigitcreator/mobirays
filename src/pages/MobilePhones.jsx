@@ -18,6 +18,7 @@ import SidebarBanner3 from '../components/SidebarSections/SidebarBanner3';
 import BannerAd from '../components/BannerAd';
 import { filterProductsByCategory } from '../utils/filterHelpers';
 import { useData } from '../context/DataContext';
+const END_POINT = '/api/v1/products/phoneComingsoon';
 
 const MobilePhones = () => {
     const location = useLocation();
@@ -118,7 +119,7 @@ const MobilePhones = () => {
                 {pageBanners['phones_banner_2'] && <BannerAd banner={pageBanners['phones_banner_2']} className="mt-7 h-[200px] sm:h-auto sm:w-full" />}
             </div>
 
-            <ComingSoonMobiles title="Coming Soon Mobiles" itemImage={mobileImg} />
+            <ComingSoonMobiles title="Coming Soon Mobiles" itemImage={mobileImg} endpoint={END_POINT} />
 
         </div>
     )

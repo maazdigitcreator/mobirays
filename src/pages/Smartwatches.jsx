@@ -19,6 +19,7 @@ import BannerAd from '../components/BannerAd';
 import { filterProductsByCategory } from '../utils/filterHelpers';
 import { useData } from '../context/DataContext';
 
+const END_POINT = '/api/v1/products/watchesComingsoon';
 const Smartwatches = () => {
     const location = useLocation();
     const { allProducts: cachedProducts, allBanners } = useData();
@@ -113,7 +114,7 @@ const Smartwatches = () => {
                 {pageBanners['smartwatches_banner_2'] && <BannerAd banner={pageBanners['smartwatches_banner_2']} className="mt-7 h-[200px] sm:h-auto sm:w-full" />}
             </div>
 
-            <ComingSoonMobiles title="Coming Soon Smartwatches" itemImage={watchImg} />
+            <ComingSoonMobiles title="Coming Soon Smartwatches" itemImage={watchImg} endpoint={END_POINT} />
 
         </div>
     )
