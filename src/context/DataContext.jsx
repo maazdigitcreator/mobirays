@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { productService } from '../services/productService';
+import { bannerService } from '../services/bannerService';
 
 const DataContext = createContext();
 
@@ -53,7 +54,7 @@ export const DataProvider = ({ children }) => {
         try {
             // Fetch all data in parallel
             const [
-                rawProducts, newsRes, reviewsRes, brandsRes, bannersRes,
+                rawProducts, newsRes, reviewsRes, brandsRes, allBannersData,
                 phoneComingsoonRes, tabletComingsoonRes, watchesComingsoonRes,
                 phoneWhatsNewRes, tabletWhatsNewRes, watchesWhatsNewRes
             ] = await Promise.all([
@@ -61,7 +62,7 @@ export const DataProvider = ({ children }) => {
                 fetch(`${apiBaseUrl}/api/v1/posts`),
                 fetch(`${apiBaseUrl}/api/v1/reviews/allReviews`),
                 fetch(`${apiBaseUrl}/api/v1/brands/allBrands`),
-                fetch(`${apiBaseUrl}/api/v1/banner?per_page=100`),
+                bannerService.getAllBanners(100),
                 fetch(`${apiBaseUrl}/api/v1/products/phoneComingsoon`),
                 fetch(`${apiBaseUrl}/api/v1/products/tabletComingsoon`),
                 fetch(`${apiBaseUrl}/api/v1/products/watchesComingsoon`),
@@ -71,11 +72,11 @@ export const DataProvider = ({ children }) => {
             ]);
 
             const [
-                newsData, reviewsData, brandsData, bannersData,
+                newsData, reviewsData, brandsData,
                 phoneComingsoonData, tabletComingsoonData, watchesComingsoonData,
                 phoneWhatsNewData, tabletWhatsNewData, watchesWhatsNewData
             ] = await Promise.all([
-                newsRes.json(), reviewsRes.json(), brandsRes.json(), bannersRes.json(),
+                newsRes.json(), reviewsRes.json(), brandsRes.json(),
                 phoneComingsoonRes.json(), tabletComingsoonRes.json(), watchesComingsoonRes.json(),
                 phoneWhatsNewRes.json(), tabletWhatsNewRes.json(), watchesWhatsNewRes.json()
             ]);
@@ -121,7 +122,7 @@ export const DataProvider = ({ children }) => {
             const news = newsData?.data || [];
             const reviews = reviewsData?.data || [];
             const brands = brandsData?.data || [];
-            const banners = bannersData?.data || [];
+            const banners = allBannersData || [];
 
             setAllProducts(products);
             setAllNews(news);

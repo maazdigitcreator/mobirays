@@ -1,30 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Header from './Header';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import BannerAd from '../BannerAd';
+import { useData } from '../../context/DataContext';
 
 const Layout = ({ children }) => {
-    const [bannerImg, setBannerImg] = useState(null);
-
-    useEffect(() => {
-        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://mobirays.voucherndeals.com';
-        fetch(`${apiBaseUrl}/api/v1/banner`)
-            .then(res => res.json())
-            .then(data => {
-                const allBanners = Array.isArray(data.data) ? data.data : [];
-                const mainBanner = allBanners.find(b => b.location === 'main_banner_home' && b.image);
-                if (mainBanner) setBannerImg(mainBanner.image);
-            })
-            .catch(() => { });
-    }, []);
+    const { allBanners } = useData();
+    const mainBanner = allBanners.find(b => b.location === 'main_banner_home');
 
     return (
         <div className="flex flex-col min-h-screen font-sans">
             <Header />
             <Navbar />
-            {bannerImg && (
+            {mainBanner && (
                 <div className="w-full bg-white flex justify-center px-2 py-1 sm:p-0">
-                    <img src={bannerImg} alt="Main Banner" className="w-full h-50 sm:h-auto" />
+                    <BannerAd banner={mainBanner} className="w-full h-50 sm:h-auto" />
                 </div>
             )}
             <main className="flex-grow bg-white">

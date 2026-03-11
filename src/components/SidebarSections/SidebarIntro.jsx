@@ -19,13 +19,13 @@ const SidebarIntro = () => {
     return (
         <div className='flex flex-col gap-2 h-auto'>
             {/* Sidebar Banner 1 */}
-            <div className="overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                {banner1 && <BannerAd banner={banner1} />}
+            <div className="overflow-hidden shadow-sm hover:shadow-md transition-shadow lg:h-[236px]">
+                {banner1 && <BannerAd banner={banner1} className="h-full object-cover" />}
             </div>
 
             {/* Sidebar Banner 2 */}
-            <div className="overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                {banner2 && <BannerAd banner={banner2} />}
+            <div className="overflow-hidden shadow-sm hover:shadow-md transition-shadow lg:h-[236px]">
+                {banner2 && <BannerAd banner={banner2} className="h-full object-cover" />}
             </div>
         </div>
     );

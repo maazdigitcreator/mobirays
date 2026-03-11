@@ -7,7 +7,7 @@ import contactBanner from '../assets/contactBanner.png'
 import LatestNews from '../components/LatestNews'
 import ComingSoonMobiles from '../components/ComingSoonMobiles'
 import mobileImg from '../assets/mobileImg.jpg'
-import { useLocation, Link } from 'react-router-dom'
+import { useLocation, Link, useParams } from 'react-router-dom'
 import { Link as LucideLink } from 'lucide-react'
 import SidebarFilters from '../components/SidebarSections/SidebarFilters';
 import SidebarBanner1 from '../components/SidebarSections/SidebarBanner1';
@@ -20,10 +20,21 @@ import SidebarBrands from '../components/SidebarSections/SidebarBrands';
 import BannerAd from '../components/BannerAd';
 
 const SingleNewsDetail = () => {
+    const { newsSlug } = useParams();
     const location = useLocation();
-    const newsData = location.state?.newsData;
-    const { allBanners } = useData();
+    const { allBanners, allNews } = useData();
+    const [newsData, setNewsData] = useState(location.state?.newsData || null);
     const [pageBanners, setPageBanners] = useState({});
+
+    // Sync newsData with URL slug
+    useEffect(() => {
+        if (location.state?.newsData && location.state.newsData.slug === newsSlug) {
+            setNewsData(location.state.newsData);
+        } else if (allNews.length > 0) {
+            const found = allNews.find(n => n.slug === newsSlug);
+            if (found) setNewsData(found);
+        }
+    }, [allNews, newsSlug, location.state]);
 
     useEffect(() => {
         if (allBanners.length > 0) {

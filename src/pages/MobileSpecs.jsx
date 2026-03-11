@@ -39,13 +39,22 @@ const MobileSpecs = () => {
     const [pageBanners, setPageBanners] = useState({});
     const [productData, setProductData] = useState(location.state?.product || null);
 
-    // If product data is missing (e.g. on direct navigation/refresh), find it in allProducts
+    // Handle product data synchronization with URL slug
     useEffect(() => {
-        if (!productData && allProducts.length > 0) {
-            const found = allProducts.find(p => p.slug === productSlug);
-            if (found) setProductData(found);
+        // Case 1: State is provided via navigation (Link state)
+        if (location.state?.product && location.state.product.slug === productSlug) {
+            setProductData(location.state.product);
+            return;
         }
-    }, [allProducts, productSlug, productData]);
+
+        // Case 2: Direct navigation or refresh - find in global data
+        if (allProducts.length > 0) {
+            const found = allProducts.find(p => p.slug === productSlug);
+            if (found) {
+                setProductData(found);
+            }
+        }
+    }, [allProducts, productSlug, location.state]);
 
     useEffect(() => {
         if (allBanners.length > 0) {

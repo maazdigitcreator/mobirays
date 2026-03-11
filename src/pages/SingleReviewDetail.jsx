@@ -14,7 +14,7 @@ import amazonLogo from '../assets/amazon.png'
 import samsungLogo from '../assets/samsung.png'
 import ebayLogo from '../assets/ebay.png'
 import flipkartLogo from '../assets/flipkart.png'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import LatestReviews from '../components/LatestReviews'
 import SidebarFilters from '../components/SidebarSections/SidebarFilters';
 import SidebarBanner1 from '../components/SidebarSections/SidebarBanner1';
@@ -29,8 +29,20 @@ import { useData } from '../context/DataContext';
 
 
 const SingleReviewDetail = () => {
+    const { reviewSlug } = useParams();
     const location = useLocation();
-    const reviewData = location.state?.reviewData;
+    const { allBanners, allReviews } = useData();
+    const [reviewData, setReviewData] = useState(location.state?.reviewData || null);
+
+    // Sync reviewData with URL slug
+    useEffect(() => {
+        if (location.state?.reviewData && location.state.reviewData.slug === reviewSlug) {
+            setReviewData(location.state.reviewData);
+        } else if (allReviews.length > 0) {
+            const found = allReviews.find(r => r.slug === reviewSlug);
+            if (found) setReviewData(found);
+        }
+    }, [allReviews, reviewSlug, location.state]);
 
     // Use API data or fallback
     const title = reviewData?.name || "Review Article: Comprehensive Analysis";
@@ -41,8 +53,6 @@ const SingleReviewDetail = () => {
         month: 'short',
         day: '2-digit'
     }) : "06-Sep-2025";
-
-    const { allBanners } = useData();
     const [pageBanners, setPageBanners] = useState({});
 
     useEffect(() => {
