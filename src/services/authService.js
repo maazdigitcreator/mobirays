@@ -1,16 +1,33 @@
 import {
   addRequestInterceptor,
+  addResponseInterceptor,
   httpClient,
 } from "./httpClient";
 
+const TOKEN_KEY = "MOBIRAYS_TOKEN";
+
 let authTokenProvider = () => null;
+let authUnauthorizedHandler = () => {};
+
+const getAuthToken = () => {
+  const providedToken = authTokenProvider();
+  if (providedToken) {
+    return providedToken;
+  }
+
+  return localStorage.getItem(TOKEN_KEY) || null;
+};
 
 export const setAuthTokenProvider = (provider) => {
   authTokenProvider = provider;
 };
 
+export const setAuthUnauthorizedHandler = (handler) => {
+  authUnauthorizedHandler = handler;
+};
+
 addRequestInterceptor((config) => {
-  const token = authTokenProvider();
+  const token = getAuthToken();
   if (!token) {
     return config;
   }
@@ -25,6 +42,14 @@ addRequestInterceptor((config) => {
       },
     },
   };
+});
+
+addResponseInterceptor((result) => {
+  if (result.response.status === 401 && getAuthToken()) {
+    authUnauthorizedHandler();
+  }
+
+  return result;
 });
 
 export const authService = {

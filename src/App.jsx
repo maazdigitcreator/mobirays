@@ -22,14 +22,12 @@ import Dictionary from './pages/Dictionary';
 import TermsAndConditions from './pages/TermsAndConditions';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import BrandPage from './pages/BrandPage';
-import Wishlist from './pages/Wishlist';
-import LikedProducts from './pages/LikedProducts';
-import ReviewedProducts from './pages/ReviewedProducts';
 import Comparison from './pages/Comparison';
 import SearchPage from './pages/SearchPage';
 import AdvancedSearch from './pages/AdvancedSearch';
 import { DataProvider } from './context/DataContext';
 import { AuthProvider } from './context/AuthContext';
+import privateRoutes from './routes/PrivateRoutes';
 
 function App() {
   return (
@@ -58,9 +56,7 @@ function App() {
             <Route path="/news/:newsSlug" element={<SingleNewsDetail />} />
             <Route path="/review/:reviewSlug" element={<SingleReviewDetail />} />
             <Route path="/brand/:brandSlug" element={<BrandPage />} />
-            <Route path="/wishlist" element={<Wishlist />} />
-            <Route path="/liked-products" element={<LikedProducts />} />
-            <Route path="/reviewed-products" element={<ReviewedProducts />} />
+            {privateRoutes}
             <Route path="/comparison" element={<Comparison />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/advanced-search" element={<AdvancedSearch />} />

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { useLocation, useParams, Link } from 'react-router-dom'
+import { useLocation, useNavigate, useParams, Link } from 'react-router-dom'
 import { useData } from '../context/DataContext'
+import { useAuth } from '../context/useAuth'
 import Sidebar4 from '../components/Layout/Sidebar4'
 import LatestProducts from '../components/LatestProducts'
 import Pagination from '../components/Pagination'
@@ -31,13 +32,26 @@ import SidebarLatestModels from '../components/SidebarSections/SidebarLatestMode
 import SidebarBanner3 from '../components/SidebarSections/SidebarBanner3'
 import RelatedReviews from '../components/SidebarSections/RelatedReviews'
 import RelatedNews from '../components/SidebarSections/RelatedNews'
+import { productReviewService } from '../services/productReviewService'
 
 const MobileSpecs = () => {
     const { productSlug } = useParams();
+    const navigate = useNavigate();
     const location = useLocation();
+    const { user } = useAuth();
     const { allProducts, allNews, allReviews, allBanners, loading: contextLoading } = useData();
     const [pageBanners, setPageBanners] = useState({});
     const [productData, setProductData] = useState(location.state?.product || null);
+    const [reviewForm, setReviewForm] = useState({
+        title: '',
+        rating: 0,
+        content: '',
+    });
+    const [reviewStatus, setReviewStatus] = useState({
+        loading: false,
+        error: '',
+        success: '',
+    });
 
     // Handle product data synchronization with URL slug
     useEffect(() => {
@@ -113,6 +127,103 @@ const MobileSpecs = () => {
             endpoint: '/api/v1/products/phoneComingsoon',
         };
     }, [productData?.product_category]);
+
+    const handleReviewChange = (e) => {
+        const { name, value } = e.target;
+        setReviewForm((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const handleRatingSelect = (rating) => {
+        setReviewForm((prev) => ({
+            ...prev,
+            rating,
+        }));
+    };
+
+    const getReviewErrorMessage = (error) => {
+        const apiError = error?.data || error;
+        if (apiError?.errors) {
+            const firstError = Object.values(apiError.errors).flat()[0];
+            if (firstError) return firstError;
+        }
+        return apiError?.message || 'Failed to submit review. Please try again.';
+    };
+
+    const handleReviewSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!user) {
+            navigate('/login', {
+                state: {
+                    from: location,
+                },
+            });
+            return;
+        }
+
+        if (!productData?.id) {
+            setReviewStatus({
+                loading: false,
+                error: 'Product information is missing. Please refresh and try again.',
+                success: '',
+            });
+            return;
+        }
+
+        if (!reviewForm.rating) {
+            setReviewStatus({
+                loading: false,
+                error: 'Please select a rating before submitting your review.',
+                success: '',
+            });
+            return;
+        }
+
+        setReviewStatus({
+            loading: true,
+            error: '',
+            success: '',
+        });
+
+        try {
+            debugger
+            await productReviewService.store({
+                productId: productData.id,
+                title: reviewForm.title.trim(),
+                rating: reviewForm.rating,
+                content: reviewForm.content.trim(),
+            });
+
+            setReviewStatus({
+                loading: false,
+                error: '',
+                success: 'Your review has been submitted successfully.',
+            });
+            setReviewForm({
+                title: '',
+                rating: 0,
+                content: '',
+            });
+        } catch (error) {
+            if (error?.status === 401) {
+                navigate('/login', {
+                    state: {
+                        from: location,
+                    },
+                });
+                return;
+            }
+
+            setReviewStatus({
+                loading: false,
+                error: getReviewErrorMessage(error),
+                success: '',
+            });
+        }
+    };
 
     return (
         <div>
@@ -436,18 +547,42 @@ const MobileSpecs = () => {
                             })()}
 
                             {/* Add Review Form */}
-                            <div className="border-2 border-[#0580A5] bg-gray-50 p-2 mt-2">
+                            <form className="border-2 border-[#0580A5] bg-gray-50 p-2 mt-2" onSubmit={handleReviewSubmit}>
+                                {reviewStatus.error && (
+                                    <div className="mb-3 border border-red-300 bg-red-100 px-3 py-2 text-sm text-red-700">
+                                        {reviewStatus.error}
+                                    </div>
+                                )}
+
+                                {reviewStatus.success && (
+                                    <div className="mb-3 border border-green-300 bg-green-100 px-3 py-2 text-sm text-green-700">
+                                        {reviewStatus.success}
+                                    </div>
+                                )}
+
                                 {/* Title and Stars Row */}
                                 <div className="flex items-center gap-4 mb-3">
                                     <input
                                         type="text"
+                                        name="title"
+                                        value={reviewForm.title}
+                                        onChange={handleReviewChange}
                                         placeholder="Add Title"
+                                        required
                                         className="border-1 px-3 py-1 focus:outline-none bg-white border-[#0580A5] flex-shrink-0 placeholder-black text-black placeholder:font-semibold placeholder:text-lg"
                                         style={{ width: '300px' }}
                                     />
                                     <div className="flex items-center gap-1">
                                         {[...Array(5)].map((_, i) => (
-                                            <span key={i} className="text-[#0580A5] text-xl cursor-pointer hover:text-yellow-400">☆</span>
+                                            <button
+                                                key={i}
+                                                type="button"
+                                                onClick={() => handleRatingSelect(i + 1)}
+                                                className={`text-xl cursor-pointer ${i < reviewForm.rating ? 'text-yellow-400' : 'text-[#0580A5]'}`}
+                                                aria-label={`Rate ${i + 1} star${i === 0 ? '' : 's'}`}
+                                            >
+                                                {i < reviewForm.rating ? '★' : '☆'}
+                                            </button>
                                         ))}
                                     </div>
                                 </div>
@@ -456,19 +591,27 @@ const MobileSpecs = () => {
                                 <div className="mb-1">
 
                                     <textarea
+                                        name="content"
+                                        value={reviewForm.content}
+                                        onChange={handleReviewChange}
                                         className="w-full border-1  p-3 focus:outline-none border-[#0580A5] bg-white text-black placeholder-black"
                                         rows="3"
                                         placeholder="Content"
+                                        required
                                     ></textarea>
                                 </div>
 
                                 {/* Buttons */}
                                 <div className="flex justify-end gap-3">
-                                    <button className="bg-[#0580A5] text-white px-8 py-2 hover:bg-[#046a8a] transition-colors font-medium cursor-pointer">
-                                        Submit
+                                    <button
+                                        type="submit"
+                                        disabled={reviewStatus.loading}
+                                        className="bg-[#0580A5] text-white px-8 py-2 hover:bg-[#046a8a] transition-colors font-medium cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+                                    >
+                                        {reviewStatus.loading ? 'Submitting...' : 'Submit'}
                                     </button>
                                 </div>
-                            </div>
+                            </form>
 
                             <div className="flex flex-col sm:flex-row gap-4 justify-end items-center mt-2">
                                 <Link to="/reviews" className="flex items-center justify-center border-2 border-[#0580A5] text-black px-6 py-2 rounded-full hover:bg-[#0580A5] hover:text-white transition-colors text-base cursor-pointer">
