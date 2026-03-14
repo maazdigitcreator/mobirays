@@ -5,10 +5,6 @@ const SpecificationsTable = ({ productData }) => {
     // Get more_specifications from API
     const moreSpecs = productData?.more_specifications || [];
 
-    // Debug: Log to see what data we're getting
-    console.log('SpecificationsTable - productData:', productData);
-    console.log('SpecificationsTable - more_specifications:', moreSpecs);
-
     // Group specifications by attribute (Build, Frequency, Processor, etc.)
     const groupedSpecs = moreSpecs.reduce((acc, spec) => {
         const attribute = spec.attribute;

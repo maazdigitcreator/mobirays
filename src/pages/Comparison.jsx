@@ -205,7 +205,6 @@ const Comparison = () => {
     };
 
     const handleSearch = (index) => {
-        console.log(`Searching for: ${searchInputs[index]}`);
         // TODO: Implement search functionality with API if needed (e.g. enter key)
     };
 

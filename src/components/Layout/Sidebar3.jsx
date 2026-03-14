@@ -47,7 +47,6 @@ const Sidebar3 = ({ bottomImage }) => {
     };
 
     const handleApplyFilters = () => {
-        console.log('Applying Filters:', selectedFilters);
         // You can add logic here to filter data
     };
 

@@ -49,8 +49,6 @@ const Videos = () => {
                 const response = await fetch('https://mobirays.voucherndeals.com/api/v1/videos/allVideos?per_page=100')
                 if (!response.ok) throw new Error('Failed to fetch videos')
                 const json = await response.json()
-                console.log('Videos API response:', json)
-                console.log('Videos count:', json.data?.length)
                 setVideos(json.data || [])
             } catch (err) {
                 console.error('Error fetching videos:', err)

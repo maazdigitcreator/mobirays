@@ -10,8 +10,6 @@ const AllBrandsHero = ({ title = "All Brands", backgroundImage }) => {
 
     const handleSearch = (e) => {
         e.preventDefault();
-        console.log('Searching for:', searchQuery);
-        // Add search logic here
     };
 
     return (

@@ -189,7 +189,6 @@ const MobileSpecs = () => {
         });
 
         try {
-            debugger
             await productReviewService.store({
                 productId: productData.id,
                 title: reviewForm.title.trim(),
@@ -249,7 +248,7 @@ const MobileSpecs = () => {
                 {/* Main Content Column */}
                 <div className="w-full lg:w-3/4">
                     {/* Mobile Specs Detail Component */}
-                    <MobileSpecsDetail productData={productData} />
+                    <MobileSpecsDetail key={productData?.id || productSlug} productData={productData} />
 
                     {/* Specifications Table */}
                     <div className="mt-4 ">
@@ -286,13 +285,6 @@ const MobileSpecs = () => {
                             {(() => {
                                 // Use API data from productData.shopBy_links or fallback to empty array
                                 const shopLinks = productData?.shopBy_links || [];
-
-                                // Debug logging
-                                console.log('MobileSpecs - Shop By Links:', shopLinks);
-                                if (shopLinks.length > 0) {
-                                    console.log('MobileSpecs - First shop link:', shopLinks[0]);
-                                    console.log('MobileSpecs - Image URL:', `https://mobirays.voucherndeals.com/storage/${shopLinks[0].image}`);
-                                }
 
                                 // If no API data, show message
                                 if (shopLinks.length === 0) {

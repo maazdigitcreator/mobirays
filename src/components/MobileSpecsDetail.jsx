@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import GalleryModal from './GalleryModal'
 import { FaEye, FaHeart, FaShareAlt } from 'react-icons/fa'
 import displayIcon from "../assets/Icons/displayIcon.png"
@@ -20,10 +20,23 @@ import picturesIcon from "../assets/picturesIcon.png"
 import shareIcon from "../assets/shareIcon.png"
 import viewsIcon from "../assets/viewsIcon.png"
 import likesIcon from "../assets/likeIcon.png"
+import { useProductLike } from '../hooks/useProductLike'
 
 const MobileSpecsDetail = ({ productData }) => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+    const {
+        isLiked,
+        likesCount,
+        likesLoading,
+        likesReady,
+        toggleLike,
+        authRequiredCode,
+    } = useProductLike({
+        productId: productData?.id,
+        initialLikesCount: productData?.likes,
+    });
     // Get background color from API or use default
     const backgroundColor = productData?.background_color || 'rgb(200, 155, 123)';
 
@@ -31,17 +44,12 @@ const MobileSpecsDetail = ({ productData }) => {
     const specs = productData?.specifications || {};
     const prices = productData?.price || {};
 
-    // Debug log
-    console.log('MobileSpecsDetail - productData:', productData);
-    console.log('MobileSpecsDetail - specs:', specs);
-    console.log('MobileSpecsDetail - prices:', prices);
-
     // Use API data or fallback to defaults
     const device = {
         name: productData?.name || "Product Name",
         image: productData?.image || "https://fdn2.gsmarena.com/vv/bigpic/samsung-galaxy-note20-5g.jpg",
         views: productData?.views || "0",
-        likes: productData?.likes || "0",
+        likes: likesCount,
         releaseDate: specs?.released || productData?.released || productData?.release_date || "Coming Soon",
         specs: {
             display: specs?.display_size ? specs.display_size.replace(/\s*Inches?/i, '') : "6.9",
@@ -64,6 +72,19 @@ const MobileSpecsDetail = ({ productData }) => {
         ]
     };
 
+    const handleToggleLike = async () => {
+        try {
+            await toggleLike();
+        } catch (error) {
+            if (error?.code === authRequiredCode) {
+                navigate('/login', {
+                    state: {
+                        from: location,
+                    },
+                });
+            }
+        }
+    };
 
 
 
@@ -99,13 +120,18 @@ const MobileSpecsDetail = ({ productData }) => {
                                 <span className="text-[10px] leading-none  sm:text-xs ">Views</span>
                             </div>
                         </div>
-                        <div className="h-fit flex items-center gap-1.5 text-[#0580A5]">
+                        <button
+                            type="button"
+                            onClick={handleToggleLike}
+                            disabled={likesLoading || !likesReady}
+                            className={`h-fit flex items-center gap-1.5 ${isLiked ? 'text-[#046a8a]' : 'text-[#0580A5]'} disabled:opacity-70 hover:cursor-pointer transition-colors`}
+                        >
                             <img src={likesIcon} alt="" />
                             <div className='flex flex-col'>
                                 <span className="text-xs sm:text-lg  leading-none">{device.likes}</span>
                                 <span className="text-[10px] sm:text-xs leading-none">Likes</span>
                             </div>
-                        </div>
+                        </button>
                         <button className="hover:cursor-pointer flex items-center transition-colors w-fit pb-7 ">
                             <img src={shareIcon} width={70} alt="" />
                         </button>

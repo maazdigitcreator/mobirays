@@ -6,7 +6,6 @@ import { useData } from '../context/DataContext';
 import Pagination from './Pagination';
 
 const LatestProducts = ({ title, products, itemImage, limit, useDummyData = false, category, enablePagination = false, itemsPerPage = 24}) => {
-    console.log('LatestProducts Render:', { title, hasProducts: !!products, productCount: products ? products.length : 0, useDummyData, category });
     const navigate = useNavigate();
     const { allProducts: cachedProducts } = useData();
     const [apiProducts, setApiProducts] = React.useState([]);
@@ -84,9 +83,6 @@ const LatestProducts = ({ title, products, itemImage, limit, useDummyData = fals
 
         // Create URL slug from product slug or name
         const slug = product.slug || createSlug(product.name);
-
-        // Debug: Log the product data before navigation
-        console.log('LatestProducts - Clicking product:', product);
 
         // Navigate to product page with slug in URL and pass COMPLETE product data
         navigate(`/${slug}`, {
