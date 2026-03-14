@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useLocation } from 'react-router-dom'
 import Sidebar3 from '../components/Layout/Sidebar3'
 import AllBrandsHero from '../components/AllBrandsHero'
 import BrandsGrid from '../components/BrandsGrid'
@@ -21,10 +21,12 @@ const Login = () => {
 
     const { login, user } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
+    const redirectPath = location.state?.from?.pathname || '/wishlist';
 
     useEffect(() => {
-        if (user) navigate('/wishlist');
-    }, [user, navigate]);
+        if (user) navigate(redirectPath, { replace: true });
+    }, [user, navigate, redirectPath]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -36,7 +38,7 @@ const Login = () => {
         setStatus({ error: '', loading: true });
         try {
             await login(form.email, form.password);
-            navigate('/wishlist');
+            navigate(redirectPath, { replace: true });
         } catch (err) {
             setStatus({ error: err?.message || 'Invalid email or password. Please try again.', loading: false });
         }
