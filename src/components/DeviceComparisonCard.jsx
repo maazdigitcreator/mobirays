@@ -14,13 +14,6 @@ const DeviceComparisonCard = ({ device }) => {
                     product: device.originalData
                 }
             });
-        } else {
-            console.warn("Missing slug or original data for navigation", device);
-            // Fallback just in case (e.g. dummy data)
-            if (device.name) {
-                // Try to construct a slug if missing, or just alert? 
-                // For now, let's just log. The user mainly cares about real API data which has slugs.
-            }
         }
     };
 

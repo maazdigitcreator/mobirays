@@ -10,8 +10,6 @@ const SubNewsBanner = ({ heading, bannerImage, date, commentsCount }) => {
 
     const handleSearch = (e) => {
         e.preventDefault();
-        console.log('Searching for:', searchQuery);
-        // Add search logic here
     };
 
     return (
