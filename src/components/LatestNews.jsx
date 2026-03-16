@@ -70,22 +70,23 @@ const LatestNews = ({ title, gridCols, titleAlign = 'center', clipPath, paddingL
                             key={newsItem.id}
                             to={`/news/${newsItem.slug}`}
                             state={{ newsData: newsItem }}
+                            className="block h-full"
                         >
-                            <div className="flex gap-4 justify-between items-start group cursor-pointer">
-                                <div className="flex-1 flex gap-8  flex-col">
-                                    <h3 className="text-gray-800 font-semibold text-lg leading-snug mb-3 group-hover:text-[#0580A5] transition-colors line-clamp-3">
+                            <div className="flex h-full items-center justify-between gap-3 group cursor-pointer">
+                                <div className="flex min-w-0 flex-1 flex-col justify-center gap-3">
+                                    <h3 className="text-gray-800 font-semibold text-lg leading-snug group-hover:text-[#0580A5] transition-colors line-clamp-3">
                                         {newsItem.name}
                                     </h3>
-                                    <div className="flex text-[#1E1E1E] flex-wrap items-center gap-4 text-xs">
-                                        <span>{formatDate(newsItem.created_at)}, by Noor</span>
-                                        <div className="flex items-center gap-1">
+                                    <div className="flex min-w-0 items-center gap-2 overflow-hidden whitespace-nowrap text-[10px] text-[#1E1E1E] sm:text-xs">
+                                        <span className="truncate">{formatDate(newsItem.created_at)}, by Noor</span>
+                                        <div className="flex shrink-0 items-center gap-1">
                                             <span>Comments</span>
                                             <FaRegCommentDots className="text-base" />
                                             <span>12</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="w-36 h-36 flex-shrink-0 overflow-hidden bg-gray-100">
+                                <div className="h-28 w-28 shrink-0 overflow-hidden bg-gray-100 sm:h-32 sm:w-32 lg:h-36 lg:w-36">
                                     <img
                                         src={newsItem.image || LatestNewsImg}
                                         alt={newsItem.name}

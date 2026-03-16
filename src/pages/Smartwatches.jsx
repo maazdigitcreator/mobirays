@@ -18,6 +18,8 @@ import SidebarBanner3 from '../components/SidebarSections/SidebarBanner3';
 import BannerAd from '../components/BannerAd';
 import { filterProductsByCategory } from '../utils/filterHelpers';
 import { useData } from '../context/DataContext';
+import homeBanner3 from '../assets/homeBanner3.png';
+import homeBannerSM3 from '../assets/homeBannerSM3.png';
 
 const END_POINT = '/api/v1/products/watchesComingsoon';
 const Smartwatches = () => {
@@ -38,6 +40,14 @@ const Smartwatches = () => {
         : allProducts;
 
     const [pageBanners, setPageBanners] = useState({});
+    const smartwatchesBannerFallback = {
+        title: 'Smartwatches Banner',
+        image: homeBanner3,
+    };
+    const smartwatchesBannerMobileFallback = {
+        title: 'Smartwatches Banner Mobile',
+        image: homeBannerSM3,
+    };
 
     useEffect(() => {
         if (allBanners.length > 0) {
@@ -52,9 +62,9 @@ const Smartwatches = () => {
 
     return (
         <div>
-            <div className='flex flex-col lg:flex-row gap-2'>
+            <div className="grid gap-2 lg:grid-cols-[401px_minmax(0,1fr)] lg:items-start">
                 {/* Sidebar Column */}
-                <div className="w-full lg:w-1/3 hidden lg:block">
+                <div className="hidden lg:block">
                     <div className="flex flex-col gap-2">
                         <SidebarIntro />
                         <SidebarBrands />
@@ -70,7 +80,7 @@ const Smartwatches = () => {
                 </div>
 
                 {/* Main Content Column */}
-                <div className="w-full lg:w-3/4">
+                <div className="min-w-0">
 
                     <HeroBanner />
 
@@ -84,26 +94,25 @@ const Smartwatches = () => {
                             itemsPerPage={48}
                         />
                     </div>
-                    {pageBanners['smartwatches_banner_1'] && <div className='mt-7'><BannerAd banner={pageBanners['smartwatches_banner_1']} className='h-[200px] sm:w-full' /></div>}
+                    <div className='mt-7'>
+                        <div className="sm:hidden">
+                            <BannerAd banner={pageBanners['smartwatches_banner_1'] || smartwatchesBannerMobileFallback} className='w-full' />
+                        </div>
+                        <div className="hidden sm:block">
+                            <BannerAd banner={pageBanners['smartwatches_banner_1'] || smartwatchesBannerFallback} className='w-full' />
+                        </div>
+                    </div>
                     <div className='mt-10'>
                         <LatestNews
-                            title="News"
+                            title="Latest News"
                             gridCols="sm:grid-cols-2"
-                            titleAlign="start"
-                            clipPath="polygon(0% 100%, 0px 0%, calc(100% - 60px) 0%, 100% 100%)"
-                            paddingLeft="40px"
-                            paddingRight="100px"
                             limit={4}
                         />
                     </div>
                     <div className='mt-10'>
                         <LatestReviews
-                            title="Reviews"
+                            title="Latest Reviews"
                             gridCols="sm:grid-cols-3"
-                            titleAlign="start"
-                            clipPath="polygon(0% 100%, 0px 0%, calc(100% - 60px) 0%, 100% 100%)"
-                            paddingLeft="40px"
-                            paddingRight="100px"
                             limit={6}
                         />
                     </div>
@@ -111,7 +120,12 @@ const Smartwatches = () => {
             </div>
 
             <div className="md:col-span-3 mb-6 overflow-hidden">
-                {pageBanners['smartwatches_banner_2'] && <BannerAd banner={pageBanners['smartwatches_banner_2']} className="mt-7 h-[200px] sm:h-auto sm:w-full" />}
+                <div className="sm:hidden">
+                    <BannerAd banner={pageBanners['smartwatches_banner_2'] || smartwatchesBannerMobileFallback} className="mt-7 w-full" />
+                </div>
+                <div className="hidden sm:block">
+                    <BannerAd banner={pageBanners['smartwatches_banner_2'] || smartwatchesBannerFallback} className="mt-7 w-full" />
+                </div>
             </div>
 
             <ComingSoonMobiles title="Coming Soon Smartwatches" itemImage={watchImg} endpoint={END_POINT} />

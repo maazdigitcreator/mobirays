@@ -12,21 +12,28 @@ const DashboardSidebar = () => {
     ];
 
     return (
-        <div className='col-span-3 bg-[#0580A8] min-h-screen'>
-            <ul className='flex flex-col gap-2 text-white font-medium items-center py-4 px-2'>
+        <aside className="w-full overflow-hidden bg-[#0580A5] text-white lg:min-h-[540px]">
+            <nav className="flex flex-col gap-3 px-4 py-3">
                 {navItems.map((item) => {
                     const isActive = currentPath === item.path;
+
                     return (
-                        <Link to={item.path} key={item.path} className={`w-full text-center py-3 transition-all duration-300 ease-in-out cursor-pointer ${isActive
-                                ? 'bg-white text-[#0580A8]'
-                                : 'hover:bg-white hover:text-[#0580A8]'
-                            }`}>
-                            <li>{item.name}</li>
+                        <Link
+                            to={item.path}
+                            key={item.path}
+                            className={[
+                                'block border px-4 py-3 text-center text-[18px] leading-none transition-colors',
+                                isActive
+                                    ? 'border-white bg-white font-medium text-[#0580A5]'
+                                    : 'border-transparent bg-transparent text-white hover:border-white/65 hover:bg-white hover:text-[#0580A5]',
+                            ].join(' ')}
+                        >
+                            {item.name}
                         </Link>
                     );
                 })}
-            </ul>
-        </div>
+            </nav>
+        </aside>
     );
 };
 

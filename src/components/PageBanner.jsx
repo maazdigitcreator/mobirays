@@ -1,10 +1,12 @@
 import BannerAd from './BannerAd';
 
-const PageBanner = ({ heading, banner }) => {
+const PageBanner = ({ heading, banner, bannerImage }) => {
+    const resolvedBanner = banner || (bannerImage ? { image: bannerImage, ads_type: 'image', title: heading } : null);
+
     return (
         <div className="w-full mb-2">
             {/* Heading Section */}
-            <div className="relative w-full flex items-end justify-center lg:justify-start mb-2">
+            <div className="relative mb-2 flex w-full items-end justify-start">
                 {/* Horizontal Line Background */}
                 <div className="absolute bottom-0 left-0 w-full h-[10px] sm:h-[16px] bg-[#0580A5]"></div>
 
@@ -23,7 +25,7 @@ const PageBanner = ({ heading, banner }) => {
 
             {/* Banner Ad */}
             <div className="w-full">
-                <BannerAd banner={banner} className="h-[65vh]" />
+                <BannerAd banner={resolvedBanner} className="h-auto w-full" />
             </div>
         </div>
     );

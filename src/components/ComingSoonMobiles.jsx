@@ -6,7 +6,8 @@ import { createSlug } from '../utils/urlHelper' // Import createSlug
 const END_POINT = '/api/v1/products/phoneComingsoon';
 const ComingSoonMobiles = ({ title, itemImage, endpoint = END_POINT}) => {
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [itemsToShow, setItemsToShow] = useState(6);
+    const [itemsToShow, setItemsToShow] = useState(3);
+    const [isMobile, setIsMobile] = useState(false);
     const [isDesktop, setIsDesktop] = useState(false);
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -34,16 +35,9 @@ const ComingSoonMobiles = ({ title, itemImage, endpoint = END_POINT}) => {
     useEffect(() => {
         const handleResize = () => {
             const width = window.innerWidth;
-            if (width >= 1024) {
-                setItemsToShow(6);
-                setIsDesktop(true);
-            } else if (width >= 768) {
-                setItemsToShow(4);
-                setIsDesktop(false);
-            } else {
-                setItemsToShow(3);
-                setIsDesktop(false);
-            }
+            setItemsToShow(3);
+            setIsMobile(width < 640);
+            setIsDesktop(width >= 1024);
         };
 
         handleResize(); // Set initial value
@@ -103,12 +97,12 @@ const ComingSoonMobiles = ({ title, itemImage, endpoint = END_POINT}) => {
                     className="latest-news-clip bg-[#0580A5] text-white w-fit h-10 sm:h-12 flex items-center justify-center relative z-10 transition-none"
                     style={{ backfaceVisibility: 'hidden', transform: 'translateZ(0)', paddingLeft: isDesktop ? '70px' : '60px', paddingRight: isDesktop ? '70px' : '60px' }}
                 >
-                    <h2 className="sm:text-2xl text-[18px]">{title}</h2>
+                    <h2 className="text-[15px] sm:text-[18px] lg:text-2xl">{title}</h2>
                 </div>
             </div>
 
             {/* Carousel Section - Parent should NOT have group class */}
-            <div className="relative flex items-center px-4 sm:px-0">
+            <div className="relative flex items-center px-2 sm:px-0">
                 {/* Left Arrow */}
                 <button
                     onClick={prevSlide}
@@ -118,37 +112,27 @@ const ComingSoonMobiles = ({ title, itemImage, endpoint = END_POINT}) => {
                 </button>
 
                 {/* Items Container */}
-                <div className="overflow-x-auto sm:overflow-hidden w-full px-7 scrollbar-hide snap-x snap-mandatory">
+                <div className="w-full overflow-x-auto px-1 scrollbar-hide snap-x snap-mandatory sm:overflow-hidden">
                     <div
-                        className="flex sm:transition-transform sm:duration-300 sm:ease-out gap-4"
-                        style={itemsToShow >= 4 ? { transform: `translateX(-${currentIndex * (100 / itemsToShow)}%)` } : {}}
+                        className="flex sm:transition-transform sm:duration-300 sm:ease-out"
+                        style={!isMobile ? { transform: `translateX(-${currentIndex * (100 / itemsToShow)}%)` } : undefined}
                     >
                         {products.map((product) => (
                             <div
                                 key={product.id}
-                                className=" min-w-[calc(100%/3-11px)] md:min-w-[calc(100%/4-12px)] lg:min-w-[calc(100%/6-14px)] flex flex-col group cursor-pointer mt-12 snap-center"
+                                className="mt-8 min-w-[33.3333%] px-1.5 flex flex-col group cursor-pointer snap-center sm:mt-12 sm:px-2"
                                 onClick={() => handleProductClick(product)}
                             >
-                                <div className="relative mb-3 flex justify-center items-center p-2 bg-blue-50/50 rounded-lg h-48 transition-transform group-hover:scale-105">
-                                    {/* Coming Soon Badge */}
-                                    <div className="absolute -top-2 sm:-top-7 right-7 z-10 scale-90 sm:scale-100">
-                                        <div className="bg-[#FF0008] text-white text-[14px] font-semibold px-1.5 py-0.5 rounded-md relative shadow-lg whitespace-nowrap">
-                                            Coming Soon
-                                            {/* Speech Bubble Tail */}
-                                            <div
-                                                className="absolute -bottom-3 right-4 w-0 h-0 
-                                                border-l-[0px] border-l-transparent 
-                                                border-r-[10px] border-r-transparent 
-                                                border-t-[12px] border-t-[#FF0008]"
-                                            ></div>
-                                        </div>
-                                    </div>
-
-                                    <div className="w-full h-full flex items-center justify-center">
-                                        <img src={product.image || itemImage || MobileImg} alt={product.name} className="max-h-full object-contain" />
+                                <div className="relative mb-2 flex h-[108px] items-center justify-center p-1 transition-transform group-hover:scale-105 sm:mb-3 sm:h-48 sm:p-2">
+                                    <div className="flex h-full w-full items-center justify-center">
+                                        <img
+                                            src={product.image || itemImage || MobileImg}
+                                            alt={product.name}
+                                            className="max-h-full max-w-full object-contain"
+                                        />
                                     </div>
                                 </div>
-                                <h3 className="text-sm text-gray-700 font-medium leading-tight group-hover:text-[#0580A5] text-center uppercase truncate px-2">
+                                <h3 className="px-1 text-left text-[10px] font-medium uppercase leading-[1.25] text-gray-700 line-clamp-2 group-hover:text-[#0580A5] sm:px-2 sm:text-sm">
                                     {product.name}
                                 </h3>
                             </div>
