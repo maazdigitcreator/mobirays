@@ -80,7 +80,7 @@ const LatestReviews = ({ title, gridCols, titleAlign = 'center', clipPath, paddi
                                 to={`/review/${slug}`}
                                 state={{ reviewData: review }}
                             >
-                                <div className="border border-2 border-[#0580A5] p-1 bg-white hover:shadow-lg transition-shadow cursor-pointer h-full">
+                                <div className="bg-white hover:shadow-lg transition-shadow cursor-pointer h-full">
                                     <div className="relative w-full aspect-square overflow-hidden bg-gray-100 h-[170px] sm:h-[300px] sm:h-auto">
                                         <img
                                             src={review.image || reviewImg}

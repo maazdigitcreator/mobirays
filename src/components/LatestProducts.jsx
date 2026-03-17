@@ -156,9 +156,13 @@ const LatestProducts = ({ title, products, itemImage, limit, useDummyData = fals
                                         </div>
                                     )}
                                     {/* Replace with actual <img> tag from API data */}
-                                    <div className="w-full h-full flex items-center justify-center text-6xl text-blue-200">
+                                    <div className="w-full h-full flex items-center justify-center overflow-hidden text-6xl text-blue-200">
                                         {/* Placeholder for actual image: <img src={product.image || itemImage || MobileImg} alt={product.name} /> */}
-                                        <img src={product.image || itemImage || MobileImg} alt="" />
+                                        <img
+                                            src={product.image || itemImage || MobileImg}
+                                            alt={product.name}
+                                            className="max-h-full max-w-full object-contain"
+                                        />
                                     </div>
                                 </div>
                                 <h3 className="text-[18px] leading-tight uppercase text-[#1E1E1E] line-clamp-2 overflow-hidden">

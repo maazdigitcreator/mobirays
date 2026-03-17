@@ -11,7 +11,6 @@ import {
     UserPlus,
     User,
     Menu,
-    MoreVertical,
     MoreHorizontal,
     X,
 } from "lucide-react";
@@ -22,6 +21,15 @@ import WhatsNewImg from "../../assets/whatsnew.png";
 import SearchModal from "./SearchModal";
 import MobileSidebar from "./MobileSidebar";
 import MobileMenu from "./MobileMenu";
+import { socialLinks } from "../../constants/siteLinks";
+
+const socialIconMap = {
+    facebook: Facebook,
+    twitter: Twitter,
+    instagram: Instagram,
+    youtube: Youtube,
+    rss: Rss,
+};
 
 const Header = () => {
     const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
@@ -54,23 +62,23 @@ const Header = () => {
     return (
         <header className="w-full border-b border-gray-200 bg-white">
             {/* Desktop Header */}
-            <div className="hidden md:block">
-                <div className="mx-auto px-4 py-6">
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="hidden lg:block">
+                <div className="mx-auto max-w-[1440px] px-[30px] py-3">
+                    <div className="flex items-center justify-between gap-6">
                         {/* Logo */}
-                        <div className="flex-shrink-1">
+                        <div className="min-w-0 shrink-0">
                             <Link to="/" className="flex items-baseline">
-                                <img className="w-64 xl:w-100" src={Logo} alt="mobirays" />
+                                <img className="w-[300px] xl:w-[420px]" src={Logo} alt="mobirays" />
                             </Link>
                         </div>
 
                         {/* Search Bar */}
-                        <div className="search-container relative flex items-center w-full md:w-auto flex-1 md:flex-initial max-w-md">
-                            <div className="flex items-center w-full border border-[#0891b2] border-2 overflow-hidden">
-                                <div className="flex items-center px-3 w-72 py-2 flex-1 relative">
+                        <div className="search-container relative w-full max-w-[441px] shrink-0">
+                            <div className="flex h-[42px] items-center overflow-hidden border-2 border-[#0891b2]">
+                                <div className="relative flex flex-1 items-center px-3 py-2">
                                     <input
                                         type="text"
-                                        placeholder="Phone | Tabs | Smart Watches"
+                                        placeholder="Phones | Tabs | Smartwatches"
                                         value={searchQuery}
                                         onChange={(e) => {
                                             setSearchQuery(e.target.value);
@@ -78,7 +86,7 @@ const Header = () => {
                                         }}
                                         onFocus={() => setIsSearchModalOpen(true)}
                                         onKeyDown={handleKeyDown}
-                                        className="flex-1 outline-none text-sm placeholder-[#1E1E1E] pr-6"
+                                        className="flex-1 pr-6 text-sm outline-none placeholder-[#1E1E1E]"
                                     />
                                     {searchQuery && (
                                         <button
@@ -95,7 +103,7 @@ const Header = () => {
                                 </div>
                                 <button
                                     onClick={handleSearch}
-                                    className="flex items-center gap-2 px-4 py-2 bg-[#0891b2] hover:bg-[#0e7490] text-white text-base transition-colors cursor-pointer"
+                                    className="flex h-full min-w-[108px] items-center justify-center gap-2 bg-[#0891b2] px-3 text-base text-white transition-colors hover:bg-[#0e7490] cursor-pointer"
                                 >
                                     <Search size={18} className="scale-x-[-1] text-white" />
                                     Search
@@ -112,7 +120,7 @@ const Header = () => {
                             )}
                         </div>
 
-                        <div>
+                        <div className="shrink-0">
                             <Link to="/whats-new">
                                 <div
                                     className="hover:cursor-pointer"
@@ -132,22 +140,36 @@ const Header = () => {
                         </div>
 
                         {/* Social Icons */}
-                        <div className="flex items-center gap-1">
-                            <a href="#" className="p-2 bg-[#fff] border-2 border-[#0580A5] text-[#0580A5]">
-                                <Facebook size={25} />
-                            </a>
-                            <a href="#" className="p-2 bg-[#fff] border-2 border-[#0580A5] text-[#0580A5]">
-                                <Twitter size={25} />
-                            </a>
-                            <a href="#" className="p-2 bg-[#fff] border-2 border-[#0580A5] text-[#0580A5]">
-                                <Instagram size={25} />
-                            </a>
-                            <a href="#" className="p-2 bg-[#fff] border-2 border-[#0580A5] text-[#0580A5]">
-                                <Youtube size={25} />
-                            </a>
-                            <a href="#" className="p-2 bg-[#fff] border-2 border-[#0580A5] text-[#0580A5]">
-                                <Rss size={25} />
-                            </a>
+                        <div className="flex shrink-0 items-center gap-1">
+                            {socialLinks.map((link) => {
+                                const Icon = socialIconMap[link.key];
+                                const commonClassName = "p-2 bg-[#fff] border-2 border-[#0580A5] text-[#0580A5]";
+
+                                if (!link.href) {
+                                    return (
+                                        <span
+                                            key={link.key}
+                                            aria-label={`${link.label} link unavailable`}
+                                            className={commonClassName}
+                                        >
+                                            <Icon size={25} />
+                                        </span>
+                                    );
+                                }
+
+                                return (
+                                    <a
+                                        key={link.key}
+                                        href={link.href}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        aria-label={link.label}
+                                        className={commonClassName}
+                                    >
+                                        <Icon size={25} />
+                                    </a>
+                                );
+                            })}
                             {user ? (
                                 <div className="ml-2 flex items-center gap-3 p-2 bg-[#fff] border-2 border-[#0580A5]">
                                     <User size={22} className="text-[#0580A5]" />
@@ -178,9 +200,9 @@ const Header = () => {
             </div>
 
             {/* Mobile Header */}
-            <div className="md:hidden">
+            <div className="lg:hidden">
                 {/* Top Row: Hamburger | Logo | Login/Account */}
-                <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 relative z-[60] bg-white">
+                <div className="relative z-[60] flex items-center justify-between gap-2 border-b border-gray-200 bg-white px-4 py-3">
                     {/* Hamburger Menu */}
                     <button
                         id="mobile-sidebar-toggle"
@@ -191,13 +213,13 @@ const Header = () => {
                     </button>
 
                     {/* Logo */}
-                    <Link to="/" className="flex-1 flex justify-center">
+                    <Link to="/" className="flex min-w-0 flex-1 justify-center px-2">
                         <img src={Logo} alt="mobirays" className="h-8" />
                     </Link>
 
                     {/* Login/Account Icons */}
                     {user ? (
-                        <div className="flex items-center gap-2 border-2 border-[#0580A5] px-2 py-1">
+                        <div className="flex max-w-[42%] shrink-0 items-center gap-2 border-2 border-[#0580A5] px-2 py-1">
                             <User size={22} className="text-[#0580A5]" />
                             <span className="text-[#0580A5] text-xs font-medium max-w-[70px] truncate">
                                 {user.name || user.email}
@@ -211,7 +233,7 @@ const Header = () => {
                             </button>
                         </div>
                     ) : (
-                        <div className="flex items-center gap-2 border-2 border-[#0580A5]">
+                        <div className="flex shrink-0 items-center gap-2 border-2 border-[#0580A5]">
                             <Link to="/login" className="p-1 text-[#0580A5] rounded">
                                 <LogIn size={25} />
                             </Link>
@@ -222,12 +244,12 @@ const Header = () => {
                     )}
                 </div>
 
-                <div className="px-4 py-3 sm:bg-white search-container bg-[#0891b2]">
-                    <div className="flex gap-4 items-center justify-between">
+                <div className="search-container bg-[#0891b2] px-4 py-3 sm:bg-white">
+                    <div className="flex items-center justify-between gap-2">
                         {/* Search Input - Same as Desktop */}
-                        <div className="relative flex-1">
-                            <div className="flex items-center border bg-white border-[#0891b2] overflow-hidden">
-                                <div className="flex items-center px-3 py-1 flex-1 relative">
+                        <div className="relative min-w-0 flex-1">
+                            <div className="flex min-w-0 items-center overflow-hidden border border-[#0891b2] bg-white">
+                                <div className="relative flex min-w-0 flex-1 items-center px-3 py-1">
 
                                     <input
                                         type="text"
@@ -238,7 +260,7 @@ const Header = () => {
                                             setIsSearchModalOpen(true);
                                         }}
                                         onFocus={() => setIsSearchModalOpen(true)}
-                                        className="flex-1 outline-none text-sm placeholder-[#1E1E1E] pr-6"
+                                        className="min-w-0 flex-1 pr-6 text-sm outline-none placeholder-[#1E1E1E]"
                                     />
                                     {searchQuery && (
                                         <button
@@ -255,10 +277,10 @@ const Header = () => {
                                 </div>
                                 <button
                                     onClick={handleSearch}
-                                    className="flex gap-2 sm:px-4 cursor-pointer px-2 border-2  border-[#fff] py-1 bg-[#0891b2] hover:bg-[#0e7490] text-white  text-base items-center transition-colors"
+                                    className="flex shrink-0 items-center gap-2 border-2 border-[#fff] bg-[#0891b2] px-2 py-1 text-base text-white transition-colors hover:bg-[#0e7490] cursor-pointer sm:px-4"
                                 >
                                     <Search size={18} className="text-white scale-x-[-1]" />
-                                    Search
+                                    <span className="hidden sm:inline">Search</span>
                                 </button>
                             </div>
 
@@ -273,7 +295,7 @@ const Header = () => {
                         </div>
 
                         {/* Three-dot Menu */}
-                        <div className="relative pr-2">
+                        <div className="relative shrink-0">
                             <button
                                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                                 className="py-1 px-1 border-2 border-[#fff] text-[#fff] rounded-full"
