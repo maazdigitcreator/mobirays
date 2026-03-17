@@ -18,8 +18,6 @@ import SidebarBanner2 from '../components/SidebarSections/SidebarBanner2';
 import SidebarLatestModels from '../components/SidebarSections/SidebarLatestModels';
 import SidebarBrands from '../components/SidebarSections/SidebarBrands';
 import BannerAd from '../components/BannerAd';
-import homeBanner3 from '../assets/homeBanner3.png';
-import homeBannerSM3 from '../assets/homeBannerSM3.png';
 
 const SingleNewsDetail = () => {
     const { newsSlug } = useParams();
@@ -27,14 +25,6 @@ const SingleNewsDetail = () => {
     const { allBanners, allNews } = useData();
     const [newsData, setNewsData] = useState(location.state?.newsData || null);
     const [pageBanners, setPageBanners] = useState({});
-    const subNewsBannerFallback = {
-        title: 'Sub News Banner',
-        image: homeBanner3,
-    };
-    const subNewsBannerMobileFallback = {
-        title: 'Sub News Banner Mobile',
-        image: homeBannerSM3,
-    };
 
     // Sync newsData with URL slug
     useEffect(() => {
@@ -179,7 +169,7 @@ const SingleNewsDetail = () => {
 
                                         {/* Title Box */}
                                         <div
-                                            className="latest-news-clip lg:latest-products-clip relative z-10 flex h-10 max-w-full items-center bg-[#0580A5] text-white sm:h-12"
+                                            className="latest-news-clip lg:latest-products-clip bg-[#0580A5] text-white w-fit h-10 sm:h-12 flex items-center justify-center relative z-10"
                                             style={{
                                                 clipPath: "polygon(0% 100%, 0px 0%, calc(100% - 60px) 0%, 100% 100%)",
                                                 paddingLeft: "0px",
@@ -187,9 +177,7 @@ const SingleNewsDetail = () => {
                                             }}
                                         >
 
-                                            <h2 className="pl-2 text-[11px] leading-none sm:pl-4 sm:text-2xl">
-                                                {newsData?.name || 'Galaxy S20 FE'} Price Discussions, Opinions and Reviews
-                                            </h2>
+                                            <h2 className="sm:text-2xl text-[18px] lg:pl-2 sm:lg:pl-4">Galaxy S20 FE Price Discussions, Opinions and Reviews</h2>
                                         </div>
                                     </div>
 
@@ -260,40 +248,45 @@ const SingleNewsDetail = () => {
                                         })()}
 
                                         {/* Add Review Form */}
-                                        <div className="mt-2 border-2 border-[#0580A5] bg-gray-50 p-2">
-                                            <div className="mb-3 flex items-center gap-2 sm:gap-4">
+                                        <div className="border-2 border-[#0580A5] bg-gray-50 p-2 mt-2">
+                                            {/* Title and Stars Row */}
+                                            <div className="flex items-center gap-4 mb-3">
                                                 <input
                                                     type="text"
                                                     placeholder="Add Title"
-                                                    className="border-1 min-w-0 flex-1 border-[#0580A5] bg-white px-3 py-1 text-black placeholder:text-[12px] placeholder:font-semibold placeholder:text-black focus:outline-none sm:w-[300px] sm:flex-none sm:placeholder:text-lg"
+                                                    className="border-1 px-3 py-1 focus:outline-none bg-white border-[#0580A5] flex-shrink-0 placeholder-black text-black placeholder:font-semibold placeholder:text-lg"
+                                                    style={{ width: '300px' }}
                                                 />
-                                                <div className="flex shrink-0 items-center gap-0.5 sm:gap-1">
+                                                <div className="flex items-center gap-1">
                                                     {[...Array(5)].map((_, i) => (
-                                                        <span key={i} className="cursor-pointer text-[16px] text-[#0580A5] hover:text-yellow-400 sm:text-xl">☆</span>
+                                                        <span key={i} className="text-[#0580A5] text-xl cursor-pointer hover:text-yellow-400">☆</span>
                                                     ))}
                                                 </div>
                                             </div>
 
+                                            {/* Comment Section */}
                                             <div className="mb-1">
+
                                                 <textarea
-                                                    className="border-1 w-full border-[#0580A5] bg-white p-3 text-black placeholder-black focus:outline-none"
+                                                    className="w-full border-1  p-3 focus:outline-none border-[#0580A5] bg-white text-black placeholder-black"
                                                     rows="3"
                                                     placeholder="Content"
                                                 ></textarea>
                                             </div>
 
+                                            {/* Buttons */}
                                             <div className="flex justify-end gap-3">
-                                                <button className="cursor-pointer bg-[#0580A5] px-6 py-2 text-[11px] font-medium text-white transition-colors hover:bg-[#046a8a] sm:px-8 sm:text-base">
+                                                <button className="bg-[#0580A5] text-white px-8 py-2 hover:bg-[#046a8a] transition-colors font-medium cursor-pointer">
                                                     Submit
                                                 </button>
                                             </div>
                                         </div>
 
-                                        <div className="mt-2 flex w-full items-center gap-2 sm:gap-4">
-                                            <Link to="/reviews" className="flex flex-1 items-center justify-center rounded-full border-2 border-[#0580A5] px-3 py-1.5 text-[9px] text-black transition-colors hover:bg-[#0580A5] hover:text-white cursor-pointer sm:px-6 sm:py-2 sm:text-base">
+                                        <div className="flex flex-col sm:flex-row gap-4 justify-end items-center mt-2">
+                                            <Link to="/reviews" className="flex items-center justify-center border-2 border-[#0580A5] text-black px-6 py-2 rounded-full hover:bg-[#0580A5] hover:text-white transition-colors text-base cursor-pointer">
                                                 Read All Reviews&gt;&gt;
                                             </Link>
-                                            <button className="flex-1 rounded-full border-2 border-[#0580A5] px-3 py-1.5 text-[9px] text-black transition-colors hover:bg-[#0580A5] hover:text-white cursor-pointer sm:px-6 sm:py-2 sm:text-base">
+                                            <button className="border-2 border-[#0580A5] text-black px-6 py-2 rounded-full hover:bg-[#0580A5] hover:text-white transition-colors  text-base cursor-pointer ">
                                                 Post a Suggestion&gt;&gt;
                                             </button>
                                         </div>
@@ -301,12 +294,11 @@ const SingleNewsDetail = () => {
                                 </div>
                             </div>
 
-                            <div className="mt-7 sm:hidden">
-                                <BannerAd banner={pageBanners['subnews_banner_2'] || subNewsBannerMobileFallback} className="w-full" />
-                            </div>
-                            <div className="mt-7 hidden sm:block">
-                                <BannerAd banner={pageBanners['subnews_banner_2'] || subNewsBannerFallback} className="w-full" />
-                            </div>
+                            {pageBanners['subnews_banner_2'] && (
+                                <div className="md:col-span-3 mb-6 overflow-hidden">
+                                    <BannerAd banner={pageBanners['subnews_banner_2']} className="mt-7 w-auto sm:w-full h-[200px] sm:h-auto" />
+                                </div>
+                            )}
 
                         </div>
 
@@ -319,12 +311,11 @@ const SingleNewsDetail = () => {
             <div>
                 <LatestNews title="Latest News" gridCols="sm:grid-cols-3" limit={6} />
             </div>
-            <div className="mt-7 sm:hidden">
-                <BannerAd banner={pageBanners['subnews_banner_3'] || subNewsBannerMobileFallback} className="w-full" />
-            </div>
-            <div className="mt-7 hidden sm:block">
-                <BannerAd banner={pageBanners['subnews_banner_3'] || subNewsBannerFallback} className="w-full" />
-            </div>
+            {pageBanners['subnews_banner_3'] && (
+                <div className="md:col-span-3 mb-6 overflow-hidden">
+                    <BannerAd banner={pageBanners['subnews_banner_3']} className="mt-7 w-auto sm:w-full h-[200px] sm:h-auto" />
+                </div>
+            )}
             <div>
                 <ComingSoonMobiles title="Coming Soon Mobiles" itemImage={mobileImg} />
             </div>

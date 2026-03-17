@@ -33,8 +33,6 @@ import SidebarBanner3 from '../components/SidebarSections/SidebarBanner3'
 import RelatedReviews from '../components/SidebarSections/RelatedReviews'
 import RelatedNews from '../components/SidebarSections/RelatedNews'
 import { productReviewService } from '../services/productReviewService'
-import BannerAd from '../components/BannerAd'
-import homeBannerSM3 from '../assets/homeBannerSM3.png'
 
 const MobileSpecs = () => {
     const { productSlug } = useParams();
@@ -54,14 +52,6 @@ const MobileSpecs = () => {
         error: '',
         success: '',
     });
-    const specsBannerFallback = {
-        title: 'Specs Banner',
-        image: homeBanner3,
-    };
-    const specsBannerMobileFallback = {
-        title: 'Specs Banner Mobile',
-        image: homeBannerSM3,
-    };
 
     // Handle product data synchronization with URL slug
     useEffect(() => {
@@ -123,7 +113,7 @@ const MobileSpecs = () => {
             };
         }
 
-        if (category && (category.includes('tab') || category.includes('pad'))) {
+        if (category.includes('tab') || category.includes('pad')) {
             return {
                 itemImage: tabImg,
                 title: 'Coming Soon Tablets',
@@ -236,9 +226,11 @@ const MobileSpecs = () => {
 
     return (
         <div>
-            <div className="grid gap-2 lg:grid-cols-[401px_minmax(0,1fr)] lg:items-start">
-                <div className="hidden lg:block">
+            <div className='flex flex-col lg:flex-row gap-2'>
+                {/* Sidebar Column */}
+                <div className="w-full lg:w-1/3 hidden lg:block">
                     <div className="flex flex-col gap-2">
+
                         <SidebarBrands />
                         <SidebarFilters />
                         <SidebarBanner1 />
@@ -253,30 +245,28 @@ const MobileSpecs = () => {
                     </div>
                 </div>
 
-                <div className="min-w-0">
+                {/* Main Content Column */}
+                <div className="w-full lg:w-3/4">
+                    {/* Mobile Specs Detail Component */}
                     <MobileSpecsDetail key={productData?.id || productSlug} productData={productData} />
 
+                    {/* Specifications Table */}
                     <div className="mt-4 ">
                         <SpecificationsTable productData={productData} />
                     </div>
 
 
-                    <div className="mt-7 sm:hidden">
-                        <BannerAd banner={{ image: pageBanners['mobilespecifications_banner_1'] || specsBannerMobileFallback.image }} className="w-full" />
-                    </div>
-                    <div className="mt-7 hidden sm:block">
-                        <BannerAd banner={{ image: pageBanners['mobilespecifications_banner_1'] || specsBannerFallback.image }} className="w-full" />
-                    </div>
+                    {pageBanners['mobilespecifications_banner_1'] && <img className='mt-7 h-[200px] w-auto sm:w-full' src={pageBanners['mobilespecifications_banner_1']} alt="Mobile Specs Banner 1" />}
 
 
                     <div>
-                        <div className="relative mb-8 mt-3 flex w-full items-end justify-start">
+                        <div className="relative w-full flex items-end justify-center lg:justify-start mb-8 mt-3">
                             {/* Horizontal Line Background */}
                             <div className="absolute bottom-0 left-0 w-full h-[10px] sm:h-[16px] bg-[#0580A5]"></div>
 
                             {/* Title Box */}
                             <div
-                                className="latest-news-clip lg:latest-products-clip relative z-10 flex h-10 w-fit items-center bg-[#0580A5] text-white sm:h-12"
+                                className="latest-news-clip lg:latest-products-clip bg-[#0580A5] text-white w-fit h-10 sm:h-12 flex items-center justify-center relative z-10"
                                 style={{
                                     clipPath: "polygon(0% 100%, 0px 0%, calc(100% - 60px) 0%, 100% 100%)",
                                     paddingLeft: "10px",
@@ -284,13 +274,13 @@ const MobileSpecs = () => {
                                 }}
                             >
                                 <img src={cartIcon} width={30} alt="" />
-                                <h2 className="pl-2 text-[18px] sm:pl-4 sm:text-2xl">Shop by</h2>
+                                <h2 className="sm:text-2xl text-[18px] lg:pl-2 sm:lg:pl-4">Shop by</h2>
                             </div>
                         </div>
 
 
                         {/* Shop Section */}
-                        <div className="mt-4 px-0 sm:px-2">
+                        <div className="mt-5 px-2 sm:px-4">
                             {/* Shop Data */}
                             {(() => {
                                 // Use API data from productData.shopBy_links or fallback to empty array
@@ -309,25 +299,26 @@ const MobileSpecs = () => {
                                 const rightColumn = shopLinks.slice(3, 6);
 
                                 return (
-                                    <div className="mx-auto grid max-w-5xl grid-cols-1 gap-3 lg:grid-cols-2 lg:gap-6">
-                                        <div className="space-y-2">
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-15 max-w-5xl mx-auto">
+                                        {/* Left Column */}
+                                        <div className="space-y-3">
                                             {leftColumn.map((item, index) => (
-                                                <div key={index} className="flex items-stretch gap-1.5">
-                                                    <div className="flex min-w-[72px] items-center justify-center rounded-l-full border-2 border-[#0580A5] px-3 py-1">
-                                                        <span className="text-[11px] font-semibold text-black sm:text-sm">${item.price}</span>
+                                                <div key={index} className="flex items-stretch justify-center lg:justify-end gap-2">
+                                                    <div className="border-2 border-[#0580A5] rounded-l-full px-5 py-2 flex items-center justify-center">
+                                                        <span className="font-semibold text-black">${item.price}</span>
                                                     </div>
-                                                    <div className="flex min-w-[88px] items-center justify-center border-2 border-[#0580A5] bg-white px-3 py-1 sm:min-w-[120px]">
+                                                    <div className="border-2 border-[#0580A5] bg-white px-6 py-2 min-w-[140px] flex items-center justify-center">
                                                         <img
                                                             src={item.image}
                                                             alt="Store logo"
-                                                            className="h-5 object-contain sm:h-6"
+                                                            className="h-6 object-contain"
                                                         />
                                                     </div>
                                                     <a
                                                         href={item.link}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="flex flex-1 items-center justify-center rounded-r-full bg-[#0580A5] px-3 py-1 text-[10px] text-white transition-colors hover:bg-[#046a8a] sm:text-sm"
+                                                        className="bg-[#0580A5] text-white px-6 py-2 hover:bg-[#046a8a] transition-colors cursor-pointer text-sm rounded-r-full flex items-center justify-center"
                                                     >
                                                         GO TO BUYING
                                                     </a>
@@ -335,24 +326,25 @@ const MobileSpecs = () => {
                                             ))}
                                         </div>
 
-                                        <div className="space-y-2">
+                                        {/* Right Column */}
+                                        <div className="space-y-3">
                                             {rightColumn.map((item, index) => (
-                                                <div key={index} className="flex items-stretch gap-1.5">
-                                                    <div className="flex min-w-[72px] items-center justify-center rounded-l-full border-2 border-[#0580A5] px-3 py-1">
-                                                        <span className="text-[11px] font-semibold text-gray-800 sm:text-sm">${item.price}</span>
+                                                <div key={index} className="flex items-stretch gap-2 justify-start lg:justify-start">
+                                                    <div className="border-2 border-[#0580A5] rounded-l-full px-5 py-2 flex items-center justify-center">
+                                                        <span className="font-semibold text-gray-800">${item.price}</span>
                                                     </div>
-                                                    <div className="flex min-w-[88px] items-center justify-center border-2 border-[#0580A5] bg-white px-3 py-1 sm:min-w-[120px]">
+                                                    <div className="border-2 border-[#0580A5] bg-white px-6 py-2 min-w-[140px] flex items-center justify-center">
                                                         <img
                                                             src={item.image}
                                                             alt="Store logo"
-                                                            className="h-5 object-contain sm:h-6"
+                                                            className="h-6 object-contain"
                                                         />
                                                     </div>
                                                     <a
                                                         href={item.link}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="flex flex-1 items-center justify-center rounded-r-full bg-[#0580A5] px-3 py-1 text-[10px] text-white transition-colors hover:bg-[#046a8a] sm:text-sm"
+                                                        className="bg-[#0580A5] text-white px-6 py-2 hover:bg-[#046a8a] transition-colors cursor-pointer text-sm rounded-r-full flex items-center justify-center"
                                                     >
                                                         GO TO BUYING
                                                     </a>
@@ -364,8 +356,8 @@ const MobileSpecs = () => {
                             })()}
 
                             {/* Disclaimer Text */}
-                            <div className="mx-auto mt-5 max-w-4xl text-center">
-                                <p className="text-[10px] font-medium leading-relaxed text-black sm:text-[15px]">
+                            <div className="mt-6 text-center max-w-4xl mx-auto">
+                                <p className="text-sm font-medium text-black leading-relaxed  text-[17px]">
                                     <span className="font-semibold">Disclaimer.</span> Samsung Galaxy Note 20 price in Pakistan is updated daily from the price list provided by local shops and dealers but we can not guarantee that the information/price/Samsung Galaxy Note 20 Prices on this page is 100% correct (Human error is possible), always visit your local shop for exact cell phone cost & rate. Samsung Galaxy Note 20 price Pakistan.
                                 </p>
                             </div>
@@ -373,80 +365,88 @@ const MobileSpecs = () => {
 
                     </div>
                     <div>
-                        <div className="relative mb-5 mt-3 flex w-full items-start justify-between gap-2">
+                        <div className="relative w-full flex items-start justify-between lg:justify-between mb-5 mt-3">
                             {/* Horizontal Line Background */}
                             <div className="absolute bottom-0 left-0 w-full h-[10px] sm:h-[16px] bg-[#0580A5]"></div>
 
                             {/* Title Box */}
                             <div
-                                className="latest-news-clip lg:latest-products-clip relative z-10 flex h-10 w-fit items-center bg-[#0580A5] text-white sm:h-12"
+                                className="latest-news-clip lg:latest-products-clip bg-[#0580A5] text-white w-fit h-10 sm:h-12 flex items-center justify-center relative z-10"
                                 style={{
                                     clipPath: "polygon(0% 100%, 0px 0%, calc(100% - 60px) 0%, 100% 100%)",
                                     paddingLeft: "10px",
                                     paddingRight: "60px"
                                 }}
                             >
-                                <h2 className="pl-2 text-[14px] sm:pl-4 sm:text-2xl">User Reviews</h2>
+                                <h2 className="sm:text-2xl text-[18px] lg:pl-2 sm:lg:pl-4">User Reviews</h2>
                             </div>
                             <div>
-                                <Link to="/reviews" className="cursor-pointer text-[10px] text-[#0060FF] underline sm:text-xl">Read All User Reviews</Link>
+                                <Link to="/reviews" className='text-[#0060FF] text-xl underline cursor-pointer '>Read All User Reviews</Link>
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 gap-1.5 px-0 sm:grid-cols-3 sm:px-2">
-                            <div className="flex flex-col items-center justify-center border-2 border-[#0580A5] p-1.5 text-center sm:p-5">
-                                <h3 className="mb-1 text-[9px] font-semibold text-black sm:mb-2 sm:text-lg">OVERALL RATING</h3>
-                                <div className="text-[20px] font-bold text-black sm:text-6xl">
-                                    4.3<span className="text-[11px] sm:text-4xl">/5</span>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-2 sm:px-4">
+                            {/* Box 1: Overall Rating */}
+                            <div className="border-2 border-[#0580A5] p-6 flex flex-col items-center justify-evenly">
+                                <h3 className="text-lg font-semibold mb-2 text-black">OVERALL RATING</h3>
+                                <div className="text-6xl font-bold text-black">
+                                    4.3<span className="text-4xl">/5</span>
                                 </div>
-                                <p className="mt-1 text-[7px] leading-tight text-black sm:mt-2 sm:text-sm">BASED ON 7,373 RATING(S)</p>
+                                <p className="text-base text-black mt-2 text-sm">BASED ON 7,373 RATING(S)</p>
                             </div>
 
-                            <div className="border-2 border-[#0580A5] p-1.5 sm:p-5">
-                                <h3 className="mb-1.5 text-center text-[8px] font-semibold text-black sm:mb-4 sm:text-lg">OVERALL RATING</h3>
-                                <div className="space-y-1 text-black sm:space-y-2">
-                                    <div className="flex items-center gap-1 sm:gap-2">
-                                        <span className="w-7 text-[7px] sm:w-14 sm:text-sm">5 stars</span>
-                                        <div className="h-2 flex-1 bg-gray-200 sm:h-4">
-                                            <div className="h-2 bg-[#0580A5] sm:h-4" style={{ width: '70%' }}></div>
+                            {/* Box 2: Rating Breakdown */}
+                            <div className="border-2 border-[#0580A5] p-6">
+                                <h3 className="text-lg font-semibold mb-4 text-black text-center">OVERALL RATING</h3>
+                                <div className="space-y-2 text-black">
+                                    {/* 5 stars */}
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-sm w-14">5 stars</span>
+                                        <div className="flex-1 bg-gray-200 h-4 ">
+                                            <div className="bg-[#0580A5] h-4 " style={{ width: '70%' }}></div>
                                         </div>
-                                        <span className="w-6 text-right text-[7px] sm:w-12 sm:text-sm">4,645</span>
+                                        <span className="text-sm w-12 text-right">4,645</span>
                                     </div>
-                                    <div className="flex items-center gap-1 sm:gap-2">
-                                        <span className="w-7 text-[7px] sm:w-14 sm:text-sm">4 stars</span>
-                                        <div className="h-2 flex-1 bg-gray-200 sm:h-4">
-                                            <div className="h-2 bg-[#0580A5] sm:h-4" style={{ width: '25%' }}></div>
+                                    {/* 4 stars */}
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-sm w-14">4 stars</span>
+                                        <div className="flex-1 bg-gray-200 h-4 ">
+                                            <div className="bg-[#0580A5] h-4 " style={{ width: '25%' }}></div>
                                         </div>
-                                        <span className="w-6 text-right text-[7px] sm:w-12 sm:text-sm">1,777</span>
+                                        <span className="text-sm w-12 text-right">1,777</span>
                                     </div>
-                                    <div className="flex items-center gap-1 sm:gap-2">
-                                        <span className="w-7 text-[7px] sm:w-14 sm:text-sm">3 stars</span>
-                                        <div className="h-2 flex-1 bg-gray-200 sm:h-4">
-                                            <div className="h-2 bg-[#0580A5] sm:h-4" style={{ width: '7%' }}></div>
+                                    {/* 3 stars */}
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-sm w-14">3 stars</span>
+                                        <div className="flex-1 bg-gray-200 h-4 ">
+                                            <div className="bg-[#0580A5] h-4 " style={{ width: '7%' }}></div>
                                         </div>
-                                        <span className="w-6 text-right text-[7px] sm:w-12 sm:text-sm">485</span>
+                                        <span className="text-sm w-12 text-right">485</span>
                                     </div>
-                                    <div className="flex items-center gap-1 sm:gap-2">
-                                        <span className="w-7 text-[7px] sm:w-14 sm:text-sm">2 stars</span>
-                                        <div className="h-2 flex-1 bg-gray-200 sm:h-4">
-                                            <div className="h-2 bg-[#0580A5] sm:h-4" style={{ width: '3%' }}></div>
+                                    {/* 2 stars */}
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-sm w-14">2 stars</span>
+                                        <div className="flex-1 bg-gray-200 h-4 ">
+                                            <div className="bg-[#0580A5] h-4 " style={{ width: '3%' }}></div>
                                         </div>
-                                        <span className="w-6 text-right text-[7px] sm:w-12 sm:text-sm">183</span>
+                                        <span className="text-sm w-12 text-right">183</span>
                                     </div>
-                                    <div className="flex items-center gap-1 sm:gap-2">
-                                        <span className="w-7 text-[7px] sm:w-14 sm:text-sm">1 star</span>
-                                        <div className="h-2 flex-1 bg-gray-200 sm:h-4">
-                                            <div className="h-2 bg-[#0580A5] sm:h-4" style={{ width: '7%' }}></div>
+                                    {/* 1 star */}
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-sm w-14">1 star</span>
+                                        <div className="flex-1 bg-gray-200 h-4 ">
+                                            <div className="bg-[#0580A5] h-4 " style={{ width: '7%' }}></div>
                                         </div>
-                                        <span className="w-6 text-right text-[7px] sm:w-12 sm:text-sm">477</span>
+                                        <span className="text-sm w-12 text-right">477</span>
                                     </div>
                                 </div>
-                                <p className="mt-1.5 text-center text-[7px] leading-tight text-black sm:mt-4 sm:text-xs">2,492 USER REVIEW(S)</p>
+                                <p className="text-xs text-center mt-4 text-black">2,492 USER REVIEW(S)</p>
                             </div>
 
-                            <div className="flex flex-col items-center justify-between border-2 border-[#0580A5] p-1.5 text-center sm:p-5">
-                                <h3 className="mb-2 text-[8px] font-semibold leading-tight text-black sm:mb-6 sm:text-lg">SHARE YOUR THOUGHTS</h3>
-                                <button className="bg-[#0580A5] px-2 py-1.5 text-[8px] text-white transition-colors hover:bg-[#046a8a] sm:px-8 sm:py-3 sm:text-sm">
+                            {/* Box 3: Share Your Thoughts */}
+                            <div className="border-2 border-[#0580A5] p-6 flex flex-col items-center justify-start gap-10">
+                                <h3 className="text-lg font-semibold mb-6 text-black">SHARE YOUR THOUGHTS</h3>
+                                <button className="bg-[#0580A5] text-white px-8 py-3 hover:bg-[#046a8a] transition-colors  text-sm cursor-pointer">
                                     WRITE A REVIEW
                                 </button>
                             </div>
@@ -454,13 +454,13 @@ const MobileSpecs = () => {
                     </div>
 
                     <div>
-                        <div className="relative mb-5 mt-6 flex w-full items-end justify-start">
+                        <div className="relative w-full flex items-end justify-center lg:justify-start mb-5 mt-6">
                             {/* Horizontal Line Background */}
                             <div className="absolute bottom-0 left-0 w-full h-[10px] sm:h-[16px] bg-[#0580A5]"></div>
 
                             {/* Title Box */}
                             <div
-                                className="latest-news-clip lg:latest-products-clip relative z-10 flex h-10 max-w-full items-center bg-[#0580A5] text-white sm:h-12"
+                                className="latest-news-clip lg:latest-products-clip bg-[#0580A5] text-white w-fit h-10 sm:h-12 flex items-center justify-center relative z-10"
                                 style={{
                                     clipPath: "polygon(0% 100%, 0px 0%, calc(100% - 60px) 0%, 100% 100%)",
                                     paddingLeft: "0px",
@@ -468,15 +468,13 @@ const MobileSpecs = () => {
                                 }}
                             >
 
-                                <h2 className="pl-2 text-[11px] leading-none sm:pl-4 sm:text-2xl">
-                                    {productData?.name || "Mobile"} Price Discussions, Opinions and Reviews
-                                </h2>
+                                <h2 className="sm:text-2xl text-[18px] lg:pl-2 sm:lg:pl-4">{productData?.name || "Mobile"} Price Discussions, Opinions and Reviews</h2>
                             </div>
                         </div>
 
 
 
-                        <div className="space-y-2 px-0">
+                        <div className="space-y-3 px-2 sm:px-0">
                             {/* Review Cards - Array Mapping */}
                             {(() => {
                                 const reviewsData = [
@@ -511,25 +509,25 @@ const MobileSpecs = () => {
                                 ];
 
                                 return reviewsData.map((review, index) => (
-                                    <div key={index} className="border-2 border-[#0580A5] px-2 py-2 sm:px-4">
-                                        <div className="mb-1 flex items-start justify-between gap-2">
-                                            <h3 className="text-[10px] font-medium leading-tight sm:text-2xl">{review.title}</h3>
+                                    <div key={index} className="border-2 border-[#0580A5] px-4 py-2">
+                                        <div className="flex justify-between items-start mb-1">
+                                            <h3 className="text-2xl">{review.title}</h3>
                                             <div className="flex flex-col items-end gap-0">
                                                 <div className="flex items-center gap-0.5">
                                                     {[...Array(review.rating)].map((_, i) => (
-                                                        <span key={i} className="text-[12px] text-yellow-400 sm:text-xl">★</span>
+                                                        <span key={i} className="text-yellow-400 text-xl">★</span>
                                                     ))}
                                                 </div>
                                                 <span className="text-[10px] text-black">{review.date}</span>
                                             </div>
                                         </div>
-                                        <p className="mb-2 text-[10px] font-bold text-black sm:text-sm">{review.author}</p>
-                                        <p className="mb-3 text-[10px] leading-tight text-black sm:text-sm">
+                                        <p className="text-sm text-black font-bold mb-2">{review.author}</p>
+                                        <p className="text-sm text-black leading-tight mb-3">
                                             {review.text}
                                         </p>
-                                        <div className="flex items-center gap-3 pb-1 text-[10px] sm:text-sm">
-                                            <span className="text-[10px] font-semibold text-black sm:text-sm">Is this review helpful?</span>
-                                            <button className="flex items-center gap-1 text-[#0580A5] hover:underline cursor-pointer">
+                                        <div className="flex items-center gap-4 text-sm pb-1">
+                                            <span className="text-black font-semibold text-sm">Is this review helpful?</span>
+                                            <button className="text-[#0580A5] hover:underline flex items-center gap-1 cursor-pointer">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                                                 </svg>
@@ -541,7 +539,7 @@ const MobileSpecs = () => {
                             })()}
 
                             {/* Add Review Form */}
-                            <form className="mt-2 border-2 border-[#0580A5] bg-gray-50 p-2" onSubmit={handleReviewSubmit}>
+                            <form className="border-2 border-[#0580A5] bg-gray-50 p-2 mt-2" onSubmit={handleReviewSubmit}>
                                 {reviewStatus.error && (
                                     <div className="mb-3 border border-red-300 bg-red-100 px-3 py-2 text-sm text-red-700">
                                         {reviewStatus.error}
@@ -555,7 +553,7 @@ const MobileSpecs = () => {
                                 )}
 
                                 {/* Title and Stars Row */}
-                                <div className="mb-3 flex items-center gap-2 sm:gap-4">
+                                <div className="flex items-center gap-4 mb-3">
                                     <input
                                         type="text"
                                         name="title"
@@ -563,15 +561,16 @@ const MobileSpecs = () => {
                                         onChange={handleReviewChange}
                                         placeholder="Add Title"
                                         required
-                                        className="border-1 min-w-0 flex-1 border-[#0580A5] bg-white px-3 py-1 text-black placeholder:text-[12px] placeholder:font-semibold placeholder:text-black focus:outline-none sm:w-[300px] sm:flex-none sm:placeholder:text-lg"
+                                        className="border-1 px-3 py-1 focus:outline-none bg-white border-[#0580A5] flex-shrink-0 placeholder-black text-black placeholder:font-semibold placeholder:text-lg"
+                                        style={{ width: '300px' }}
                                     />
-                                    <div className="flex shrink-0 items-center gap-0.5 sm:gap-1">
+                                    <div className="flex items-center gap-1">
                                         {[...Array(5)].map((_, i) => (
                                             <button
                                                 key={i}
                                                 type="button"
                                                 onClick={() => handleRatingSelect(i + 1)}
-                                                className={`cursor-pointer text-[16px] sm:text-xl ${i < reviewForm.rating ? 'text-yellow-400' : 'text-[#0580A5]'}`}
+                                                className={`text-xl cursor-pointer ${i < reviewForm.rating ? 'text-yellow-400' : 'text-[#0580A5]'}`}
                                                 aria-label={`Rate ${i + 1} star${i === 0 ? '' : 's'}`}
                                             >
                                                 {i < reviewForm.rating ? '★' : '☆'}
@@ -599,37 +598,36 @@ const MobileSpecs = () => {
                                     <button
                                         type="submit"
                                         disabled={reviewStatus.loading}
-                                        className="bg-[#0580A5] px-6 py-2 text-[11px] font-medium text-white transition-colors hover:bg-[#046a8a] cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 sm:px-8 sm:text-base"
+                                        className="bg-[#0580A5] text-white px-8 py-2 hover:bg-[#046a8a] transition-colors font-medium cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
                                     >
                                         {reviewStatus.loading ? 'Submitting...' : 'Submit'}
                                     </button>
                                 </div>
                             </form>
 
-                            <div className="mt-2 flex w-full items-center gap-2 sm:gap-4">
-                                <Link to="/reviews" className="flex flex-1 items-center justify-center rounded-full border-2 border-[#0580A5] px-3 py-1.5 text-[9px] text-black transition-colors hover:bg-[#0580A5] hover:text-white cursor-pointer sm:px-6 sm:py-2 sm:text-base">
+                            <div className="flex flex-col sm:flex-row gap-4 justify-end items-center mt-2">
+                                <Link to="/reviews" className="flex items-center justify-center border-2 border-[#0580A5] text-black px-6 py-2 rounded-full hover:bg-[#0580A5] hover:text-white transition-colors text-base cursor-pointer">
                                     Read All Reviews&gt;&gt;
                                 </Link>
-                                <button className="flex-1 rounded-full border-2 border-[#0580A5] px-3 py-1.5 text-[9px] text-black transition-colors hover:bg-[#0580A5] hover:text-white cursor-pointer sm:px-6 sm:py-2 sm:text-base">
+                                <button className="border-2 border-[#0580A5] text-black px-6 py-2 rounded-full hover:bg-[#0580A5] hover:text-white transition-colors  text-base cursor-pointer ">
                                     Post a Suggestion&gt;&gt;
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    <div className="mt-7 sm:hidden">
-                        <BannerAd banner={{ image: pageBanners['mobilespecifications_banner_2'] || specsBannerMobileFallback.image }} className="w-full" />
-                    </div>
-                    <div className="mt-7 hidden sm:block">
-                        <BannerAd banner={{ image: pageBanners['mobilespecifications_banner_2'] || specsBannerFallback.image }} className="w-full" />
-                    </div>
+                    {pageBanners['mobilespecifications_banner_2'] && <img className='mt-7 h-[200px] w-auto sm:w-full' src={pageBanners['mobilespecifications_banner_2']} alt="Mobile Specs Banner 2" />}
 
 
 
                     <div className='mt-10'>
                         <LatestNews
-                            title="Latest News"
+                            title="Related News"
                             gridCols="sm:grid-cols-2"
+                            titleAlign="start"
+                            clipPath="polygon(0% 100%, 0px 0%, calc(100% - 60px) 0%, 100% 100%)"
+                            paddingLeft="0px"
+                            paddingRight="60px"
                             limit={4}
                             newsData={filteredRelatedNews}
                             emptyMessage="This product has no related news yet."
@@ -637,8 +635,12 @@ const MobileSpecs = () => {
                     </div>
                     <div className='mt-10'>
                         <LatestReviews
-                            title="Latest Reviews"
+                            title="Related Reviews"
                             gridCols="sm:grid-cols-3"
+                            titleAlign="start"
+                            clipPath="polygon(0% 100%, 0px 0%, calc(100% - 60px) 0%, 100% 100%)"
+                            paddingLeft="0px"
+                            paddingRight="60px"
                             limit={6}
                             reviewsData={filteredRelatedReviews}
                             emptyMessage="This product has no reviews yet."
@@ -652,12 +654,7 @@ const MobileSpecs = () => {
             </div>
 
 
-            <div className="mt-7 sm:hidden">
-                <BannerAd banner={{ image: pageBanners['mobilespecifications_banner_3'] || specsBannerMobileFallback.image }} className="w-full" />
-            </div>
-            <div className="mt-7 hidden sm:block">
-                <BannerAd banner={{ image: pageBanners['mobilespecifications_banner_3'] || specsBannerFallback.image }} className="w-full" />
-            </div>
+            {pageBanners['mobilespecifications_banner_3'] && <img className='mt-7 w-auto sm:w-full h-[200px] sm:h-auto' src={pageBanners['mobilespecifications_banner_3']} alt="Mobile Specs Banner 3" />}
 
             <ComingSoonMobiles title={comingSoonConfig.title} itemImage={comingSoonConfig.itemImage} endpoint={comingSoonConfig.endpoint} />
 
