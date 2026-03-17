@@ -7,7 +7,7 @@ import {
 } from "../utils/productReview";
 import { createSlug } from "../utils/urlHelper";
 
-const ITEMS_PER_PAGE = 14;
+const ITEMS_PER_PAGE = 9;
 
 export const usePublicProductReviews = (searchQuery) => {
   const { allProducts } = useData();
