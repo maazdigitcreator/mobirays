@@ -1,15 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import homeBannerSM1 from '../assets/homeBannerSM1.png'
-import homeBannerSM2 from '../assets/homeBannerSM2.png'
-import HeroBanner from '../components/Layout/HeroBanner'
+import banner from '../assets/banner.png'
 import { Search } from 'lucide-react'
-import shareIcon from "../assets/shareIcon.png"
-import Sidebar from '../components/Layout/Sidebar'
 import BannerAd from '../components/BannerAd'
-import { useData } from '../context/DataContext'
-import Banner1 from '../assets/homeBannerSM1.png'
-import Banner2 from '../assets/homeBannerSM2.png'
 import homeBanner3 from '../assets/homeBanner3.png'
+import homeBannerSM3 from '../assets/homeBannerSM3.png'
 
 
 const Videos = () => {
@@ -19,6 +14,14 @@ const Videos = () => {
     const [error, setError] = useState(null)
     const [selectedVideo, setSelectedVideo] = useState(null)
     const [pageBanners, setPageBanners] = useState({});
+    const videosBannerFallback = {
+        title: 'Videos Banner',
+        image: homeBanner3,
+    };
+    const videosBannerMobileFallback = {
+        title: 'Videos Banner Mobile',
+        image: homeBannerSM3,
+    };
 
     // Fetch banners from API
     useEffect(() => {
@@ -77,8 +80,7 @@ const Videos = () => {
     // Video card component (reusable)
     const VideoCard = ({ video }) => (
         <div className="cursor-pointer group" onClick={() => setSelectedVideo(video)}>
-            {/* Thumbnail */}
-            <div className="relative w-full aspect-video bg-gray-200 overflow-hidden">
+            <div className="relative w-full aspect-video overflow-hidden bg-gray-200">
                 <img
                     src={video.thumbnail?.high || video.thumbnail?.medium || video.thumbnail?.default || `https://i.ytimg.com/vi/${video.youtube_id}/hqdefault.jpg`}
                     alt={video.title}
@@ -103,10 +105,8 @@ const Videos = () => {
                 </div>
             </div>
 
-            {/* Info */}
-            <div className='flex mt-3 gap-4'>
-                {/* Channel Icon */}
-                <div className="w-8 h-8 mt-2 rounded-full overflow-hidden flex-shrink-0 bg-[#0580A5] flex items-center justify-center">
+            <div className='mt-2 flex gap-2 sm:mt-3 sm:gap-4'>
+                <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#0580A5] sm:mt-2 sm:h-8 sm:w-8">
                     {video.channel_icon ? (
                         <img
                             src={video.channel_icon}
@@ -119,22 +119,22 @@ const Videos = () => {
                         />
                     ) : null}
                     <span
-                        className="text-white text-xs font-bold"
+                        className="text-[10px] font-bold text-white sm:text-xs"
                         style={{ display: video.channel_icon ? 'none' : 'flex' }}
                     >
                         {video.channel ? video.channel.charAt(0).toUpperCase() : 'V'}
                     </span>
                 </div>
-                <div className="">
-                    <h3 className="text-sm font-medium text-black line-clamp-2 leading-tight mb-1">
+                <div className="min-w-0">
+                    <h3 className="mb-1 line-clamp-2 text-[10px] font-medium leading-tight text-black sm:text-sm">
                         {video.title}
                     </h3>
                     <div className="flex items-start gap-2">
-                        <div className="flex-1 min-w-0">
+                        <div className="min-w-0 flex-1">
                             {video.channel && (
-                                <p className="text-xs text-gray-700 font-medium">{video.channel}</p>
+                                <p className="text-[9px] font-medium text-gray-700 sm:text-xs">{video.channel}</p>
                             )}
-                            <p className="text-xs text-gray-600">
+                            <p className="text-[9px] text-gray-600 sm:text-xs">
                                 {formatViews(video.views)}{video.time_ago ? ` • ${video.time_ago}` : ''}
                             </p>
                         </div>
@@ -146,56 +146,43 @@ const Videos = () => {
 
     return (
         <div className="w-full">
-
-            <div className='flex gap-2'>
-                <div className="w-full lg:w-1/3 hidden lg:block">
-                    <div className='flex flex-col gap-2 sm:h-120 h-auto'>
-                        {/* Left Large Banner */}
-                        <div className="md:col-span-4 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                            <img src={Banner1} alt="Digital Grand Offer" className="w-full h-full object-cover" />
-                        </div>
-                        {/* Center Banner */}
-                        <div className="md:col-span-5 overflow-hidden shadow-sm hover:shadow-md transition-shadow bg-blue-50">
-                            <img src={Banner2} alt="Spark 20" className="w-full h-full object-cover" />
-                        </div>
-                    </div>
+            <div className='mb-4 flex flex-col gap-2'>
+                <div className="overflow-hidden">
+                    <img src={homeBannerSM1} alt="Digital Grand Offer" className="w-full object-cover" />
                 </div>
-                <div className="w-full lg:w-3/4">
-                    <HeroBanner />
+                <div className="overflow-hidden border border-[#d9d9d9] bg-white">
+                    <img src={banner} alt="Phone promo" className="w-full object-cover" />
                 </div>
             </div>
 
-            <div className="relative w-full mb-5 overflow-hidden">
-                {/* Background bar */}
-                <div className="w-full h-10 sm:h-14 flex items-center justify-between">
-                    {/* Left side - Device name with slanted edge */}
+            <div className="mb-5 flex justify-start">
+                <div className="flex w-full max-w-[420px]">
+                    <input
+                        type="text"
+                        placeholder="Search videos..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && setSearchQuery(searchQuery.trim())}
+                        className="min-w-0 flex-1 border-2 border-[#0580A5] px-2 py-1 text-[12px] text-black placeholder-gray-500 focus:outline-none focus:border-[#046a8a] sm:text-base"
+                    />
+                    <button
+                        onClick={() => setSearchQuery(searchQuery.trim())}
+                        className="flex items-center justify-center bg-[#0580A5] px-3 transition-colors hover:bg-[#046a8a] sm:px-4"
+                    >
+                        <Search className="text-white" size={18} />
+                    </button>
+                </div>
+            </div>
+
+            <div className="relative mb-5 w-full overflow-hidden">
+                <div className="flex h-10 items-center justify-between sm:h-14">
                     <div className="absolute -bottom-1 left-0 w-full h-[10px] sm:h-[16px] bg-[#0580A5]"></div>
 
-                    <div className="relative w-full flex items-end">
-                        {/* Title Box */}
+                    <div className="relative flex w-full items-end">
                         <div
-                            className="latest-products-clip bg-[#0580A5] text-white w-fit sm:h-14 h-10 flex items-center relative z-10"
+                            className="latest-products-clip relative z-10 flex h-10 w-fit items-center bg-[#0580A5] text-white sm:h-14"
                         >
-                            <h1 className="sm:text-[26px] text-[18px] pl-2 sm:pl-4">Reviews Videos</h1>
-                        </div>
-                    </div>
-
-                    {/* Search Bar */}
-                    <div className="flex gap-4 mb-4 justify-start items-start z-10">
-                        <div className="flex">
-                            <input
-                                type="text"
-                                placeholder="Search videos..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                onKeyDown={(e) => e.key === 'Enter' && setSearchQuery(searchQuery.trim())}
-                                className="w-full sm:w-[350px] border-2 border-[#0580A5] py-1 px-2 focus:outline-none focus:border-[#046a8a] text-black placeholder-gray-500"
-                            />
-                            <button
-                                onClick={() => setSearchQuery(searchQuery.trim())}
-                                className="right-0 top-0 min-h-full px-4 bg-[#0580A5] hover:bg-[#046a8a] transition-colors flex items-center justify-center">
-                                <Search className="text-white" size={20} />
-                            </button>
+                            <h1 className="pl-2 text-[14px] sm:pl-4 sm:text-[26px]">Reviews Videos</h1>
                         </div>
                     </div>
                 </div>
@@ -233,22 +220,21 @@ const Videos = () => {
             {/* Videos Grid */}
             {!loading && !error && filteredVideos.length > 0 && (
                 <>
-                    {/* First 16 videos */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 lg:gap-4">
                         {filteredVideos.slice(0, 16).map((video) => (
                             <VideoCard key={video.id} video={video} />
                         ))}
                     </div>
 
-                    {/* Videos 17-32 and Banner 1 */}
                     {filteredVideos.length > 16 && (
                         <div className="mt-8">
-                            {pageBanners['videos_banner_1'] && (
-                                <div className='mb-8'>
-                                    <BannerAd banner={pageBanners['videos_banner_1']} />
-                                </div>
-                            )}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div className='mb-8 sm:hidden'>
+                                <BannerAd banner={pageBanners['videos_banner_1'] ? { image: pageBanners['videos_banner_1'] } : videosBannerMobileFallback} />
+                            </div>
+                            <div className='mb-8 hidden sm:block'>
+                                <BannerAd banner={pageBanners['videos_banner_1'] ? { image: pageBanners['videos_banner_1'] } : videosBannerFallback} />
+                            </div>
+                            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 lg:gap-4">
                                 {filteredVideos.slice(16, 32).map((video) => (
                                     <VideoCard key={video.id} video={video} />
                                 ))}
@@ -256,15 +242,15 @@ const Videos = () => {
                         </div>
                     )}
 
-                    {/* Videos 33+ and Banner 2 */}
                     {filteredVideos.length > 32 && (
                         <div className="mt-8 mb-10">
-                            {pageBanners['videos_banner_2'] && (
-                                <div className='mb-8'>
-                                    <BannerAd banner={pageBanners['videos_banner_2']} />
-                                </div>
-                            )}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div className='mb-8 sm:hidden'>
+                                <BannerAd banner={pageBanners['videos_banner_2'] ? { image: pageBanners['videos_banner_2'] } : videosBannerMobileFallback} />
+                            </div>
+                            <div className='mb-8 hidden sm:block'>
+                                <BannerAd banner={pageBanners['videos_banner_2'] ? { image: pageBanners['videos_banner_2'] } : videosBannerFallback} />
+                            </div>
+                            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 lg:gap-4">
                                 {filteredVideos.slice(32).map((video) => (
                                     <VideoCard key={video.id} video={video} />
                                 ))}

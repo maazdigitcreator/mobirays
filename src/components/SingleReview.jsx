@@ -12,10 +12,10 @@ const SingleReview = ({ title, rating, image, customHeight }) => {
     const color = getRatingColor(finalRating);
 
     return (
-        <div className="cursor-pointer border border-2 border-[#0580A5]">
-            <div className=" p-1 hover:shadow-lg transition-shadow">
+        <div className="cursor-pointer">
+            <div className="p-0 transition-shadow hover:shadow-lg">
                 <div
-                    className={`relative w-full aspect-square overflow-hidden bg-gray-100 ${customHeight || 'h-[170px] sm:h-[300px]'}`}
+                    className={`relative w-full aspect-square overflow-hidden bg-gray-100 ${customHeight || 'h-[148px] sm:h-[300px]'}`}
                 >
                     <img
                         src={image || reviewImg}
@@ -25,16 +25,16 @@ const SingleReview = ({ title, rating, image, customHeight }) => {
 
                     {/* Rating Badge */}
                     <div
-                        className="absolute top-0 right-0 text-white font-bold p-2 text-lg"
+                        className="absolute right-0 top-0 p-1.5 text-sm font-bold text-white sm:p-2 sm:text-lg"
                         style={{ backgroundColor: `${color}a6` }}
                     >
                         {finalRating.toFixed(1)}
                     </div>
 
                     {/* Bottom Rating Bar Overlay */}
-                    <div className="absolute bottom-0 w-full bg-[#0580A5]/60 h-8 flex items-center px-2 backdrop-blur-[1px]">
+                    <div className="absolute bottom-0 flex h-6 w-full items-center bg-[#0580A5]/60 px-2 backdrop-blur-[1px] sm:h-8">
                         <span
-                            className="text-sm font-bold mr-2"
+                            className="mr-2 text-[10px] font-bold sm:text-sm"
                             style={{ color: color }}
                         >
                             {finalRating.toFixed(1)}
@@ -48,7 +48,7 @@ const SingleReview = ({ title, rating, image, customHeight }) => {
                     </div>
                 </div>
             </div>
-            <h3 className="sm:text-lg text-sm text-gray-800 font-medium mt-2 leading-tight line-clamp-2 p-1">
+            <h3 className="mt-1 px-0.5 text-[10px] font-medium leading-tight text-gray-800 line-clamp-2 sm:mt-2 sm:p-1 sm:text-lg">
                 {title || "No Title"}
             </h3>
         </div>

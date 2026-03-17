@@ -10,19 +10,29 @@ import SidebarStats from '../components/SidebarSections/SidebarStats';
 import SidebarLatestModels from '../components/SidebarSections/SidebarLatestModels';
 import SidebarBanner1 from '../components/SidebarSections/SidebarBanner1';
 import SidebarBanner2 from '../components/SidebarSections/SidebarBanner2';
-import RelatedReviews from '../components/SidebarSections/RelatedReviews';
-import RelatedNews from '../components/SidebarSections/RelatedNews';
+import SidebarBanner3 from '../components/SidebarSections/SidebarBanner3';
+import BannerAd from '../components/BannerAd';
+import homeBanner3 from '../assets/homeBanner3.png';
+import homeBannerSM3 from '../assets/homeBannerSM3.png';
 
 const AllBrands = () => {
     const { allBanners } = useData();
     const [pageBanners, setPageBanners] = useState({});
+    const allBrandsBannerFallback = {
+        title: 'All Brands Banner',
+        image: homeBanner3,
+    };
+    const allBrandsBannerMobileFallback = {
+        title: 'All Brands Banner Mobile',
+        image: homeBannerSM3,
+    };
 
     useEffect(() => {
         if (allBanners.length > 0) {
             const map = {};
             ['allbrands_banner_1', 'allbrands_banner_2'].forEach(loc => {
-                const b = allBanners.find(b => b.location === loc);
-                if (b?.image) map[loc] = b.image;
+                const b = allBanners.find((banner) => banner.location === loc);
+                if (b) map[loc] = b;
             });
             setPageBanners(map);
         }
@@ -30,36 +40,35 @@ const AllBrands = () => {
 
     return (
         <div>
-            <div className='flex flex-col lg:flex-row gap-2'>
-                {/* Sidebar Column */}
-                <div className="w-full lg:w-1/3 hidden lg:block">
+            <div className="grid gap-2 lg:grid-cols-[401px_minmax(0,1fr)] lg:items-start">
+                <div className="hidden lg:block">
                     <div className="flex flex-col gap-2">
+                        <SidebarIntro />
+                        <SidebarBrands />
                         <SidebarFilters />
                         <SidebarBanner1 />
-                        <RelatedReviews />
-                        <RelatedNews />
                         <div className="flex flex-col gap-6">
                             <SidebarStats />
                             <SidebarBanner2 />
                             <SidebarLatestModels />
+                            <SidebarBanner3 />
                         </div>
                     </div>
                 </div>
 
-                {/* Main Content Column */}
-                <div className="w-full lg:w-3/4">
-                    {/* Hero Section with Background Image */}
-                    <AllBrandsHero backgroundImage={pageBanners['allbrands_banner_1']} />
+                <div className="min-w-0">
+                    <AllBrandsHero backgroundImage={pageBanners['allbrands_banner_1']?.image} />
 
-                    {/* Brands Grid */}
                     <BrandsGrid />
-
-
                 </div>
-
             </div>
-            {/* Bottom banner */}
-            {pageBanners['allbrands_banner_2'] && <img className='mt-7 w-auto sm:w-full h-[200px] sm:h-auto' src={pageBanners['allbrands_banner_2']} alt="All Brands Banner 2" />}
+
+            <div className="mt-7 sm:hidden">
+                <BannerAd banner={pageBanners['allbrands_banner_2'] || allBrandsBannerMobileFallback} className="w-full" />
+            </div>
+            <div className="mt-7 hidden sm:block">
+                <BannerAd banner={pageBanners['allbrands_banner_2'] || allBrandsBannerFallback} className="w-full" />
+            </div>
         </div>
     )
 }

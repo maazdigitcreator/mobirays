@@ -2,22 +2,22 @@ import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import newsBanner1 from '../assets/newsBanner1.png'
 import newsBanner2 from '../assets/newsBanner2.png'
-import Sidebar2 from '../components/Layout/Sidebar2'
-import sidebarBanner2 from '../assets/sidebarBanner2.jpg'
-import LatestNews from '../components/LatestNews'
-import LatestReviews from '../components/LatestReviews'
 import SingleNews from '../components/SingleNews'
 import Pagination from '../components/Pagination'
 import ComingSoonMobiles from '../components/ComingSoonMobiles'
 import mobileImg from '../assets/mobileImg.jpg'
+import SidebarIntro from '../components/SidebarSections/SidebarIntro'
 import SidebarBrands from '../components/SidebarSections/SidebarBrands'
 import SidebarFilters from '../components/SidebarSections/SidebarFilters'
 import SidebarBanner1 from '../components/SidebarSections/SidebarBanner1'
 import SidebarBanner2 from '../components/SidebarSections/SidebarBanner2'
 import SidebarStats from '../components/SidebarSections/SidebarStats'
 import SidebarLatestModels from '../components/SidebarSections/SidebarLatestModels'
+import SidebarBanner3 from '../components/SidebarSections/SidebarBanner3'
 import { useData } from '../context/DataContext';
 import BannerAd from '../components/BannerAd'
+import homeBanner3 from '../assets/homeBanner3.png'
+import homeBannerSM3 from '../assets/homeBannerSM3.png'
 
 const News = () => {
     const location = useLocation();
@@ -25,6 +25,14 @@ const News = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 4;
     const [pageBanners, setPageBanners] = useState({});
+    const newsBannerFallback = {
+        title: 'News Banner',
+        image: homeBanner3,
+    };
+    const newsBannerMobileFallback = {
+        title: 'News Banner Mobile',
+        image: homeBannerSM3,
+    };
 
     useEffect(() => {
         if (allBanners.length > 0) {
@@ -105,8 +113,7 @@ const News = () => {
             {searchQuery && displayedNews.length === 0 ? (
                 <div className="text-center py-20 text-gray-500">No news found matching "{searchQuery}"</div>
             ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
-                    {/* Large Featured News - Left Side */}
+                <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
                     <Link
                         to={`/news/${featuredNews.slug}`}
                         state={{ newsData: featuredNews }}
@@ -117,21 +124,18 @@ const News = () => {
                             alt={featuredNews.name}
                             className="w-full h-full object-cover"
                         />
-                        {/* Overlay Gradient */}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
 
-                        {/* Content Overlay */}
-                        <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                            <h2 className="text-2xl sm:text-[48px] font-bold mb-2 leading-tight transition-colors">
+                        <div className="absolute bottom-0 left-0 right-0 p-3 text-white sm:p-6">
+                            <h2 className="mb-1 text-[18px] font-bold leading-tight transition-colors sm:mb-2 sm:text-[48px]">
                                 {featuredNews.name}
                             </h2>
-                            <p className="text-sm uppercase tracking-wide">
+                            <p className="text-[10px] uppercase tracking-wide sm:text-sm">
                                 BY NOOR
                             </p>
                         </div>
                     </Link>
 
-                    {/* Grid of 4 News Items - Right Side */}
                     <div className="grid grid-cols-2 gap-2">
                         {gridNews.map((news) => (
                             <Link
@@ -145,15 +149,13 @@ const News = () => {
                                     alt={news.name}
                                     className="w-full h-full object-cover"
                                 />
-                                {/* Overlay Gradient */}
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
 
-                                {/* Content Overlay */}
                                 <div className="absolute bottom-0 left-0 right-0 p-3 pr-7 text-white">
-                                    <h3 className="text-sm sm:text-[25px] sm:font-bold font-semibold mb-1 leading-tight line-clamp-3 transition-colors">
+                                    <h3 className="mb-1 text-[10px] font-semibold leading-tight line-clamp-3 transition-colors sm:text-[25px] sm:font-bold">
                                         {news.name}
                                     </h3>
-                                    <p className="text-xs uppercase tracking-wide">
+                                    <p className="text-[9px] uppercase tracking-wide sm:text-xs">
                                         BY NOOR
                                     </p>
                                 </div>
@@ -162,12 +164,10 @@ const News = () => {
                     </div>
                 </div>
             )}
-
-
-            <div className='flex flex-col lg:flex-row gap-2 mt-2'>
-                {/* Sidebar Column */}
-                <div className="w-full lg:w-1/3 hidden lg:block">
+            <div className="mt-2 grid gap-2 lg:grid-cols-[401px_minmax(0,1fr)] lg:items-start">
+                <div className="hidden lg:block">
                     <div className="flex flex-col gap-2">
+                        <SidebarIntro />
                         <SidebarBrands />
                         <SidebarFilters />
                         <SidebarBanner1 />
@@ -176,13 +176,12 @@ const News = () => {
                             <SidebarStats />
                             <SidebarBanner2 />
                             <SidebarLatestModels />
+                            <SidebarBanner3 />
                         </div>
                     </div>
                 </div>
 
-                {/* Main Content Column */}
-                <div className="w-full lg:w-3/4">
-                    {/* First 3 News */}
+                <div className="min-w-0">
                     <div>
                         {firstThreeNews.map((newsItem) => (
                             <Link
@@ -200,14 +199,6 @@ const News = () => {
                         ))}
                     </div>
 
-                    {/* First Banner */}
-                    {pageBanners['news_banner_1'] && (
-                        <div className="md:col-span-3 mb-6 overflow-hidden">
-                            <BannerAd banner={pageBanners['news_banner_1']} className="mt-7 w-auto sm:w-full h-[200px] sm:h-auto" />
-                        </div>
-                    )}
-
-                    {/* Next 3 News */}
                     <div>
                         {nextThreeNews.map((newsItem) => (
                             <Link
@@ -224,15 +215,6 @@ const News = () => {
                             </Link>
                         ))}
                     </div>
-
-                    {/* Second Banner */}
-                    {pageBanners['news_banner_2'] && (
-                        <div className="md:col-span-3 mb-6 overflow-hidden">
-                            <BannerAd banner={pageBanners['news_banner_2']} className="mt-7 w-auto sm:w-full h-[200px] sm:h-auto" />
-                        </div>
-                    )}
-
-                    {/* Last 4 News with Pagination */}
                     {currentPaginatedNews.length > 0 && (
                         <>
                             <div>
@@ -252,7 +234,6 @@ const News = () => {
                                 ))}
                             </div>
 
-                            {/* Pagination */}
                             {totalPages > 1 && (
                                 <Pagination
                                     currentPage={currentPage}
@@ -262,16 +243,13 @@ const News = () => {
                             )}
                         </>
                     )}
-                    {pageBanners['news_banner_3'] && (
-                        <div className="md:col-span-3 mb-6 overflow-hidden">
-                            <BannerAd banner={pageBanners['news_banner_3']} className="mt-7 w-auto sm:w-full h-[200px] sm:h-auto" />
-                        </div>
-                    )}
+                    <div className="mt-7 sm:hidden">
+                        <BannerAd banner={pageBanners['news_banner_3'] || newsBannerMobileFallback} className="w-full" />
+                    </div>
+                    <div className="mt-7 hidden sm:block">
+                        <BannerAd banner={pageBanners['news_banner_3'] || newsBannerFallback} className="w-full" />
+                    </div>
                 </div>
-
-
-
-
             </div>
             <ComingSoonMobiles title="Coming Soon Mobiles" itemImage={mobileImg} />
 

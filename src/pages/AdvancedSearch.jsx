@@ -12,11 +12,13 @@ import SidebarBanner2 from '../components/SidebarSections/SidebarBanner2';
 import SidebarBanner3 from '../components/SidebarSections/SidebarBanner3';
 import { useData } from '../context/DataContext';
 import LatestProducts from '../components/LatestProducts';
+import homeBanner3 from '../assets/homeBanner3.png';
+import homeBannerSM3 from '../assets/homeBannerSM3.png';
 
 /* ────────────── Section Header ────────────── */
 const SectionHeader = ({ title }) => (
     <div
-        className="px-4 py-2.5 text-white font-medium text-xl"
+        className="px-3 py-1.5 text-[13px] font-medium text-white sm:px-4 sm:py-2.5 sm:text-xl"
         style={{
             background: 'linear-gradient(to right, #0580A5 0%, #3a9dbc 30%, #7ec4d9 60%, #c5e5ef 80%, #ffffff 100%)',
         }}
@@ -79,13 +81,13 @@ if (typeof document !== 'undefined' && !document.getElementById('dual-range-css'
 /* ────────────── Dropdown Component ────────────── */
 const Dropdown = ({ label, value, onChange, options, placeholder = '' }) => (
     <div className="flex items-center bg-white border border-[#0580A5] ">
-        <span className="text-md uppercase tracking-wide px-3 py-[8px] whitespace-nowrap">
+        <span className="px-1.5 py-[6px] text-[10px] uppercase tracking-wide whitespace-nowrap sm:px-3 sm:py-[8px] sm:text-base">
             {label}:
         </span>
         <select
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className="flex-1 text-md py-[8px] px-3 outline-none bg-transparent border-none cursor-pointer appearance-none"
+            className="flex-1 border-none bg-transparent px-1.5 py-[6px] text-[10px] outline-none cursor-pointer appearance-none sm:px-3 sm:py-[8px] sm:text-base"
             style={{
                 backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234a5568' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
                 backgroundRepeat: 'no-repeat',
@@ -104,10 +106,10 @@ const Dropdown = ({ label, value, onChange, options, placeholder = '' }) => (
 /* ────────────── Checkbox Row ────────────── */
 const CheckboxRow = ({ label, checked, onChange }) => (
     <div
-        className="flex items-center justify-between bg-white border border-[#0580A5] px-3 py-[8px] cursor-pointer select-none"
+        className="flex items-center justify-between bg-white border border-[#0580A5] px-1.5 py-[6px] cursor-pointer select-none sm:px-3 sm:py-[8px]"
         onClick={() => onChange(!checked)}
     >
-        <span className="text-md uppercase tracking-wide whitespace-nowrap">{label}:</span>
+        <span className="text-[10px] uppercase tracking-wide whitespace-nowrap sm:text-base">{label}:</span>
         <div className={`w-[18px] h-[18px] border-2 flex items-center justify-center transition-colors ${checked ? 'bg-[#0580A5] border-[#0580A5]' : 'border-gray-400 bg-white'
             }`}>
             {checked && (
@@ -128,7 +130,7 @@ const SliderRow = ({ label, minValue, maxValue, onMinChange, onMaxChange, min = 
     const mid = (min + max) / 2;
     return (
         <div className="flex items-center border border-[#0580A5]">
-            <span className="text-md uppercase tracking-wide px-2 py-[7px] whitespace-nowrap min-w-[70px]">
+            <span className="min-w-[58px] px-1.5 py-[6px] text-[10px] uppercase tracking-wide whitespace-nowrap sm:min-w-[70px] sm:text-base">
                 {label}:
             </span>
             <div className="flex items-center flex-1 gap-1 px-1">
@@ -137,7 +139,7 @@ const SliderRow = ({ label, minValue, maxValue, onMinChange, onMaxChange, min = 
                     value={minValue}
                     onChange={(e) => onMinChange(e.target.value)}
                     placeholder="Min"
-                    className="w-[50px] text-[11px] text-center py-[5px] outline-none text-black font-normal"
+                    className="w-[44px] py-[4px] text-center text-[10px] font-normal text-black outline-none sm:w-[50px] sm:text-[11px]"
                 />
                 <div className="flex-1 dual-range-wrap">
                     <div className="slider-track"></div>
@@ -176,7 +178,7 @@ const SliderRow = ({ label, minValue, maxValue, onMinChange, onMaxChange, min = 
                     value={maxValue}
                     onChange={(e) => onMaxChange(e.target.value)}
                     placeholder="Max"
-                    className="w-[50px] text-[11px] text-center py-[5px] outline-none text-black font-normal"
+                    className="w-[44px] py-[4px] text-center text-[10px] font-normal text-black outline-none sm:w-[50px] sm:text-[11px]"
                 />
             </div>
         </div>
@@ -192,10 +194,10 @@ const LabelSliderRow = ({ label, minValue, maxValue, onMinChange, onMaxChange, p
     const mid = (min + max) / 2;
     return (
         <div className="flex items-center border border-[#0580A5]">
-            <span className="text-md uppercase tracking-wide px-2 py-[7px] whitespace-nowrap min-w-[60px]">
+            <span className="min-w-[58px] px-1.5 py-[6px] text-[10px] uppercase tracking-wide whitespace-nowrap sm:min-w-[60px] sm:text-base">
                 {label}:
             </span>
-            <span className="text-[11px] text-gray-500 px-1 whitespace-nowrap">{prefix}{minValue || '0'}</span>
+            <span className="px-1 text-[10px] text-gray-500 whitespace-nowrap sm:text-[11px]">{prefix}{minValue || '0'}</span>
             <div className="flex-1 dual-range-wrap">
                 <div className="slider-track"></div>
                 <div
@@ -228,7 +230,7 @@ const LabelSliderRow = ({ label, minValue, maxValue, onMinChange, onMaxChange, p
                     }}
                 />
             </div>
-            <span className="text-[11px] text-gray-500 px-1 whitespace-nowrap">{prefix}{maxValue || '0'}</span>
+            <span className="px-1 text-[10px] text-gray-500 whitespace-nowrap sm:text-[11px]">{prefix}{maxValue || '0'}</span>
         </div>
     );
 };
@@ -236,7 +238,7 @@ const LabelSliderRow = ({ label, minValue, maxValue, onMinChange, onMaxChange, p
 /* ═══════════════════ MAIN PAGE ═══════════════════ */
 const AdvancedSearch = () => {
     const navigate = useNavigate();
-    const { allProducts } = useData();
+    const { allProducts, allBanners } = useData();
 
     // ── filter state ──
     const [filters, setFilters] = useState({
@@ -277,25 +279,18 @@ const AdvancedSearch = () => {
         sensors: '',
     });
 
-    const [bannerUrl, setBannerUrl] = useState('');
-
-    useEffect(() => {
-        const fetchBanner = async () => {
-            try {
-                const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://mobirays.voucherndeals.com';
-                const response = await fetch(`${apiBaseUrl}/api/v1/banner`);
-                const result = await response.json();
-                const allBanners = Array.isArray(result.data) ? result.data : [];
-                const banner = allBanners.find(b => b.location === 'advancesearch_banner_1');
-                if (banner && banner.image) {
-                    setBannerUrl(banner.image);
-                }
-            } catch (error) {
-                console.error('Error fetching banner:', error);
-            }
-        };
-        fetchBanner();
-    }, []);
+    const bannerUrl = useMemo(() => {
+        const banner = allBanners.find((item) => item.location === 'advancesearch_banner_1');
+        return banner?.image || '';
+    }, [allBanners]);
+    const advancedSearchBannerFallback = useMemo(() => ({
+        title: 'Advanced Search Banner',
+        image: homeBanner3,
+    }), []);
+    const advancedSearchBannerMobileFallback = useMemo(() => ({
+        title: 'Advanced Search Banner Mobile',
+        image: homeBannerSM3,
+    }), []);
 
     const [searchResults, setSearchResults] = useState(null);
 
@@ -485,9 +480,8 @@ const AdvancedSearch = () => {
 
     return (
         <div>
-            <div className='flex flex-col lg:flex-row gap-2'>
-                {/* Sidebar Column */}
-                <div className="w-full lg:w-1/3 hidden lg:block">
+            <div className="grid gap-2 lg:grid-cols-[401px_minmax(0,1fr)] lg:items-start">
+                <div className="hidden lg:block">
                     <div className="flex flex-col gap-2">
                         <SidebarIntro />
                         <SidebarBrands />
@@ -497,21 +491,15 @@ const AdvancedSearch = () => {
                             <SidebarStats />
                             <SidebarBanner2 />
                             <SidebarLatestModels />
+                            <SidebarBanner3 />
                         </div>
                     </div>
                 </div>
 
-                {/* Main Content Column */}
-                <div className="w-full lg:w-3/4">
-                    {/* Hero Banner */}
+                <div className="min-w-0">
                     <HeroBanner />
 
-
-
-                    {/* ═══════ Advanced Search Form ═══════ */}
-                    <div className="bg-white overflow-hidden mb-8">
-
-                        {/* Title */}
+                    <div className="bg-white overflow-hidden">
                         <div className="relative w-full flex items-end mb-4">
                             <div className="absolute bottom-0 left-0 w-full h-[10px] sm:h-[16px] bg-[#0580A5]"></div>
                             <div className="latest-products-clip bg-[#0580A5] text-white w-fit sm:h-14 h-10 flex items-center relative z-10">
@@ -519,9 +507,8 @@ const AdvancedSearch = () => {
                             </div>
                         </div>
 
-                        {/* ─── General ─── */}
                         <SectionHeader title="General" />
-                        <div className="px-2 py-5 pb-10 space-y-1.5">
+                        <div className="space-y-1.5 py-4 pb-7 sm:py-5 sm:pb-10">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                                 <Dropdown label="BRAND" value={filters.brand} onChange={set('brand')} options={brands} />
                                 <LabelSliderRow label="YEARS" minValue={filters.yearMin} maxValue={filters.yearMax} onMinChange={set('yearMin')} onMaxChange={set('yearMax')} min={2000} max={2026} />
@@ -532,10 +519,9 @@ const AdvancedSearch = () => {
                             </div>
                         </div>
 
-                        {/* ─── Network ─── */}
                         <SectionHeader title="Network" />
-                        <div className="px-2 py-5 pb-10 space-y-1.5">
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                        <div className="space-y-1.5 px-0 py-3 pb-5 sm:py-5 sm:pb-10">
+                            <div className="grid grid-cols-1 gap-1 sm:grid-cols-4 sm:gap-1.5">
                                 <Dropdown label="2G" value={filters.network2g} onChange={set('network2g')} options={['Yes', 'No']} />
                                 <Dropdown label="3G" value={filters.network3g} onChange={set('network3g')} options={['Yes', 'No']} />
                                 <Dropdown label="4G" value={filters.network4g} onChange={set('network4g')} options={['Yes', 'No']} />
@@ -543,18 +529,16 @@ const AdvancedSearch = () => {
                             </div>
                         </div>
 
-                        {/* ─── SIM ─── */}
                         <SectionHeader title="SIM" />
-                        <div className="px-2 py-5 pb-10 space-y-1.5">
+                        <div className="space-y-1.5 px-0 py-3 pb-5 sm:py-5 sm:pb-10">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                                 <Dropdown label="SIZE" value={filters.simSize} onChange={set('simSize')} options={['Nano-SIM', 'Micro-SIM', 'Mini-SIM', 'eSIM']} />
                                 <Dropdown label="MULTIPLE" value={filters.simMultiple} onChange={set('simMultiple')} options={['Single', 'Dual', 'Triple', 'Quad']} />
                             </div>
                         </div>
 
-                        {/* ─── Body ─── */}
                         <SectionHeader title="Body" />
-                        <div className="px-2 py-5 pb-10 space-y-1.5">
+                        <div className="space-y-1.5 px-0 py-3 pb-5 sm:py-5 sm:pb-10">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                                 <Dropdown label="FORM FACTOR" value={filters.formFactor} onChange={set('formFactor')} options={['Bar', 'Slider', 'Flip', 'Foldable']} />
                                 <Dropdown label="KEYBOARD" value={filters.keyboard} onChange={set('keyboard')} options={['Yes', 'No']} />
@@ -577,9 +561,8 @@ const AdvancedSearch = () => {
                             </div>
                         </div>
 
-                        {/* ─── Platform ─── */}
                         <SectionHeader title="Platform" />
-                        <div className="px-2 py-5 pb-10 space-y-1.5">
+                        <div className="space-y-1.5 px-0 py-3 pb-5 sm:py-5 sm:pb-10">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                                 <Dropdown label="OS" value={filters.os} onChange={set('os')} options={operatingSystems} />
                                 <Dropdown label="OS VERSION" value={filters.osVersion} onChange={set('osVersion')} options={[]} placeholder="Select an OS first" />
@@ -594,9 +577,8 @@ const AdvancedSearch = () => {
                             </div>
                         </div>
 
-                        {/* ─── Memory ─── */}
                         <SectionHeader title="Memory" />
-                        <div className="px-2 py-5 pb-10 space-y-1.5">
+                        <div className="space-y-1.5 px-0 py-3 pb-5 sm:py-5 sm:pb-10">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                                 <SliderRow label="RAM" minValue={filters.ramMin} maxValue={filters.ramMax} onMinChange={set('ramMin')} onMaxChange={set('ramMax')} />
                                 <SliderRow label="STORAGE" minValue={filters.storageMin} maxValue={filters.storageMax} onMinChange={set('storageMin')} onMaxChange={set('storageMax')} />
@@ -607,9 +589,8 @@ const AdvancedSearch = () => {
                             </div>
                         </div>
 
-                        {/* ─── Display ─── */}
                         <SectionHeader title="Display" />
-                        <div className="px-2 py-5 pb-10 space-y-1.5">
+                        <div className="space-y-1.5 px-0 py-3 pb-5 sm:py-5 sm:pb-10">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                                 <Dropdown label="TYPE" value={filters.displayType} onChange={set('displayType')} options={['IPS LCD', 'AMOLED', 'Super AMOLED', 'OLED', 'LTPO OLED', 'TFT']} />
                                 <SliderRow label="SIZE" minValue={filters.displaySizeMin} maxValue={filters.displaySizeMax} onMinChange={set('displaySizeMin')} onMaxChange={set('displaySizeMax')} />
@@ -619,9 +600,8 @@ const AdvancedSearch = () => {
                             </div>
                         </div>
 
-                        {/* ─── Camera ─── */}
                         <SectionHeader title="Camera" />
-                        <div className="px-2 py-5 pb-10 space-y-1.5">
+                        <div className="space-y-1.5 px-0 py-3 pb-5 sm:py-5 sm:pb-10">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                                 <SliderRow label="MAIN" minValue={filters.mainCameraMin} maxValue={filters.mainCameraMax} onMinChange={set('mainCameraMin')} onMaxChange={set('mainCameraMax')} />
                                 <Dropdown label="VIDEO" value={filters.videoResolution} onChange={set('videoResolution')} options={['720p', '1080p', '4K', '8K']} />
@@ -631,9 +611,8 @@ const AdvancedSearch = () => {
                             </div>
                         </div>
 
-                        {/* ─── Battery ─── */}
                         <SectionHeader title="Battery" />
-                        <div className="px-2 py-5 pb-10 space-y-1.5">
+                        <div className="space-y-1.5 px-0 py-3 pb-5 sm:py-5 sm:pb-10">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                                 <SliderRow label="CAPACITY" minValue={filters.batteryMin} maxValue={filters.batteryMax} onMinChange={set('batteryMin')} onMaxChange={set('batteryMax')} />
                                 <Dropdown label="TYPE" value={filters.batteryType} onChange={set('batteryType')} options={['Li-Ion', 'Li-Po', 'Silicon-Carbon']} />
@@ -643,9 +622,8 @@ const AdvancedSearch = () => {
                             </div>
                         </div>
 
-                        {/* ─── Connectivity ─── */}
                         <SectionHeader title="Connectivity" />
-                        <div className="px-2 py-5 pb-10 space-y-1.5">
+                        <div className="space-y-1.5 px-0 py-3 pb-5 sm:py-5 sm:pb-10">
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
                                 <Dropdown label="WLAN" value={filters.wlan} onChange={set('wlan')} options={['Yes', 'No']} />
                                 <Dropdown label="BLUETOOTH" value={filters.bluetooth} onChange={set('bluetooth')} options={['Yes', 'No']} />
@@ -657,37 +635,33 @@ const AdvancedSearch = () => {
                             </div>
                         </div>
 
-                        {/* ─── Sensors ─── */}
                         <SectionHeader title="Sensors" />
-                        <div className="px-2 py-5 pb-10 space-y-1.5">
+                        <div className="space-y-1.5 px-0 py-3 pb-5 sm:py-5 sm:pb-10">
                             <div className="grid grid-cols-1 gap-1.5">
                                 <Dropdown label="SENSORS" value={filters.sensors} onChange={set('sensors')} options={['Fingerprint', 'Face ID', 'Accelerometer', 'Gyroscope', 'Proximity', 'Compass', 'Barometer']} />
                             </div>
                         </div>
 
-                        {/* ─── Result Count Bar ─── */}
-                        <div className="flex items-center justify-center px-4 py-5 gap-3">
-                            <span className="border border-2 border-[#0580A5] rounded-l-full px-4 py-1 text-3xl ">Result</span>
-                            <span className="border border-2 border-[#0580A5] px-8 text-3xl py-1">99,522</span>
+                        <div className="flex w-full items-center gap-1 px-0 py-3 sm:gap-3 sm:px-4 sm:py-5">
+                            <span className="shrink-0 rounded-l-full border-2 border-[#0580A5] px-3 py-1 text-[11px] uppercase sm:px-4 sm:text-3xl">Result</span>
+                            <span className="flex-1 border-y-2 border-[#0580A5] px-4 py-1 text-center text-[11px] sm:px-8 sm:text-3xl">
+                                {searchResults ? searchResults.length.toLocaleString() : '99,522'}
+                            </span>
                             <button
                                 onClick={handleSearch}
-                                className="bg-[#0580A5] hover:bg-[#046a88] text-white border border-2 border-[#0580A5] font-light px-6 py-1 text-3xl transition-colors cursor-pointer rounded-r-full"
+                                className="shrink-0 rounded-r-full border-2 border-[#0580A5] bg-[#0580A5] px-3 py-1 text-[11px] font-medium text-white transition-colors cursor-pointer hover:bg-[#046a88] sm:px-6 sm:text-3xl sm:font-light"
                             >
                                 SHOW ALL
                             </button>
                         </div>
-
-
                     </div>
 
-                    {/* ─── Disclaimer / Info Text ─── */}
-                    <div className="leading-relaxed px-2 py-6 space-y-4">
+                    <div className="space-y-3 px-0 py-3 text-[10px] leading-relaxed sm:space-y-4 sm:text-base">
                         <p>*PRICE BASED ON THE LOWEST ONLINE SIM-FREE PRICE, EXCLUDING TAXES, SUBSIDIES AND SHIPMENT. ONLY PHONES WITH KNOWN PRICES WILL APPEAR IN THE RESULTS.</p>
-                        <p>*BATTERY STAND-BY AND TALK TIME BASED ON THE OFFICIAL MANUFACTURER SPECIFICATIONS, NOT ON REAL-LIFE TESTS</p>
+                        <p>*BATTERY STAND-BY AND TALK TIME BASED ON THE OFFICIAL MANUFACTURER SPECIFICATIONS, NOT ON REAL-LIFE TESTS.</p>
                         <p>*IN FREE TEXT FIELD YOU CAN SEARCH FOR OTHER FEATURES, NOT MENTIONED ABOVE. FOR EXAMPLE - "FAST BATTERY CHARGING", "WIRELESS CHARGING", "POWER BANK", "ANT+", "GALILEO", "APTX" AND SO ON. IN SOME CASES IT CAN BE VERY USEFUL, BUT THE RESULTS ARE LESS RELIABLE.</p>
                     </div>
 
-                    {/* ═══ Search Results ═══ */}
                     {searchResults !== null && (
                         <div className="mb-8">
                             <LatestProducts
@@ -702,8 +676,20 @@ const AdvancedSearch = () => {
                         </div>
                     )}
 
-                    {/* Bottom banner */}
-                    {bannerUrl && <img className='mt-7 h-[200px] w-auto sm:w-full' src={bannerUrl} alt="Advanced Search Banner" />}
+                    <div className="mt-3 sm:hidden">
+                        <img
+                            className="w-full"
+                            src={bannerUrl || advancedSearchBannerMobileFallback.image}
+                            alt="Advanced Search Banner"
+                        />
+                    </div>
+                    <div className="mt-7 hidden sm:block">
+                        <img
+                            className="w-full"
+                            src={bannerUrl || advancedSearchBannerFallback.image}
+                            alt="Advanced Search Banner"
+                        />
+                    </div>
                 </div>
             </div>
         </div>
