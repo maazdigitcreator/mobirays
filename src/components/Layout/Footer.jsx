@@ -44,7 +44,7 @@ const GooglePlayBadgeIcon = ({ className = '' }) => (
 
 const Footer = () => {
     return (
-        <footer className="overflow-x-hidden bg-white px-4 pb-6 pt-8">
+        <footer className="overflow-x-hidden bg-white px-4 pb-6 pt-5">
             <div className="mx-auto flex max-w-[1337px] flex-col items-center gap-6">
                 <p className="max-w-[1337px] text-center text-[13px] leading-[1.35] text-[#676767] sm:text-[18px] lg:text-[24px]">
                     Disclaimer. Mobile Prices are updated daily from local Pakistani Mobile shops &amp; Mobile dealers in Pakistan but we can not guarantee that the information (Prices) on this page is 100% correct (Human error is possible). Always visit your local shop for exact mobile prices. &quot;Above mobile prices and rates are only valid in Pakistan&quot;
