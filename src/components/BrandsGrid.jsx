@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useData } from '../context/DataContext';
 import { Link } from 'react-router-dom'
-import brandsPageLogo from "../assets/brandsPageLogo.png"
 
 const BrandsGrid = () => {
     const { allBrands, loading: dataLoading } = useData();
@@ -20,9 +19,8 @@ const BrandsGrid = () => {
     }
 
     return (
-        <div className="w-full mt-3">
-            {/* Brands Grid - 4 columns */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="mt-3 w-full">
+            <div className="grid grid-cols-2 gap-1 sm:gap-2 lg:grid-cols-4">
                 {brands.map((brand) => {
                     const brandSlug = brand.slug || brand.name.toLowerCase().replace(/\s+/g, '-');
 
@@ -30,13 +28,13 @@ const BrandsGrid = () => {
                         <Link
                             key={brand.id}
                             to={`/brand/${brandSlug}`}
-                            className="border border-2 p-4 flex items-center justify-center border-[#0580A5] hover:shadow-lg transition-all cursor-pointer bg-white h-56"
+                            className="flex min-h-[72px] items-center justify-center border-2 border-[#0580A5] bg-white px-3 py-4 transition-all hover:opacity-90 sm:min-h-[96px] sm:px-4 sm:py-5"
                         >
                             {brand.image ? (
                                 <img
                                     src={brand.image}
                                     alt={brand.name}
-                                    className="max-w-full max-h-full object-contain"
+                                    className="max-h-[38px] w-auto max-w-full object-contain sm:max-h-[56px]"
                                     onError={(e) => {
                                         e.target.onerror = null;
                                         e.target.style.display = 'none';
@@ -44,7 +42,7 @@ const BrandsGrid = () => {
                                     }}
                                 />
                             ) : null}
-                            <span className={`${brand.image ? 'hidden' : 'block'} text-center font-bold text-gray-700`}>
+                            <span className={`${brand.image ? 'hidden' : 'block'} text-center text-[12px] font-semibold text-gray-700 sm:text-base`}>
                                 {brand.name}
                             </span>
                         </Link>

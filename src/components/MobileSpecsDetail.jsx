@@ -81,7 +81,6 @@ const MobileSpecsDetail = ({ productData }) => {
         initialLikesCount: productData?.likes,
     });
 
-    debugger
     const apiBackgroundColor = productData?.background_color;
     const shouldUseExtractedColor = isNeutralColor(apiBackgroundColor);
     const backgroundColor = shouldUseExtractedColor
