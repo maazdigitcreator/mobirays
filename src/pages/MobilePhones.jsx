@@ -18,8 +18,6 @@ import SidebarBanner3 from '../components/SidebarSections/SidebarBanner3';
 import BannerAd from '../components/BannerAd';
 import { filterProductsByCategory } from '../utils/filterHelpers';
 import { useData } from '../context/DataContext';
-import homeBanner3 from '../assets/homeBanner3.png';
-import homeBannerSM3 from '../assets/homeBannerSM3.png';
 const END_POINT = '/api/v1/products/phoneComingsoon';
 
 const MobilePhones = () => {
@@ -40,14 +38,6 @@ const MobilePhones = () => {
         : allProducts;
 
     const [pageBanners, setPageBanners] = useState({});
-    const phonesBannerFallback = {
-        title: 'Phones Banner',
-        image: homeBanner3,
-    };
-    const phonesBannerMobileFallback = {
-        title: 'Phones Banner Mobile',
-        image: homeBannerSM3,
-    };
 
     useEffect(() => {
         if (allBanners.length > 0) {
@@ -62,9 +52,9 @@ const MobilePhones = () => {
 
     return (
         <div>
-            <div className="grid gap-2 lg:grid-cols-[401px_minmax(0,1fr)] lg:items-start">
+            <div className='flex flex-col lg:flex-row gap-2'>
                 {/* Sidebar Column */}
-                <div className="hidden lg:block">
+                <div className="w-full lg:w-1/3 hidden lg:block">
                     <div className="flex flex-col gap-2">
                         <SidebarIntro />
                         <SidebarBrands />
@@ -80,7 +70,7 @@ const MobilePhones = () => {
                 </div>
 
                 {/* Main Content Column */}
-                <div className="min-w-0">
+                <div className="w-full lg:w-3/4">
 
                     <HeroBanner />
 
@@ -94,25 +84,26 @@ const MobilePhones = () => {
                             itemsPerPage={48}
                         />
                     </div>
-                    <div className='mt-7'>
-                        <div className="sm:hidden">
-                            <BannerAd banner={pageBanners['phones_banner_1'] || phonesBannerMobileFallback} className='w-full' />
-                        </div>
-                        <div className="hidden sm:block">
-                            <BannerAd banner={pageBanners['phones_banner_1'] || phonesBannerFallback} className='w-full' />
-                        </div>
-                    </div>
+                    {pageBanners['phones_banner_1'] && <div className='mt-7'><BannerAd banner={pageBanners['phones_banner_1']} className='h-[200px] sm:w-full' /></div>}
                     <div className='mt-10'>
                         <LatestNews
-                            title="Latest News"
+                            title="News"
                             gridCols="sm:grid-cols-2"
+                            titleAlign="start"
+                            clipPath="polygon(0% 100%, 0px 0%, calc(100% - 60px) 0%, 100% 100%)"
+                            paddingLeft="40px"
+                            paddingRight="100px"
                             limit={4}
                         />
                     </div>
                     <div className='mt-10'>
                         <LatestReviews
-                            title="Latest Reviews"
+                            title="Reviews"
                             gridCols="sm:grid-cols-3"
+                            titleAlign="start"
+                            clipPath="polygon(0% 100%, 0px 0%, calc(100% - 60px) 0%, 100% 100%)"
+                            paddingLeft="40px"
+                            paddingRight="100px"
                             limit={6}
                         />
                     </div>
@@ -125,12 +116,7 @@ const MobilePhones = () => {
 
 
             <div className="md:col-span-3 mb-6 overflow-hidden">
-                <div className="sm:hidden">
-                    <BannerAd banner={pageBanners['phones_banner_2'] || phonesBannerMobileFallback} className="mt-7 w-full" />
-                </div>
-                <div className="hidden sm:block">
-                    <BannerAd banner={pageBanners['phones_banner_2'] || phonesBannerFallback} className="mt-7 w-full" />
-                </div>
+                {pageBanners['phones_banner_2'] && <BannerAd banner={pageBanners['phones_banner_2']} className="mt-7 h-[200px] sm:h-auto sm:w-full" />}
             </div>
 
             <ComingSoonMobiles title="Coming Soon Mobiles" itemImage={mobileImg} endpoint={END_POINT} />

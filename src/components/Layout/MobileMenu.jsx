@@ -1,7 +1,8 @@
-import React, { useRef } from 'react';
-import { X } from 'lucide-react';
-import { NavLink, useLocation } from 'react-router-dom';
+import React, { useEffect, useRef } from 'react';
+import { X, Search, ChevronDown } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 import Logo from '../../assets/Logo.png';
+import SearchModal from './SearchModal';
 
 const MobileMenu = ({
     isOpen,
@@ -42,17 +43,13 @@ const MobileMenu = ({
         { name: 'Phones', path: '/phones' },
         { name: 'Tabs', path: '/tablets' },
         { name: 'Smartwatches', path: '/smartwatches' },
-        { name: 'All Brands', path: '/all-brands' },
-        { name: 'Reviews', path: '/reviews' },
-        { name: 'News', path: '/news' },
-        { name: 'Discovery', path: '/dictionary' },
-        { name: 'Videos', path: '/videos' },
-        { name: 'Compare', path: '/comparison' },
-        { name: 'ADV. Search', path: '/advanced-search' },
-        { name: 'Coming Soon', path: '/coming-soon' },
-        { name: 'Misc', path: '/whats-new' },
-        { name: 'About', path: '/about' },
-        { name: 'Contact', path: '/contact' },
+        { name: 'Reviews', path: '#' },
+        { name: 'News', path: '#' },
+        { name: 'Videos', path: '#' },
+        { name: 'Adv. Search', path: '#' },
+        { name: 'Coming Soon', path: '#' },
+        { name: 'Misc', path: '#', hasDropdown: true },
+        { name: 'Contact', path: '#' },
     ];
 
     return (
@@ -121,22 +118,23 @@ const MobileMenu = ({
 
                 {/* Navigation Items */}
                 <nav className="flex flex-col">
-                    {navItems.map((item) => (
-                        <NavLink
-                            key={item.name}
-                            to={item.path}
-                            end={item.path === '/'}
-                            onClick={onClose}
-                            className={({ isActive }) =>
-                                [
-                                    'flex items-center justify-between border-b border-gray-100 px-4 py-4 text-sm transition-colors',
-                                    isActive ? 'bg-[#0580A5] font-semibold text-white' : 'text-black hover:bg-gray-50',
-                                ].join(' ')
-                            }
-                        >
-                            <span>{item.name}</span>
-                        </NavLink>
-                    ))}
+                    {navItems.map((item, index) => {
+                        const isActive = location.pathname === item.path;
+                        return (
+                            <Link
+                                key={index}
+                                to={item.path}
+                                onClick={onClose}
+                                className={`flex items-center justify-between px-4 py-4 text-sm border-b border-gray-100 transition-colors ${isActive
+                                    ? 'font-semibold'
+                                    : 'text-black hover:bg-gray-50'
+                                    }`}
+                            >
+                                <span>{item.name}</span>
+                                {item.hasDropdown && <ChevronDown size={20} className="text-black" />}
+                            </Link>
+                        );
+                    })}
                 </nav>
             </div>
         </>
