@@ -34,7 +34,7 @@ const BannerAd = ({ banner, className = "" }) => {
                 <img
                     src={image}
                     alt={title || "Banner Ad"}
-                    className="block w-full h-auto object-cover"
+                    className={`w-full h-auto object-cover ${className}`}
                 />
             );
         }
@@ -59,14 +59,14 @@ const BannerAd = ({ banner, className = "" }) => {
                 href={formatUrl(url)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`block w-full overflow-hidden cursor-pointer transition-opacity hover:opacity-90 ${className}`}
+                className={`block w-full cursor-pointer transition-opacity hover:opacity-90 ${className}`}
             >
                 {content}
             </a>
         );
     }
 
-    return <div className={`w-full overflow-hidden ${className}`}>{content}</div>;
+    return <div className={`w-full ${className}`}>{content}</div>;
 };
 
 export default BannerAd;

@@ -38,7 +38,7 @@ const HeroBanner = () => {
 
     if (loading && allBanners.length === 0) {
         return (
-            <div className="mb-2 flex h-[200px] items-center justify-center overflow-hidden bg-gray-100 animate-pulse lg:h-[381px]">
+            <div className="md:col-span-3 mb-2 overflow-hidden bg-gray-100 animate-pulse sm:h-120 h-[200px] flex items-center justify-center">
                 <span className="text-gray-400">Loading Banners...</span>
             </div>
         );
@@ -47,14 +47,14 @@ const HeroBanner = () => {
     if (filteredBanners.length === 0) return null;
 
     return (
-        <div className="group relative mb-2 overflow-hidden lg:h-[381px]">
+        <div className="md:col-span-3 mb-2 overflow-hidden relative group">
             <div
-                className="flex h-full transition-transform duration-700 ease-in-out"
+                className="flex transition-transform duration-700 ease-in-out h-full"
                 style={{ transform: `translateX(-${currentIndex * 100}%)` }}
             >
                 {filteredBanners.map((banner, index) => (
-                    <div key={index} className="h-full w-full flex-shrink-0">
-                        <BannerAd banner={banner} className="h-[200px] lg:h-[381px]" />
+                    <div key={index} className="w-full flex-shrink-0">
+                        <BannerAd banner={banner} className="sm:h-120 h-[200px]" />
                     </div>
                 ))}
             </div>

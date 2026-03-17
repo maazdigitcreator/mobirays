@@ -1,12 +1,10 @@
-import React from 'react';
-import { Edit, Search, Trash2 } from 'lucide-react';
-import MobileImg from '../assets/mobileImg.jpg';
-import Pagination from './Pagination';
-import { useReviewedProducts } from '../hooks/useReviewedProducts';
+import React from 'react'
+import MobileImg from '../assets/mobileImg.jpg'
+import { Search, Edit, Trash2 } from 'lucide-react'
+import Pagination from './Pagination'
+import { useReviewedProducts } from '../hooks/useReviewedProducts'
 
-const sectionTitleClassName = 'relative inline-flex h-7 items-center bg-[#0580A5] pl-3 pr-7 text-[11px] text-white sm:h-10 sm:pl-4 sm:pr-9 sm:text-base';
-
-const ReviewedProductsList = ({ title = 'Reviewed Products', products, itemImage }) => {
+const ReviewedProductsList = ({ title = "Reviewed Products", products, itemImage }) => {
     const {
         status,
         totalPages,
@@ -15,98 +13,103 @@ const ReviewedProductsList = ({ title = 'Reviewed Products', products, itemImage
         currentReviews,
         setCurrentPage,
         handleSearchChange,
-    } = useReviewedProducts(products);
+    } = useReviewedProducts(products)
 
     return (
-        <div className="w-full">
-            <div className="relative mb-2 w-full overflow-hidden">
-                <div className="absolute bottom-0 left-0 h-[8px] w-full bg-[#0580A5] sm:h-[10px]" />
-                <div
-                    className={sectionTitleClassName}
-                    style={{ clipPath: 'polygon(0 0, calc(100% - 18px) 0, 100% 100%, 0 100%)' }}
-                >
-                    <h2>{title}</h2>
+        <div className="w-full container">
+            <div>
+                <div className="relative w-full mb-9 overflow-hidden">
+                    {/* Background bar */}
+                    <div className="w-full h-10 sm:h-14 flex items-center justify-between">
+                        {/* Left side - Device name with slanted edge */}
+                        <div className="absolute -bottom-1 left-0 w-full h-[10px] sm:h-[16px] bg-[#0580A5]"></div>
+
+                        <div className="relative w-full flex items-end">
+                            {/* Title Box */}
+                            <div
+                                className="latest-products-clip bg-[#0580A5] text-white w-fit sm:h-14 h-10 flex items-center relative z-10"
+                            >
+                                <h1 className="sm:text-[26px] text-[18px] pl-2 sm:pl-4">{title}</h1>
+                            </div>
+                        </div>
+
+                        {/* Right side */}
+                        <div className="flex gap-20 mb-4 justify-start items-start ">
+                            {/* Search Bar */}
+                            <div className="flex">
+                                <input
+                                    type="text"
+                                    placeholder="Search"
+                                    value={searchQuery}
+                                    onChange={handleSearchChange}
+                                    className="w-full sm:w-[400px] border-2 border-[#0580A5] py-1 px-2 focus:outline-none focus:border-[#046a8a] text-black placeholder-gray-500"
+                                />
+                                <button type="button" className="right-0 top-0 min-h-full px-4 bg-[#0580A5] hover:bg-[#046a8a] transition-colors flex items-center justify-center">
+                                    <Search className="text-white" size={20} />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div className="mb-4 flex w-full items-stretch border border-[#0580A5]">
-                <input
-                    type="text"
-                    placeholder="Search"
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                    className="min-w-0 flex-1 px-2 py-1 text-[11px] text-black outline-none placeholder:text-[#6f6f6f] sm:px-3 sm:py-2 sm:text-sm"
-                />
-                <button
-                    type="button"
-                    className="flex w-8 items-center justify-center border-l border-[#0580A5] bg-white text-[#0580A5] sm:w-10"
-                    aria-label="Search reviewed products"
-                >
-                    <Search size={16} />
-                </button>
-            </div>
-
             {status.error && (
-                <div className="mb-4 border border-red-300 bg-red-100 px-3 py-2 text-sm text-red-700">
+                <div className="mb-6 border border-red-300 bg-red-100 px-4 py-3 text-sm text-red-700">
                     {status.error}
                 </div>
             )}
 
             {status.loading ? (
-                <div className="py-10 text-center text-sm text-gray-500">Loading reviewed products...</div>
+                <div className="py-10 text-center text-gray-500">Loading reviewed products...</div>
             ) : currentReviews.length === 0 ? (
-                <div className="py-10 text-center text-sm text-gray-500">
+                <div className="py-10 text-center text-gray-500">
                     {searchQuery ? `No reviewed products found for "${searchQuery}".` : 'No reviewed products found.'}
                 </div>
             ) : (
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-6 px-2 sm:px-0">
                     {currentReviews.map((review) => (
-                        <div key={review.id} className="grid grid-cols-[78px_minmax(0,1fr)] gap-2 sm:grid-cols-[132px_minmax(0,1fr)] sm:gap-4">
-                            <div className="flex min-w-0 flex-col items-center">
-                                <div className="flex h-[92px] w-[68px] items-center justify-center overflow-hidden bg-white p-1 sm:h-[136px] sm:w-[108px]">
-                                    <img
-                                        src={review.productImage || itemImage || MobileImg}
-                                        alt={review.productName}
-                                        className="h-full w-full object-contain"
-                                    />
+                        <div key={review.id} className="flex flex-col md:flex-row gap-6 items-start">
+                        {/* Left Side: Product Image and Name */}
+                            <div className="w-full md:w-1/4 flex flex-col group cursor-pointer">
+                                <div className="relative mb-3 flex justify-center items-center p-2 bg-blue-50/50 rounded-lg h-48 transition-transform group-hover:scale-105">
+                                    <div className="w-full h-full flex items-center justify-center text-6xl text-blue-200">
+                                        <img src={review.productImage || itemImage || MobileImg} alt={review.productName} />
+                                    </div>
                                 </div>
-                                <p className="mt-2 w-[68px] line-clamp-2 text-left text-[10px] uppercase leading-[1.3] text-[#3a3a3a] sm:w-[108px] sm:text-[12px]">
+                                <h3 className="text-[18px] leading-tight uppercase text-[#1E1E1E] line-clamp-2 text-center overflow-hidden px-5">
                                     {review.productName}
-                                </p>
+                                </h3>
                             </div>
 
-                            <div className="min-w-0 border border-[#b8b8b8] bg-white px-2 py-2 sm:px-4 sm:py-3">
-                                <div className="mb-1 flex items-start justify-between gap-3">
-                                    <div className="min-w-0">
-                                        <h3 className="line-clamp-1 text-[11px] font-medium text-black sm:text-[20px]">
-                                            {review.title}
-                                        </h3>
-                                        <p className="mt-1 text-[9px] text-[#525252] sm:text-[12px]">
-                                            {review.author}
-                                        </p>
-                                    </div>
-
-                                    <div className="shrink-0 text-right">
-                                        <div className="text-[10px] leading-none text-[#ffb400] sm:text-[14px]">
-                                            {'★'.repeat(Math.max(0, Math.min(5, review.rating || 0)))}
-                                            {'☆'.repeat(Math.max(0, 5 - Math.min(5, review.rating || 0)))}
+                        {/* Right Side: Review Content */}
+                            <div className="w-full md:w-3/4 border-2 border-[#0580A5] p-4 relative">
+                                <div className="flex justify-between items-start mb-2">
+                                    <h3 className="text-2xl font-normal text-black">{review.title}</h3>
+                                    <div className="flex flex-col items-end">
+                                        <div className="flex items-center gap-1">
+                                            {[...Array(5)].map((_, i) => (
+                                                <span key={i} className={`text-xl ${i < review.rating ? 'text-yellow-400' : 'text-gray-300'}`}>★</span>
+                                            ))}
                                         </div>
-                                        <p className="mt-1 text-[8px] text-[#6f6f6f] sm:text-[11px]">{review.date}</p>
+                                        <span className="text-xs text-black flex items-center gap-1 mt-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-clock"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                                            {review.date}
+                                        </span>
                                     </div>
                                 </div>
 
-                                <p className="line-clamp-4 text-[9px] leading-[1.4] text-[#363636] sm:text-[12px]">
+                                <p className="text-sm text-black font-bold mb-4">{review.author}</p>
+
+                                <p className="text-sm text-black leading-relaxed mb-8">
                                     {review.reviewText}
                                 </p>
 
-                                <div className="mt-3 flex flex-wrap items-center gap-3 text-[9px] text-[#0580A5] sm:text-[12px]">
-                                    <button type="button" className="flex items-center gap-1 font-medium">
-                                        <Edit size={12} />
-                                        Edit Review
+                                <div className="absolute bottom-4 right-4 flex items-center gap-4">
+                                    <button type="button" className="text-[#0580A5] font-semibold flex items-center gap-1 cursor-pointer hover:underline">
+                                        <Edit size={16} /> Edit Review
                                     </button>
-                                    <button type="button" className="flex items-center gap-1 font-medium">
-                                        <Trash2 size={12} />
-                                        Delete
+                                    <button type="button" className="text-[#0580A5] font-semibold flex items-center gap-1 cursor-pointer hover:underline">
+                                        <Trash2 size={16} /> Delete
                                     </button>
                                 </div>
                             </div>
@@ -115,6 +118,7 @@ const ReviewedProductsList = ({ title = 'Reviewed Products', products, itemImage
                 </div>
             )}
 
+            {/* Pagination */}
             {totalPages > 1 && (
                 <Pagination
                     currentPage={currentPage}
