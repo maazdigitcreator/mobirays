@@ -1,28 +1,16 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams, Link } from 'react-router-dom'
 import { useData } from '../context/DataContext'
 import { useAuth } from '../context/useAuth'
-import Sidebar4 from '../components/Layout/Sidebar4'
-import LatestProducts from '../components/LatestProducts'
-import Pagination from '../components/Pagination'
 import ComingSoonMobiles from '../components/ComingSoonMobiles'
-import ProductsSectionButton from '../components/ProductsSectionButton'
-import homeBanner3 from '../assets/homeBanner3.png'
-import sidebarBanner2 from '../assets/sidebarBanner2.jpg'
 import LatestNews from '../components/LatestNews'
 import LatestReviews from '../components/LatestReviews'
-import HeroBanner from '../components/Layout/HeroBanner'
-import homeBannerSM2 from '../assets/homeBannerSM2.png'
 import mobileImg from '../assets/mobileImg.jpg'
 import tabImg from '../assets/tabImg.jpg'
 import watchImg from '../assets/watchImg.png'
 import MobileSpecsDetail from '../components/MobileSpecsDetail'
 import SpecificationsTable from '../components/SpecificationsTable'
 import cartIcon from '../assets/cartIcon.png'
-import amazonLogo from '../assets/amazon.png'
-import samsungLogo from '../assets/samsung.png'
-import ebayLogo from '../assets/ebay.png'
-import flipkartLogo from '../assets/flipkart.png'
 import SidebarBrands from '../components/SidebarSections/SidebarBrands'
 import SidebarFilters from '../components/SidebarSections/SidebarFilters'
 import SidebarBanner1 from '../components/SidebarSections/SidebarBanner1'
@@ -33,15 +21,16 @@ import SidebarBanner3 from '../components/SidebarSections/SidebarBanner3'
 import RelatedReviews from '../components/SidebarSections/RelatedReviews'
 import RelatedNews from '../components/SidebarSections/RelatedNews'
 import { productReviewService } from '../services/productReviewService'
+import { useProductPageReviews } from '../hooks/useProductPageReviews'
 
 const MobileSpecs = () => {
     const { productSlug } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
     const { user } = useAuth();
-    const { allProducts, allNews, allReviews, allBanners, loading: contextLoading } = useData();
-    const [pageBanners, setPageBanners] = useState({});
-    const [productData, setProductData] = useState(location.state?.product || null);
+    const { allProducts, allNews, allReviews, allBanners } = useData();
+    const topRef = useRef(null);
+    const reviewFormRef = useRef(null);
     const [reviewForm, setReviewForm] = useState({
         title: '',
         rating: 0,
@@ -53,36 +42,38 @@ const MobileSpecs = () => {
         success: '',
     });
 
-    // Handle product data synchronization with URL slug
-    useEffect(() => {
-        // Case 1: State is provided via navigation (Link state)
+    const productData = useMemo(() => {
         if (location.state?.product && location.state.product.slug === productSlug) {
-            setProductData(location.state.product);
-            return;
+            return location.state.product;
         }
 
-        // Case 2: Direct navigation or refresh - find in global data
-        if (allProducts.length > 0) {
-            const found = allProducts.find(p => p.slug === productSlug);
-            if (found) {
-                setProductData(found);
-            }
-        }
+        return allProducts.find((product) => product.slug === productSlug) || null;
     }, [allProducts, productSlug, location.state]);
 
-    useEffect(() => {
-        if (allBanners.length > 0) {
-            const map = {};
-            ['mobilespecifications_banner_1', 'mobilespecifications_banner_2', 'mobilespecifications_banner_3'].forEach(loc => {
-                const b = allBanners.find(b => b.location === loc);
-                if (b?.image) map[loc] = b.image;
-            });
-            setPageBanners(map);
-        }
+    const pageBanners = useMemo(() => {
+        const map = {};
+        ['mobilespecifications_banner_1', 'mobilespecifications_banner_2', 'mobilespecifications_banner_3'].forEach((loc) => {
+            const banner = allBanners.find((item) => item.location === loc);
+            if (banner?.image) map[loc] = banner.image;
+        });
+        return map;
     }, [allBanners]);
+    const {
+        visibleReviews: productReviews,
+        status: productReviewsStatus,
+        stats: productReviewStats,
+        refreshReviews,
+    } = useProductPageReviews(productData?.id);
+
+    useEffect(() => {
+        topRef.current?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+        });
+    }, [productSlug]);
 
     // Define related news and reviews with unique names to avoid shadowing components
-    const filteredRelatedNews = React.useMemo(() => {
+    const filteredRelatedNews = useMemo(() => {
         if (!productData?.name) return [];
         const pName = productData.name.toLowerCase().trim();
         return allNews.filter(n =>
@@ -92,7 +83,7 @@ const MobileSpecs = () => {
         );
     }, [allNews, productData]);
 
-    const filteredRelatedReviews = React.useMemo(() => {
+    const filteredRelatedReviews = useMemo(() => {
         if (!productData?.name) return [];
         const pName = productData.name.toLowerCase().trim();
         return allReviews.filter(r =>
@@ -102,7 +93,7 @@ const MobileSpecs = () => {
         );
     }, [allReviews, productData]);
 
-    const comingSoonConfig = React.useMemo(() => {
+    const comingSoonConfig = useMemo(() => {
         const category = productData?.product_category?.toLowerCase();
 
         if (category && category.includes('watch')) {
@@ -113,7 +104,7 @@ const MobileSpecs = () => {
             };
         }
 
-        if (category.includes('tab') || category.includes('pad')) {
+        if (category && (category.includes('tab') || category.includes('pad'))) {
             return {
                 itemImage: tabImg,
                 title: 'Coming Soon Tablets',
@@ -206,6 +197,7 @@ const MobileSpecs = () => {
                 rating: 0,
                 content: '',
             });
+            refreshReviews();
         } catch (error) {
             if (error?.status === 401) {
                 navigate('/login', {
@@ -225,7 +217,7 @@ const MobileSpecs = () => {
     };
 
     return (
-        <div>
+        <div ref={topRef}>
             <div className='flex flex-col lg:flex-row gap-2'>
                 {/* Sidebar Column */}
                 <div className="w-full lg:w-1/3 hidden lg:block">
@@ -390,63 +382,47 @@ const MobileSpecs = () => {
                             <div className="border-2 border-[#0580A5] p-6 flex flex-col items-center justify-evenly">
                                 <h3 className="text-lg font-semibold mb-2 text-black">OVERALL RATING</h3>
                                 <div className="text-6xl font-bold text-black">
-                                    4.3<span className="text-4xl">/5</span>
+                                    {productReviewStats.averageRating}<span className="text-4xl">/5</span>
                                 </div>
-                                <p className="text-base text-black mt-2 text-sm">BASED ON 7,373 RATING(S)</p>
+                                <p className="text-base text-black mt-2 text-sm">
+                                    BASED ON {productReviewStats.totalReviews.toLocaleString()} RATING(S)
+                                </p>
                             </div>
 
                             {/* Box 2: Rating Breakdown */}
                             <div className="border-2 border-[#0580A5] p-6">
                                 <h3 className="text-lg font-semibold mb-4 text-black text-center">OVERALL RATING</h3>
                                 <div className="space-y-2 text-black">
-                                    {/* 5 stars */}
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-sm w-14">5 stars</span>
-                                        <div className="flex-1 bg-gray-200 h-4 ">
-                                            <div className="bg-[#0580A5] h-4 " style={{ width: '70%' }}></div>
-                                        </div>
-                                        <span className="text-sm w-12 text-right">4,645</span>
-                                    </div>
-                                    {/* 4 stars */}
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-sm w-14">4 stars</span>
-                                        <div className="flex-1 bg-gray-200 h-4 ">
-                                            <div className="bg-[#0580A5] h-4 " style={{ width: '25%' }}></div>
-                                        </div>
-                                        <span className="text-sm w-12 text-right">1,777</span>
-                                    </div>
-                                    {/* 3 stars */}
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-sm w-14">3 stars</span>
-                                        <div className="flex-1 bg-gray-200 h-4 ">
-                                            <div className="bg-[#0580A5] h-4 " style={{ width: '7%' }}></div>
-                                        </div>
-                                        <span className="text-sm w-12 text-right">485</span>
-                                    </div>
-                                    {/* 2 stars */}
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-sm w-14">2 stars</span>
-                                        <div className="flex-1 bg-gray-200 h-4 ">
-                                            <div className="bg-[#0580A5] h-4 " style={{ width: '3%' }}></div>
-                                        </div>
-                                        <span className="text-sm w-12 text-right">183</span>
-                                    </div>
-                                    {/* 1 star */}
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-sm w-14">1 star</span>
-                                        <div className="flex-1 bg-gray-200 h-4 ">
-                                            <div className="bg-[#0580A5] h-4 " style={{ width: '7%' }}></div>
-                                        </div>
-                                        <span className="text-sm w-12 text-right">477</span>
-                                    </div>
+                                    {[5, 4, 3, 2, 1].map((star) => {
+                                        const count = productReviewStats.counts[star];
+                                        const width = productReviewStats.totalReviews > 0
+                                            ? `${(count / productReviewStats.totalReviews) * 100}%`
+                                            : '0%';
+
+                                        return (
+                                            <div key={star} className="flex items-center gap-2">
+                                                <span className="text-sm w-14">{star} star{star === 1 ? '' : 's'}</span>
+                                                <div className="flex-1 bg-gray-200 h-4 ">
+                                                    <div className="bg-[#0580A5] h-4 " style={{ width }}></div>
+                                                </div>
+                                                <span className="text-sm w-12 text-right">{count.toLocaleString()}</span>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
-                                <p className="text-xs text-center mt-4 text-black">2,492 USER REVIEW(S)</p>
+                                <p className="text-xs text-center mt-4 text-black">
+                                    {productReviewStats.totalReviews.toLocaleString()} USER REVIEW(S)
+                                </p>
                             </div>
 
                             {/* Box 3: Share Your Thoughts */}
                             <div className="border-2 border-[#0580A5] p-6 flex flex-col items-center justify-start gap-10">
                                 <h3 className="text-lg font-semibold mb-6 text-black">SHARE YOUR THOUGHTS</h3>
-                                <button className="bg-[#0580A5] text-white px-8 py-3 hover:bg-[#046a8a] transition-colors  text-sm cursor-pointer">
+                                <button
+                                    type="button"
+                                    onClick={() => reviewFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                                    className="bg-[#0580A5] text-white px-8 py-3 hover:bg-[#046a8a] transition-colors  text-sm cursor-pointer"
+                                >
                                     WRITE A REVIEW
                                 </button>
                             </div>
@@ -475,44 +451,22 @@ const MobileSpecs = () => {
 
 
                         <div className="space-y-3 px-2 sm:px-0">
-                            {/* Review Cards - Array Mapping */}
-                            {(() => {
-                                const reviewsData = [
-                                    {
-                                        title: productData?.name || "Mobile",
-                                        author: "John Doe ( 9 July 20) on Amazon",
-                                        date: "2 days ago",
-                                        rating: 5,
-                                        text: "I have been using SAMSUNG products nearly for 14 -15 years and above. None of them gave any issues. Bought Samsung A51 this phone in 9th of July 2020 near my residence in 6 lightly monthly installment scheme. Few of the application was installed and put working on it had to updated to the latest version. Saw the configuration and seems to be very interesting. Hope this product should suffice my current need and fulfill my expectations. Thank & Regards, John Doe."
-                                    },
-                                    {
-                                        title: productData?.name || "Mobile",
-                                        author: "John Doe ( 9 July 20) on Amazon",
-                                        date: "2 days ago",
-                                        rating: 5,
-                                        text: "I have been using SAMSUNG products nearly for 14 -15 years and above. None of them gave any issues. Bought Samsung A51 this phone in 9th of July 2020 near my residence in 6 lightly monthly installment scheme. Few of the application was installed and put working on it had to updated to the latest version. Saw the configuration and seems to be very interesting. Hope this product should suffice my current need and fulfill my expectations. Thank & Regards, John Doe."
-                                    },
-                                    {
-                                        title: productData?.name || "Mobile",
-                                        author: "John Doe ( 9 July 20) on Amazon",
-                                        date: "2 days ago",
-                                        rating: 5,
-                                        text: "I have been using SAMSUNG products nearly for 14 -15 years and above. None of them gave any issues. Bought Samsung A51 this phone in 9th of July 2020 near my residence in 6 lightly monthly installment scheme. Few of the application was installed and put working on it had to updated to the latest version. Saw the configuration and seems to be very interesting. Hope this product should suffice my current need and fulfill my expectations. Thank & Regards, John Doe."
-                                    },
-                                    {
-                                        title: productData?.name || "Mobile",
-                                        author: "John Doe ( 9 July 20) on Amazon",
-                                        date: "2 days ago",
-                                        rating: 5,
-                                        text: "I have been using SAMSUNG products nearly for 14 -15 years and above. None of them gave any issues. Bought Samsung A51 this phone in 9th of July 2020 near my residence in 6 lightly monthly installment scheme. Few of the application was installed and put working on it had to updated to the latest version. Saw the configuration and seems to be very interesting. Hope this product should suffice my current need and fulfill my expectations. Thank & Regards, John Doe."
-                                    }
-                                ];
+                            {productReviewsStatus.error && (
+                                <div className="border border-red-300 bg-red-100 px-4 py-3 text-sm text-red-700">
+                                    {productReviewsStatus.error}
+                                </div>
+                            )}
 
-                                return reviewsData.map((review, index) => (
-                                    <div key={index} className="border-2 border-[#0580A5] px-4 py-2">
-                                        <div className="flex justify-between items-start mb-1">
+                            {productReviewsStatus.loading ? (
+                                <div className="border-2 border-[#0580A5] px-4 py-8 text-center text-gray-500">
+                                    Loading reviews...
+                                </div>
+                            ) : productReviews.length > 0 ? (
+                                productReviews.map((review) => (
+                                    <div key={review.id} className="border-2 border-[#0580A5] px-4 py-2">
+                                        <div className="flex justify-between items-start mb-1 gap-4">
                                             <h3 className="text-2xl">{review.title}</h3>
-                                            <div className="flex flex-col items-end gap-0">
+                                            <div className="flex flex-col items-end gap-0 flex-shrink-0">
                                                 <div className="flex items-center gap-0.5">
                                                     {[...Array(review.rating)].map((_, i) => (
                                                         <span key={i} className="text-yellow-400 text-xl">★</span>
@@ -523,23 +477,22 @@ const MobileSpecs = () => {
                                         </div>
                                         <p className="text-sm text-black font-bold mb-2">{review.author}</p>
                                         <p className="text-sm text-black leading-tight mb-3">
-                                            {review.text}
+                                            {review.content}
                                         </p>
-                                        <div className="flex items-center gap-4 text-sm pb-1">
-                                            <span className="text-black font-semibold text-sm">Is this review helpful?</span>
-                                            <button className="text-[#0580A5] hover:underline flex items-center gap-1 cursor-pointer">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                                                </svg>
-                                                Reply
-                                            </button>
-                                        </div>
                                     </div>
-                                ));
-                            })()}
+                                ))
+                            ) : (
+                                <div className="border-2 border-[#0580A5] px-4 py-8 text-center text-gray-500">
+                                    No reviews found for this product yet.
+                                </div>
+                            )}
 
                             {/* Add Review Form */}
-                            <form className="border-2 border-[#0580A5] bg-gray-50 p-2 mt-2" onSubmit={handleReviewSubmit}>
+                            <form
+                                ref={reviewFormRef}
+                                className="border-2 border-[#0580A5] bg-gray-50 p-2 mt-2"
+                                onSubmit={handleReviewSubmit}
+                            >
                                 {reviewStatus.error && (
                                     <div className="mb-3 border border-red-300 bg-red-100 px-3 py-2 text-sm text-red-700">
                                         {reviewStatus.error}
