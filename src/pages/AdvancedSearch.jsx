@@ -1,5 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
 import HeroBanner from '../components/Layout/HeroBanner';
 
 import SidebarIntro from '../components/SidebarSections/SidebarIntro';
@@ -11,6 +10,7 @@ import SidebarBanner1 from '../components/SidebarSections/SidebarBanner1';
 import SidebarBanner2 from '../components/SidebarSections/SidebarBanner2';
 import SidebarBanner3 from '../components/SidebarSections/SidebarBanner3';
 import { useData } from '../context/DataContext';
+import { useAdvancedSearchAttributes } from '../hooks/useAdvancedSearchAttributes';
 import LatestProducts from '../components/LatestProducts';
 
 /* ────────────── Section Header ────────────── */
@@ -233,10 +233,17 @@ const LabelSliderRow = ({ label, minValue, maxValue, onMinChange, onMaxChange, p
     );
 };
 
+const sortOptions = (values) => [...values].sort((left, right) => left.localeCompare(right));
+
 /* ═══════════════════ MAIN PAGE ═══════════════════ */
 const AdvancedSearch = () => {
-    const navigate = useNavigate();
-    const { allProducts } = useData();
+    const { allProducts, allBanners } = useData();
+    const {
+        brandOptions: apiBrandOptions,
+        availabilityOptions: apiAvailabilityOptions,
+        simSizeOptions: apiSimSizeOptions,
+        status: attributesStatus,
+    } = useAdvancedSearchAttributes();
 
     // ── filter state ──
     const [filters, setFilters] = useState({
@@ -276,41 +283,12 @@ const AdvancedSearch = () => {
         audioJack: '',
         sensors: '',
     });
-
-    const [bannerUrl, setBannerUrl] = useState('');
-
-    useEffect(() => {
-        const fetchBanner = async () => {
-            try {
-                const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://mobirays.voucherndeals.com';
-                const response = await fetch(`${apiBaseUrl}/api/v1/banner`);
-                const result = await response.json();
-                const allBanners = Array.isArray(result.data) ? result.data : [];
-                const banner = allBanners.find(b => b.location === 'advancesearch_banner_1');
-                if (banner && banner.image) {
-                    setBannerUrl(banner.image);
-                }
-            } catch (error) {
-                console.error('Error fetching banner:', error);
-            }
-        };
-        fetchBanner();
-    }, []);
-
     const [searchResults, setSearchResults] = useState(null);
 
-    // ── derive unique values for dropdowns ──
-    const brands = useMemo(() => {
-        const s = new Set();
-        allProducts.forEach(p => { if (p.brand) s.add(p.brand); if (p.specifications?.brand) s.add(p.specifications.brand); });
-        return [...s].sort();
-    }, [allProducts]);
-
-    const categories = useMemo(() => {
-        const s = new Set();
-        allProducts.forEach(p => { if (p.product_category) s.add(p.product_category); });
-        return [...s].sort();
-    }, [allProducts]);
+    const bannerUrl = useMemo(() => {
+        const banner = allBanners.find((item) => item.location === 'advancesearch_banner_1');
+        return banner?.image || '';
+    }, [allBanners]);
 
     const operatingSystems = useMemo(() => {
         const s = new Set();
@@ -318,8 +296,20 @@ const AdvancedSearch = () => {
             const os = p.specifications?.os || p.specifications?.operating_system;
             if (os) s.add(os);
         });
-        return [...s].sort();
+        return sortOptions([...s]);
     }, [allProducts]);
+
+    const brandOptions = useMemo(() => sortOptions(apiBrandOptions), [apiBrandOptions]);
+
+    const availabilityOptions = useMemo(() => sortOptions(apiAvailabilityOptions), [apiAvailabilityOptions]);
+
+    const simSizeOptions = useMemo(() => sortOptions(apiSimSizeOptions), [apiSimSizeOptions]);
+
+    useEffect(() => {
+        if (attributesStatus.error) {
+            console.error('Error fetching advanced search attributes:', attributesStatus.error);
+        }
+    }, [attributesStatus.error]);
 
     // ── helpers ──
     const set = (key) => (val) => setFilters(prev => ({ ...prev, [key]: val }));
@@ -443,46 +433,6 @@ const AdvancedSearch = () => {
         setSearchResults(results);
     };
 
-    const handleReset = () => {
-        setFilters({
-            brand: '', availability: '',
-            highRefreshRate: false,
-            yearMin: '2008', yearMax: '2026',
-            priceMin: '$158', priceMax: '$1650',
-            network2g: '', network3g: '', network4g: '', network5g: '',
-            simSize: '', simMultiple: '',
-            formFactor: '', keyboard: '',
-            heightMin: '', heightMax: '',
-            widthMin: '', widthMax: '',
-            thicknessMin: '', thicknessMax: '',
-            weightMin: '', weightMax: '',
-            ipCertificate: '', color: '',
-            backMaterial: '', frameMaterial: '',
-            os: '', osVersion: '',
-            cpuSpeedMin: '', cpuSpeedMax: '',
-            cpuCoresMin: '1', cpuCoresMax: '',
-            chipset: '',
-            gpuType: '',
-            ramMin: '', ramMax: '',
-            storageMin: '', storageMax: '',
-            cardSlot: '',
-            displayType: '',
-            displaySizeMin: '', displaySizeMax: '',
-            resolutionMin: '', resolutionMax: '',
-            mainCameraMin: '', mainCameraMax: '',
-            videoResolution: '',
-            selfieCameraMin: '', selfieCameraMax: '',
-            batteryMin: '', batteryMax: '',
-            batteryType: '',
-            charging: '',
-            wlan: '', bluetooth: '', nfc: '',
-            usbType: '',
-            audioJack: '',
-            sensors: '',
-        });
-        setSearchResults(null);
-    };
-
     return (
         <div>
             <div className='flex flex-col lg:flex-row gap-2'>
@@ -523,11 +473,11 @@ const AdvancedSearch = () => {
                         <SectionHeader title="General" />
                         <div className="px-2 py-5 pb-10 space-y-1.5">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                                <Dropdown label="BRAND" value={filters.brand} onChange={set('brand')} options={brands} />
+                                <Dropdown label="BRAND" value={filters.brand} onChange={set('brand')} options={brandOptions} />
                                 <LabelSliderRow label="YEARS" minValue={filters.yearMin} maxValue={filters.yearMax} onMinChange={set('yearMin')} onMaxChange={set('yearMax')} min={2000} max={2026} />
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                                <Dropdown label="AVAILABILITY" value={filters.availability} onChange={set('availability')} options={['Available', 'Coming Soon', 'Discontinued']} />
+                                <Dropdown label="AVAILABILITY" value={filters.availability} onChange={set('availability')} options={availabilityOptions} />
                                 <LabelSliderRow label="PRICE" minValue={filters.priceMin} maxValue={filters.priceMax} onMinChange={set('priceMin')} onMaxChange={set('priceMax')} prefix="$" min={0} max={5000} />
                             </div>
                         </div>
@@ -547,7 +497,7 @@ const AdvancedSearch = () => {
                         <SectionHeader title="SIM" />
                         <div className="px-2 py-5 pb-10 space-y-1.5">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                                <Dropdown label="SIZE" value={filters.simSize} onChange={set('simSize')} options={['Nano-SIM', 'Micro-SIM', 'Mini-SIM', 'eSIM']} />
+                                <Dropdown label="SIZE" value={filters.simSize} onChange={set('simSize')} options={simSizeOptions} />
                                 <Dropdown label="MULTIPLE" value={filters.simMultiple} onChange={set('simMultiple')} options={['Single', 'Dual', 'Triple', 'Quad']} />
                             </div>
                         </div>
