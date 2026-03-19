@@ -10,7 +10,7 @@ import HeroBanner from '../components/Layout/HeroBanner';
 import mobileImg from '../assets/mobileImg.jpg';
 import tabImg from '../assets/tabImg.jpg';
 import watchImg from '../assets/watchImg.png';
-import { useData } from '../context/DataContext';
+import { useData } from '../context/useData';
 import { filterProductsByCategory } from '../utils/filterHelpers';
 
 const BrandPage = () => {

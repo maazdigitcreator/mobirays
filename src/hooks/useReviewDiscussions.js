@@ -17,7 +17,7 @@ const mapReviewDiscussion = (discussion) => ({
 const getReviewDiscussionErrorMessage = (error) => {
   const message = error?.data?.message || error?.message;
 
-  if (message.includes("SQLSTATE")) {
+  if (message?.includes("SQLSTATE")) {
     return "No reviews available right now.";
   }
 

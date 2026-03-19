@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { useData } from '../context/DataContext';
+import { useData } from '../context/useData';
 import reviewImg from '../assets/reviewsImg.png'
 
 const LatestReviews = ({ title, gridCols, titleAlign = 'center', clipPath, paddingLeft, paddingRight, limit, reviewsData, showMoreLink, emptyMessage }) => {

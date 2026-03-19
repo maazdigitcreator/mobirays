@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useData } from "../context/DataContext";
+import { useData } from "../context/useData";
 import { reviewDiscussionService } from "../services/reviewDiscussionService";
 import { formatReviewDate } from "../utils/productReview";
 

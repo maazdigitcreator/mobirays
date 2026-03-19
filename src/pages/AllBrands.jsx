@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useData } from '../context/DataContext';
+import { useData } from '../context/useData';
 
 import AllBrandsHero from '../components/AllBrandsHero'
 import BrandsGrid from '../components/BrandsGrid'

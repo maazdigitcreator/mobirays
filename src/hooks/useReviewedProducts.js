@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useData } from "../context/DataContext";
+import { useData } from "../context/useData";
 import { productReviewService } from "../services/productReviewService";
 import {
   getProductReviewErrorMessage,
@@ -75,7 +75,10 @@ export const useReviewedProducts = (products) => {
   const productImagesById = useMemo(
     () =>
       new Map(
-        allProducts.map((product) => [Number(product.id), product.image || null]),
+        allProducts.map((product) => [
+          Number(product.id),
+          product.image || null,
+        ]),
       ),
     [allProducts],
   );
@@ -84,7 +87,10 @@ export const useReviewedProducts = (products) => {
     () =>
       reviews.map((review) => ({
         ...review,
-        productImage: review.productImage || productImagesById.get(review.productId) || null,
+        productImage:
+          review.productImage ||
+          productImagesById.get(review.productId) ||
+          null,
       })),
     [productImagesById, reviews],
   );
@@ -103,10 +109,14 @@ export const useReviewedProducts = (products) => {
   }, [reviewsWithResolvedImages, searchQuery]);
 
   const totalPages = Math.ceil(filteredReviews.length / ITEMS_PER_PAGE);
-  const resolvedCurrentPage = totalPages > 0 ? Math.min(currentPage, totalPages) : 1;
+  const resolvedCurrentPage =
+    totalPages > 0 ? Math.min(currentPage, totalPages) : 1;
   const indexOfLastItem = resolvedCurrentPage * ITEMS_PER_PAGE;
   const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
-  const currentReviews = filteredReviews.slice(indexOfFirstItem, indexOfLastItem);
+  const currentReviews = filteredReviews.slice(
+    indexOfFirstItem,
+    indexOfLastItem,
+  );
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);

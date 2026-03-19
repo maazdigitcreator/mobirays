@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams, Link } from 'react-router-dom'
-import { useData } from '../context/DataContext'
+import { useData } from '../context/useData'
 import { useAuth } from '../context/useAuth'
 import ComingSoonMobiles from '../components/ComingSoonMobiles'
 import LatestNews from '../components/LatestNews'

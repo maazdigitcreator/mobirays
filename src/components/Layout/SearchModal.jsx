@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import mobileImg from '../../assets/mobileImg.jpg';
 import { createSlug } from '../../utils/urlHelper';
-import { useData } from '../../context/DataContext';
+import { useData } from '../../context/useData';
 
 const SearchModal = ({ isOpen, onClose, searchQuery }) => {
     const modalRef = useRef(null);

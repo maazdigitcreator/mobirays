@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useData } from '../../context/DataContext';
+import { useState, useEffect } from 'react';
+import { useData } from '../../context/useData';
 import BannerAd from '../BannerAd';
 
 const SidebarBanner3 = () => {
