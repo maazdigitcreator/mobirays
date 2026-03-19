@@ -73,7 +73,10 @@ export const useReviewedProducts = (products) => {
   }, [fetchedReviews, products]);
 
   const productImagesById = useMemo(
-    () => new Map(allProducts.map((product) => [product.id, product.image || null])),
+    () =>
+      new Map(
+        allProducts.map((product) => [Number(product.id), product.image || null]),
+      ),
     [allProducts],
   );
 

@@ -15,7 +15,7 @@ export const formatReviewDate = (value) => {
 
 export const normalizeMemberProductReview = (review) => ({
   id: review?.id,
-  productId: review?.product?.id || review?.product || null,
+  productId: Number(review?.product_id || review?.product?.id || review?.product),
   productName:
     review?.product?.name ||
     review?.product_name ||

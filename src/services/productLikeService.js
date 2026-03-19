@@ -1,16 +1,36 @@
 import { httpClient } from "./httpClient";
 
+const PRODUCT_LIKE_ENDPOINT = "/api/v1/product/likes";
+const PRODUCT_LIKE_TOTAL_ENDPOINT = "/api/v1/product/likes/total";
+const PRODUCT_LIKE_TOGGLE_ENDPOINT = "/api/v1/product/likes/toggle";
+const DEFAULT_PER_PAGE = 100;
+
 export const productLikeService = {
   getLikes() {
-    return httpClient.request("/api/v1/product/likes", {
+    return httpClient.request(PRODUCT_LIKE_ENDPOINT, {
       method: "GET",
     });
   },
 
+  async getTotalLikes({ page = 1, signal } = {}) {
+    const response = await httpClient.request(
+      `${PRODUCT_LIKE_TOTAL_ENDPOINT}?page=${page}`,
+      {
+        method: "GET",
+        signal,
+      },
+    );
+
+    return response.data.data;
+  },
+
   async getAllLikes() {
-    const firstPage = await httpClient.request("/api/v1/product/likes?page=1&per_page=100", {
-      method: "GET",
-    });
+    const firstPage = await httpClient.request(
+      `${PRODUCT_LIKE_ENDPOINT}?page=1&per_page=${DEFAULT_PER_PAGE}`,
+      {
+        method: "GET",
+      },
+    );
 
     const firstPageData = Array.isArray(firstPage?.data)
       ? firstPage.data
@@ -25,9 +45,12 @@ export const productLikeService = {
 
     const remainingPages = await Promise.all(
       Array.from({ length: lastPage - 1 }, (_, index) =>
-        httpClient.request(`/api/v1/product/likes?page=${index + 2}&per_page=100`, {
-          method: "GET",
-        }),
+        httpClient.request(
+          `${PRODUCT_LIKE_ENDPOINT}?page=${index + 2}&per_page=${DEFAULT_PER_PAGE}`,
+          {
+            method: "GET",
+          },
+        ),
       ),
     );
 
@@ -40,7 +63,7 @@ export const productLikeService = {
   },
 
   toggle(productId) {
-    return httpClient.request("/api/v1/product/likes/toggle", {
+    return httpClient.request(PRODUCT_LIKE_TOGGLE_ENDPOINT, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
