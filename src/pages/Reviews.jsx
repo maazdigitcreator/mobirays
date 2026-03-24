@@ -19,7 +19,7 @@ import RelatedNews from '../components/SidebarSections/RelatedNews';
 import SidebarStats from '../components/SidebarSections/SidebarStats';
 import SidebarBanner2 from '../components/SidebarSections/SidebarBanner2';
 import SidebarLatestModels from '../components/SidebarSections/SidebarLatestModels';
-import { useData } from '../context/DataContext';
+import { useData } from '../context/useData';
 import SidebarBrands from '../components/SidebarSections/SidebarBrands';
 import shareIcon from '../assets/shareIcon.png'
 import compareIcon from '../assets/compareIcon.png'

@@ -20,7 +20,7 @@ import SidebarLatestModels from '../components/SidebarSections/SidebarLatestMode
 import SidebarBanner1 from '../components/SidebarSections/SidebarBanner1';
 import SidebarBanner2 from '../components/SidebarSections/SidebarBanner2';
 import SidebarBanner3 from '../components/SidebarSections/SidebarBanner3';
-import { useData } from '../context/DataContext';
+import { useData } from '../context/useData';
 
 const SearchPage = () => {
     const location = useLocation();

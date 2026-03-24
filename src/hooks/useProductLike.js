@@ -1,70 +1,33 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../context/useAuth";
+import { useData } from "../context/useData";
 import { productLikeService } from "../services/productLikeService";
 
 const AUTH_REQUIRED_CODE = "AUTH_REQUIRED";
 
-const getUserKey = (user) => String(user?.id || user?.email || "guest");
-const getStorageKey = (userKey) => `mobirays_product_likes_${userKey}`;
-const parseCount = (value) => Number.parseInt(value, 10) || 0;
-
-const readStoredLikes = (userKey) => {
-  if (!userKey || userKey === "guest") {
-    return {};
-  }
-
-  try {
-    const stored = localStorage.getItem(getStorageKey(userKey));
-    return stored ? JSON.parse(stored) : {};
-  } catch {
-    return {};
-  }
-};
-
-const writeStoredLikes = (userKey, value) => {
-  if (!userKey || userKey === "guest") {
-    return;
-  }
-
-  localStorage.setItem(getStorageKey(userKey), JSON.stringify(value));
-};
-
-const buildStoredLikesMap = (items, existingLikes = {}) =>
-  items.reduce((acc, item) => {
-    const productId = Number(item?.product?.id || item?.product_id || item?.product || item?.id);
-    if (productId) {
-      acc[productId] = {
-        ...acc[productId],
-        isLiked: true,
-      };
-    }
-    return acc;
-  }, { ...existingLikes });
-
 export const useProductLike = ({ productId, initialLikesCount }) => {
   const { user } = useAuth();
-  const userKey = getUserKey(user);
-  const initialCount = parseCount(initialLikesCount);
-  const storedLikes = readStoredLikes(userKey);
-  const storedProductLike = storedLikes[productId] || null;
+  const { productLikeTotals, productLikeTotalsStatus, setProductLikeTotalCount } = useData();
 
-  const [isLiked, setIsLiked] = useState(() => Boolean(user && storedProductLike?.isLiked));
-  const [likesCount, setLikesCount] = useState(
-    () => storedProductLike?.likesCount ?? initialCount,
-  );
+  const initialCount = Number.parseInt(initialLikesCount, 10) || 0;
+  const productLikeTotal = productLikeTotals.find((p) => Number(p.id) === Number(productId)) || null;
+
+  const [isLiked, setIsLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(() => Number(productLikeTotal?.likes_count) || initialCount);
   const [likesLoading, setLikesLoading] = useState(false);
   const [likesReady, setLikesReady] = useState(() => !user);
   const toggleLockRef = useRef(false);
 
+  // Sync count when totals load from context
   useEffect(() => {
-    if (!productId) {
-      return;
-    }
+    setLikesCount(Number(productLikeTotal?.likes_count) || initialCount);
+  }, [initialCount, productId, productLikeTotal?.likes_count]);
 
-    const nextStoredLikes = readStoredLikes(userKey);
-    const nextStoredProductLike = nextStoredLikes[productId];
+  // Fetch user's liked status
+  useEffect(() => {
+    if (!productId) return;
 
-    setLikesCount(nextStoredProductLike?.likesCount ?? initialCount);
+    setLikesReady(false);
 
     if (!user) {
       setIsLiked(false);
@@ -72,56 +35,26 @@ export const useProductLike = ({ productId, initialLikesCount }) => {
       return;
     }
 
-    let isMounted = true;
-    setLikesReady(false);
+    const controller = new AbortController();
 
-    const loadLikes = async () => {
-      try {
-        const likedItems = await productLikeService.getAllLikes();
-
-        if (!isMounted) {
-          return;
-        }
-
-        const currentStoredLikes = readStoredLikes(userKey);
-        const nextLikes = buildStoredLikesMap(likedItems, currentStoredLikes);
-        const isCurrentProductLiked = Boolean(
-          likedItems.some((item) => {
-            const likedProductId = Number(
-              item?.product?.id || item?.product_id || item?.product || item?.id,
-            );
-            return likedProductId === Number(productId);
-          }),
-        );
-
-        nextLikes[productId] = {
-          isLiked: isCurrentProductLiked,
-          likesCount: nextLikes[productId]?.likesCount ?? initialCount,
-        };
-
-        writeStoredLikes(userKey, nextLikes);
-        setIsLiked(isCurrentProductLiked);
-        setLikesCount(nextLikes[productId]?.likesCount ?? initialCount);
+    productLikeService
+      .getAllLikes({ signal: controller.signal })
+      .then((likedItems) => {
+        if (controller.signal.aborted) return;
+        setIsLiked(likedItems.some((item) => Number(item.product) === Number(productId)));
         setLikesReady(true);
-      } catch {
-        if (isMounted) {
-          setIsLiked(false);
-          setLikesReady(true);
-        }
-      }
-    };
+      })
+      .catch(() => {
+        if (controller.signal.aborted) return;
+        setIsLiked(false);
+        setLikesReady(true);
+      });
 
-    loadLikes();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [initialCount, productId, user, userKey]);
+    return () => controller.abort();
+  }, [productId, user]);
 
   const toggleLike = async () => {
-    if (!productId || !likesReady || likesLoading || toggleLockRef.current) {
-      return;
-    }
+    if (!productId || !likesReady || likesLoading || toggleLockRef.current) return;
 
     if (!user) {
       const error = new Error("Please login to like products.");
@@ -133,34 +66,27 @@ export const useProductLike = ({ productId, initialLikesCount }) => {
     const previousCount = likesCount;
     const nextLiked = !previousLiked;
     const nextCount = Math.max(0, previousCount + (previousLiked ? -1 : 1));
-    const nextStoredLikes = {
-      ...readStoredLikes(userKey),
-      [productId]: {
-        isLiked: nextLiked,
-        likesCount: nextCount,
-      },
-    };
 
     setLikesLoading(true);
     toggleLockRef.current = true;
     setIsLiked(nextLiked);
     setLikesCount(nextCount);
-    writeStoredLikes(userKey, nextStoredLikes);
+    setProductLikeTotalCount(productId, nextCount);
 
     try {
-      await productLikeService.toggle(productId);
-    } catch (error) {
-      const rollbackLikes = {
-        ...readStoredLikes(userKey),
-        [productId]: {
-          isLiked: previousLiked,
-          likesCount: previousCount,
-        },
-      };
+      const response = await productLikeService.toggle(productId);
+      const confirmedLiked = Boolean(response.liked);
 
+      if (confirmedLiked !== nextLiked) {
+        const confirmedCount = Math.max(0, previousCount + (confirmedLiked ? 1 : -1));
+        setIsLiked(confirmedLiked);
+        setLikesCount(confirmedCount);
+        setProductLikeTotalCount(productId, confirmedCount);
+      }
+    } catch (error) {
       setIsLiked(previousLiked);
       setLikesCount(previousCount);
-      writeStoredLikes(userKey, rollbackLikes);
+      setProductLikeTotalCount(productId, previousCount);
       throw error;
     } finally {
       setLikesLoading(false);
@@ -172,7 +98,7 @@ export const useProductLike = ({ productId, initialLikesCount }) => {
     isLiked,
     likesCount,
     likesLoading,
-    likesReady,
+    likesReady: likesReady && !productLikeTotalsStatus.loading,
     toggleLike,
     authRequiredCode: AUTH_REQUIRED_CODE,
   };

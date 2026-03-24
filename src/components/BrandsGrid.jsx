@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react'
-import { useData } from '../context/DataContext';
+import { useState, useEffect } from 'react'
+import { useData } from '../context/useData';
 import { Link } from 'react-router-dom'
-import brandsPageLogo from "../assets/brandsPageLogo.png"
 
 const BrandsGrid = () => {
     const { allBrands, loading: dataLoading } = useData();

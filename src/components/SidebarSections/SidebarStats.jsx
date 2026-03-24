@@ -1,4 +1,3 @@
-import React from "react";
 import { useSidebarLikeStats } from "../../hooks/useSidebarLikeStats";
 
 const VISITOR_DEVICES = Array.from({ length: 8 }, () => ({
@@ -24,7 +23,7 @@ const StatsSection = ({ label, items, loading, error, emptyMessage }) => (
       ) : (
         items.map((item, index) => (
           <div
-            key={item.id ?? item.name}
+            key={item.id ?? index}
             className={`flex justify-between items-center px-4 py-2 ${
               index % 2 === 0 ? "bg-[#67afc5]" : "bg-white"
             }`}

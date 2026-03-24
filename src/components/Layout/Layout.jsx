@@ -1,9 +1,8 @@
-import React from 'react';
 import Header from './Header';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import BannerAd from '../BannerAd';
-import { useData } from '../../context/DataContext';
+import { useData } from '../../context/useData';
 
 const Layout = ({ children }) => {
     const { allBanners } = useData();

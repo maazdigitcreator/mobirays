@@ -16,7 +16,7 @@ import SidebarBanner1 from '../components/SidebarSections/SidebarBanner1'
 import SidebarBanner2 from '../components/SidebarSections/SidebarBanner2'
 import SidebarStats from '../components/SidebarSections/SidebarStats'
 import SidebarLatestModels from '../components/SidebarSections/SidebarLatestModels'
-import { useData } from '../context/DataContext';
+import { useData } from '../context/useData';
 import BannerAd from '../components/BannerAd'
 
 const News = () => {

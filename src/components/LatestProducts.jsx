@@ -2,7 +2,7 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import MobileImg from '../assets/mobileImg.jpg'
 import { createSlug } from '../utils/urlHelper'
-import { useData } from '../context/DataContext';
+import { useData } from '../context/useData';
 import Pagination from './Pagination';
 
 const LatestProducts = ({ title, products, itemImage, limit, useDummyData = false, category, enablePagination = false, itemsPerPage = 24}) => {

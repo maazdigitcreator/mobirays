@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useData } from "../context/DataContext";
+import { useData } from "../context/useData";
 import { productReviewService } from "../services/productReviewService";
 import {
   getProductReviewErrorMessage,
@@ -88,10 +88,14 @@ export const usePublicProductReviews = (searchQuery) => {
   }, [normalizedReviews, searchQuery]);
 
   const totalPages = Math.ceil(filteredReviews.length / ITEMS_PER_PAGE);
-  const resolvedCurrentPage = totalPages > 0 ? Math.min(currentPage, totalPages) : 1;
+  const resolvedCurrentPage =
+    totalPages > 0 ? Math.min(currentPage, totalPages) : 1;
   const indexOfLastItem = resolvedCurrentPage * ITEMS_PER_PAGE;
   const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
-  const currentReviews = filteredReviews.slice(indexOfFirstItem, indexOfLastItem);
+  const currentReviews = filteredReviews.slice(
+    indexOfFirstItem,
+    indexOfLastItem,
+  );
 
   return {
     currentReviews,

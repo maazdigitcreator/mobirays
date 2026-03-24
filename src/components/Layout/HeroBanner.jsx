@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import BannerAd from '../BannerAd';
-import { useData } from '../../context/DataContext';
+import { useData } from '../../context/useData';
 
 const HeroBanner = () => {
     const { allBanners, loading } = useData();

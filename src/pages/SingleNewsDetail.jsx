@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useData } from '../context/DataContext';
+import { useData } from '../context/useData';
 import Sidebar4 from '../components/Layout/Sidebar4'
 import sidebarBanner2 from '../assets/sidebarBanner2.jpg'
 import SubNewsBanner from '../components/SubNewsBanner'

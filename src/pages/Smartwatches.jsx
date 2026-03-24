@@ -17,7 +17,7 @@ import SidebarBanner2 from '../components/SidebarSections/SidebarBanner2';
 import SidebarBanner3 from '../components/SidebarSections/SidebarBanner3';
 import BannerAd from '../components/BannerAd';
 import { filterProductsByCategory } from '../utils/filterHelpers';
-import { useData } from '../context/DataContext';
+import { useData } from '../context/useData';
 
 const END_POINT = '/api/v1/products/watchesComingsoon';
 const Smartwatches = () => {

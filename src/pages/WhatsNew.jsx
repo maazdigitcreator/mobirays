@@ -6,7 +6,7 @@ import LatestNews from '../components/LatestNews';
 import LatestReviews from '../components/LatestReviews';
 import HeroBanner from '../components/Layout/HeroBanner';
 import BannerAd from '../components/BannerAd';
-import { useData } from '../context/DataContext';
+import { useData } from '../context/useData';
 import mobileImg from '../assets/mobileImg.jpg';
 import tabImg from '../assets/tabImg.jpg';
 import watchImg from '../assets/watchImg.png';

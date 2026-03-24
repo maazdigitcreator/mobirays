@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useData } from "../context/DataContext";
+import { useData } from "../context/useData";
 import { productLikeService } from "../services/productLikeService";
 import {
   getProductLikeErrorMessage,
@@ -79,7 +79,10 @@ export const useLikedProducts = (products) => {
   const likedProducts = useMemo(
     () =>
       rawLikes.map((like) =>
-        normalizeLikedProduct(like, productsById.get(Number(like?.product)) || null),
+        normalizeLikedProduct(
+          like,
+          productsById.get(Number(like?.product)) || null,
+        ),
       ),
     [productsById, rawLikes],
   );
@@ -96,10 +99,14 @@ export const useLikedProducts = (products) => {
   }, [likedProducts, searchQuery]);
 
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
-  const resolvedCurrentPage = totalPages > 0 ? Math.min(currentPage, totalPages) : 1;
+  const resolvedCurrentPage =
+    totalPages > 0 ? Math.min(currentPage, totalPages) : 1;
   const indexOfLastItem = resolvedCurrentPage * ITEMS_PER_PAGE;
   const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
-  const currentProducts = filteredProducts.slice(indexOfFirstItem, indexOfLastItem);
+  const currentProducts = filteredProducts.slice(
+    indexOfFirstItem,
+    indexOfLastItem,
+  );
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
