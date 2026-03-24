@@ -37,7 +37,9 @@ export const normalizeAttributeId = (value) =>
     .replace(/^_+|_+$/g, "");
 
 const normalizeCategoryTitle = (value) => {
-  const normalized = String(value || "").trim().toLowerCase();
+  const normalized = String(value || "")
+    .trim()
+    .toLowerCase();
   return CATEGORY_LABELS[normalized] || value || "Other";
 };
 
@@ -48,6 +50,7 @@ export const buildSidebarFilters = (attributes) => {
       const groups = Array.isArray(attribute?.categories)
         ? attribute.categories
             .map((category) => ({
+              categoryId: category?.brand_category_id,
               title: normalizeCategoryTitle(category?.brand_category_name),
               options: Array.from(new Set(category?.values || [])),
             }))
@@ -69,8 +72,31 @@ export const buildSidebarFilters = (attributes) => {
   return mappedFilters.sort((left, right) => {
     const leftIndex = ATTRIBUTE_ORDER.indexOf(left.id);
     const rightIndex = ATTRIBUTE_ORDER.indexOf(right.id);
-    const safeLeftIndex = leftIndex === -1 ? Number.MAX_SAFE_INTEGER : leftIndex;
-    const safeRightIndex = rightIndex === -1 ? Number.MAX_SAFE_INTEGER : rightIndex;
+    const safeLeftIndex =
+      leftIndex === -1 ? Number.MAX_SAFE_INTEGER : leftIndex;
+    const safeRightIndex =
+      rightIndex === -1 ? Number.MAX_SAFE_INTEGER : rightIndex;
     return safeLeftIndex - safeRightIndex;
   });
+};
+
+export const encodeSidebarFilterQuery = (selectedFiltersByCategory) =>
+  btoa(JSON.stringify({ c: selectedFiltersByCategory }))
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
+
+export const decodeSidebarFilterQuery = (value) => {
+  if (!value) {
+    return [];
+  }
+
+  try {
+    const normalizedValue = value.replace(/-/g, "+").replace(/_/g, "/");
+    const padding = "=".repeat((4 - (normalizedValue.length % 4)) % 4);
+    const parsedValue = JSON.parse(atob(`${normalizedValue}${padding}`));
+    return Array.isArray(parsedValue?.c) ? parsedValue.c : [];
+  } catch {
+    return [];
+  }
 };

@@ -47,7 +47,7 @@ const SidebarFilters = () => {
                     </div>
                     <div className="border border-[#0580A5] px-3 py-3 flex flex-wrap gap-x-2 gap-y-1">
                         {group.options.map((option) => {
-                            const selectionId = `${filter.id}-${group.title}`;
+                            const selectionId = `${filter.id}-${group.categoryId}`;
                             const isSelected = selectedFilters[selectionId]?.includes(option);
 
                             return (
@@ -55,7 +55,7 @@ const SidebarFilters = () => {
                                     key={`${selectionId}-${option}`}
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        toggleFilter(filter.id, group.title, option);
+                                        toggleFilter(filter.id, group.categoryId, option);
                                     }}
                                     className={`text-md cursor-pointer font-normal whitespace-nowrap px-2 py-0.5 rounded transition-colors ${isSelected
                                         ? 'bg-[#0580A5] text-white'
@@ -83,7 +83,7 @@ const SidebarFilters = () => {
             {filters.map((filter) => {
                 const Icon = FILTER_ICONS[filter.id] || Settings;
                 const groupCount = filter.groups.reduce((sum, group) => (
-                    sum + (selectedFilters[`${filter.id}-${group.title}`]?.length || 0)
+                    sum + (selectedFilters[`${filter.id}-${group.categoryId}`]?.length || 0)
                 ), 0);
 
                 return (
