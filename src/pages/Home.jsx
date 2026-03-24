@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useData } from "../context/useData";
 import LatestProducts from "../components/LatestProducts";
@@ -23,11 +23,13 @@ import HeroBanner from "../components/Layout/HeroBanner";
 import BannerAd from "../components/BannerAd";
 import { filterService } from "../services/filterService";
 import { decodeSidebarFilterQuery } from "../utils/sidebarFilters";
+import { filterProductsByCategory } from "../utils/filterHelpers";
 
 const Home = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { allBanners } = useData();
+  const { allProducts, allBanners } = useData();
+
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [filteredProductsMeta, setFilteredProductsMeta] = useState(null);
   const [filteredProductsStatus, setFilteredProductsStatus] = useState({
@@ -42,9 +44,11 @@ const Home = () => {
     Number.isInteger(filteredPageParam) && filteredPageParam > 0
       ? filteredPageParam
       : 1;
-  const appliedFilters = React.useMemo(() => {
-    return decodeSidebarFilterQuery(filtersParam);
-  }, [filtersParam]);
+
+  const appliedFilters = React.useMemo(
+    () => decodeSidebarFilterQuery(filtersParam),
+    [filtersParam],
+  );
 
   const homeBanners = React.useMemo(() => {
     const map = {};
@@ -55,58 +59,51 @@ const Home = () => {
     return map;
   }, [allBanners]);
 
+  // Default view — filter allProducts client-side (already loaded from filter API)
+  const phones = React.useMemo(
+    () => filterProductsByCategory(allProducts, "Mobile Phones"),
+    [allProducts],
+  );
+  const tablets = React.useMemo(
+    () => filterProductsByCategory(allProducts, "Tablets"),
+    [allProducts],
+  );
+  const watches = React.useMemo(
+    () => filterProductsByCategory(allProducts, "Smartwatches"),
+    [allProducts],
+  );
+
+  // Filtered view — call filter API with body when filters are applied
   useEffect(() => {
-    if (appliedFilters.length === 0) {
-      return;
-    }
+    if (appliedFilters.length === 0) return;
 
     const controller = new AbortController();
 
-    const fetchFilteredProducts = async () => {
-      setFilteredProductsStatus({
-        loading: true,
-        error: "",
-      });
-
+    const fetchFiltered = async () => {
+      setFilteredProductsStatus({ loading: true, error: "" });
       try {
         const response = await filterService.applyFilters({
           categories: appliedFilters,
           page: filteredPage,
           signal: controller.signal,
         });
-
-        if (controller.signal.aborted) {
-          return;
-        }
-
+        if (controller.signal.aborted) return;
         setFilteredProducts(response.data);
         setFilteredProductsMeta(response.meta);
-        setFilteredProductsStatus({
-          loading: false,
-          error: "",
-        });
-      } catch (error) {
-        if (controller.signal.aborted) {
-          return;
-        }
-
+        setFilteredProductsStatus({ loading: false, error: "" });
+      } catch (err) {
+        if (controller.signal.aborted) return;
         setFilteredProducts([]);
         setFilteredProductsMeta(null);
         setFilteredProductsStatus({
           loading: false,
-          error:
-            error?.data?.message ||
-            error?.message ||
-            "Failed to load filtered products.",
+          error: err?.data?.message || err?.message || "Failed to load filtered products.",
         });
       }
     };
 
-    void fetchFilteredProducts();
-
-    return () => {
-      controller.abort();
-    };
+    void fetchFiltered();
+    return () => controller.abort();
   }, [appliedFilters, filteredPage]);
 
   const handleFilteredPageChange = (page) => {
@@ -146,7 +143,6 @@ const Home = () => {
                     {filteredProductsStatus.error}
                   </div>
                 )}
-
                 {filteredProductsStatus.loading ? (
                   <div className="py-10 text-center text-gray-500">
                     Loading filtered products...
@@ -158,7 +154,6 @@ const Home = () => {
                       products={filteredProducts}
                       itemImage={mobileImg}
                     />
-
                     {filteredProductsMeta?.last_page > 1 && (
                       <Pagination
                         currentPage={filteredProductsMeta.current_page}
@@ -174,8 +169,8 @@ const Home = () => {
                 <div>
                   <LatestProducts
                     title="Latest Phones"
+                    products={phones}
                     itemImage={mobileImg}
-                    category="Mobile Phones"
                     limit={24}
                   />
                   <ProductsSectionButton
@@ -192,11 +187,12 @@ const Home = () => {
                     />
                   </div>
                 )}
+
                 <div className="mt-10">
                   <LatestProducts
                     title="Latest Tabs"
+                    products={tablets}
                     itemImage={tabImg}
-                    category="Tablets"
                     limit={24}
                   />
                   <ProductsSectionButton
@@ -213,11 +209,12 @@ const Home = () => {
                     />
                   </div>
                 )}
+
                 <div className="mt-10">
                   <LatestProducts
                     title="Latest Smartwatches"
+                    products={watches}
                     itemImage={watchImg}
-                    category="Smartwatches"
                     limit={24}
                   />
                   <ProductsSectionButton
@@ -229,6 +226,7 @@ const Home = () => {
             )}
           </div>
         </div>
+
         {homeBanners["home_banner_3"] && (
           <div className="mt-7">
             <BannerAd

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { productService } from "../services/productService";
 import { bannerService } from "../services/bannerService";
+import { filterService } from "../services/filterService";
 import { productLikeService } from "../services/productLikeService";
 import { DataContext } from "./dataContextInstance";
 
@@ -50,36 +50,13 @@ export const DataProvider = ({ children }) => {
     setError(null);
 
     try {
+      // Fire all requests in parallel — including filter page 1 and enrichment endpoints
       const [
-        rawProducts,
         newsRes,
         reviewsRes,
         brandsRes,
         allBannersData,
-        phoneComingsoonRes,
-        tabletComingsoonRes,
-        watchesComingsoonRes,
-        phoneWhatsNewRes,
-        tabletWhatsNewRes,
-        watchesWhatsNewRes,
-      ] = await Promise.all([
-        productService.getAllProducts(100),
-        fetch(`${API_BASE_URL}/api/v1/posts`),
-        fetch(`${API_BASE_URL}/api/v1/reviews/allReviews`),
-        fetch(`${API_BASE_URL}/api/v1/brands/allBrands`),
-        bannerService.getAllBanners(100),
-        fetch(`${API_BASE_URL}/api/v1/products/phoneComingsoon`),
-        fetch(`${API_BASE_URL}/api/v1/products/tabletComingsoon`),
-        fetch(`${API_BASE_URL}/api/v1/products/watchesComingsoon`),
-        fetch(`${API_BASE_URL}/api/v1/products/phoneWhatsNew`),
-        fetch(`${API_BASE_URL}/api/v1/products/tabletWhatsNew`),
-        fetch(`${API_BASE_URL}/api/v1/products/watchesWhatsNew`),
-      ]);
-
-      const [
-        newsData,
-        reviewsData,
-        brandsData,
+        firstFilterRes,
         phoneComingsoonData,
         tabletComingsoonData,
         watchesComingsoonData,
@@ -87,16 +64,52 @@ export const DataProvider = ({ children }) => {
         tabletWhatsNewData,
         watchesWhatsNewData,
       ] = await Promise.all([
-        newsRes.json(),
-        reviewsRes.json(),
-        brandsRes.json(),
-        phoneComingsoonRes.json(),
-        tabletComingsoonRes.json(),
-        watchesComingsoonRes.json(),
-        phoneWhatsNewRes.json(),
-        tabletWhatsNewRes.json(),
-        watchesWhatsNewRes.json(),
+        fetch(`${API_BASE_URL}/api/v1/posts`),
+        fetch(`${API_BASE_URL}/api/v1/reviews/allReviews`),
+        fetch(`${API_BASE_URL}/api/v1/brands/allBrands`),
+        bannerService.getAllBanners(100),
+        filterService.applyFilters({ categories: [], page: 1 }),
+        fetch(`${API_BASE_URL}/api/v1/products/phoneComingsoon`).then((r) =>
+          r.json(),
+        ),
+        fetch(`${API_BASE_URL}/api/v1/products/tabletComingsoon`).then((r) =>
+          r.json(),
+        ),
+        fetch(`${API_BASE_URL}/api/v1/products/watchesComingsoon`).then((r) =>
+          r.json(),
+        ),
+        fetch(`${API_BASE_URL}/api/v1/products/phoneWhatsNew`).then((r) =>
+          r.json(),
+        ),
+        fetch(`${API_BASE_URL}/api/v1/products/tabletWhatsNew`).then((r) =>
+          r.json(),
+        ),
+        fetch(`${API_BASE_URL}/api/v1/products/watchesWhatsNew`).then((r) =>
+          r.json(),
+        ),
       ]);
+
+      // Parse JSON + fetch remaining filter pages — all in parallel
+      const lastPage = Number(firstFilterRes?.meta?.last_page || 1);
+      const remainingPageNums = Array.from(
+        { length: lastPage - 1 },
+        (_, i) => i + 2,
+      );
+
+      const [newsData, reviewsData, brandsData, ...remainingFilterPages] =
+        await Promise.all([
+          newsRes.json(),
+          reviewsRes.json(),
+          brandsRes.json(),
+          ...remainingPageNums.map((p) =>
+            filterService.applyFilters({ categories: [], page: p }),
+          ),
+        ]);
+
+      const rawProducts = [
+        ...(firstFilterRes.data || []),
+        ...remainingFilterPages.flatMap((r) => r.data || []),
+      ];
 
       const comingSoonIds = new Set([
         ...(phoneComingsoonData?.data?.map((p) => p.id) || []),
