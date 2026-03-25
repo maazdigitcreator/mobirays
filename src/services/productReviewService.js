@@ -4,6 +4,8 @@ const PRODUCT_REVIEW_STORE_ENDPOINT = "/api/v1/product/reviews/store";
 const PRODUCT_REVIEW_MEMBER_ENDPOINT = "/api/v1/product/reviews/member";
 const PRODUCT_REVIEW_ALL_ENDPOINT = "/api/v1/product/reviews/allReviews";
 const PRODUCT_REVIEW_BY_PRODUCT_ENDPOINT = "/api/v1/product/reviews/getProductReviewsById";
+const PRODUCT_REVIEW_EDIT_ENDPOINT = "/api/v1/product/reviews/edit";
+const PRODUCT_REVIEW_DELETE_ENDPOINT = "/api/v1/product/reviews/delete";
 const DEFAULT_PER_PAGE = 100;
 
 const getPublicReviewsPage = async ({
@@ -53,6 +55,22 @@ export const productReviewService = {
   getMemberReviews() {
     return httpClient.request(PRODUCT_REVIEW_MEMBER_ENDPOINT, {
       method: "GET",
+    });
+  },
+
+  update(reviewId, { title, content, rating }) {
+    return httpClient.request(`${PRODUCT_REVIEW_EDIT_ENDPOINT}/${reviewId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ title, content, rating }),
+    });
+  },
+
+  delete(reviewId) {
+    return httpClient.request(`${PRODUCT_REVIEW_DELETE_ENDPOINT}/${reviewId}`, {
+      method: "DELETE",
     });
   },
 
