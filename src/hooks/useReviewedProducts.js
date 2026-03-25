@@ -17,6 +17,9 @@ export const useReviewedProducts = (products) => {
     loading: false,
     error: "",
   });
+  const [editingReview, setEditingReview] = useState(null);
+  const [editStatus, setEditStatus] = useState({ loading: false, error: "" });
+  const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
     if (Array.isArray(products) && products.length > 0) {
@@ -123,6 +126,47 @@ export const useReviewedProducts = (products) => {
     setCurrentPage(1);
   };
 
+  const handleEditOpen = (review) => {
+    setEditingReview(review);
+    setEditStatus({ loading: false, error: "" });
+  };
+
+  const handleEditClose = () => {
+    setEditingReview(null);
+    setEditStatus({ loading: false, error: "" });
+  };
+
+  const handleEditSubmit = async ({ title, content, rating }) => {
+    setEditStatus({ loading: true, error: "" });
+    try {
+      await productReviewService.update(editingReview.id, { title, content, rating });
+      setFetchedReviews((prev) =>
+        prev.map((r) =>
+          r.id === editingReview.id ? { ...r, title, reviewText: content, rating } : r
+        )
+      );
+      setEditingReview(null);
+      setEditStatus({ loading: false, error: "" });
+    } catch (error) {
+      setEditStatus({ loading: false, error: getProductReviewErrorMessage(error) });
+    }
+  };
+
+  const handleDelete = async (reviewId) => {
+    setDeletingId(reviewId);
+    try {
+      await productReviewService.delete(reviewId);
+      setFetchedReviews((prev) => prev.filter((r) => r.id !== reviewId));
+    } catch (error) {
+      setStatus((prev) => ({
+        ...prev,
+        error: getProductReviewErrorMessage(error),
+      }));
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   return {
     currentReviews,
     currentPage: resolvedCurrentPage,
@@ -131,5 +175,12 @@ export const useReviewedProducts = (products) => {
     totalPages,
     setCurrentPage,
     handleSearchChange,
+    editingReview,
+    editStatus,
+    handleEditOpen,
+    handleEditClose,
+    handleEditSubmit,
+    deletingId,
+    handleDelete,
   };
 };
