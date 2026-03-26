@@ -1,9 +1,16 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 
-const EditReviewModal = ({ review, status, onClose, onSubmit }) => {
+const EditReviewModal = ({
+  review,
+  status,
+  onClose,
+  onSubmit,
+  heading = "Edit Review",
+  contentLabel = "Review",
+}) => {
   const [title, setTitle] = useState(review.title);
-  const [content, setContent] = useState(review.reviewText);
+  const [content, setContent] = useState(review.reviewText ?? review.content ?? "");
   const [rating, setRating] = useState(review.rating);
   const [hoveredStar, setHoveredStar] = useState(0);
 
@@ -16,7 +23,7 @@ const EditReviewModal = ({ review, status, onClose, onSubmit }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="w-full max-w-lg bg-white">
         <div className="flex items-center justify-between bg-[#0580A5] px-4 py-3">
-          <h2 className="text-white text-lg">Edit Review</h2>
+          <h2 className="text-white text-lg">{heading}</h2>
           <button
             type="button"
             onClick={onClose}
@@ -66,7 +73,7 @@ const EditReviewModal = ({ review, status, onClose, onSubmit }) => {
 
           <div className="flex flex-col gap-1">
             <label className="text-sm font-semibold text-gray-700">
-              Review
+              {contentLabel}
             </label>
             <textarea
               value={content}

@@ -1,8 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Search } from "lucide-react";
+import { Edit, Search, Trash2 } from "lucide-react";
 import Pagination from "./Pagination";
 import reviewImg from "../assets/reviewsImg.png";
+import EditReviewModal from "./EditReviewModal";
 
 const DashboardReviewRepliesList = ({
   title,
@@ -14,6 +15,13 @@ const DashboardReviewRepliesList = ({
   setCurrentPage,
   handleSearchChange,
   emptyMessage,
+  editingReply,
+  editStatus,
+  handleEditOpen,
+  handleEditClose,
+  handleEditSubmit,
+  deletingId,
+  handleDelete,
 }) => {
   return (
     <div className="w-full container">
@@ -135,9 +143,28 @@ const DashboardReviewRepliesList = ({
                   {reply.author}
                 </p>
 
-                <p className="text-sm text-black leading-relaxed">
+                <p className="text-sm text-black leading-relaxed mb-8">
                   {reply.content}
                 </p>
+
+                <div className="absolute bottom-4 right-4 flex items-center gap-4">
+                  <button
+                    type="button"
+                    onClick={() => handleEditOpen(reply)}
+                    className="text-[#0580A5] font-semibold flex items-center gap-1 cursor-pointer hover:underline"
+                  >
+                    <Edit size={16} /> Edit Reply
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(reply.id)}
+                    disabled={deletingId === reply.id}
+                    className="text-[#0580A5] font-semibold flex items-center gap-1 cursor-pointer hover:underline disabled:opacity-50"
+                  >
+                    <Trash2 size={16} />
+                    {deletingId === reply.id ? "Deleting..." : "Delete"}
+                  </button>
+                </div>
               </div>
             </div>
           ))}
@@ -149,6 +176,17 @@ const DashboardReviewRepliesList = ({
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={setCurrentPage}
+        />
+      )}
+
+      {editingReply && (
+        <EditReviewModal
+          review={editingReply}
+          status={editStatus}
+          onClose={handleEditClose}
+          onSubmit={handleEditSubmit}
+          heading="Edit Reply"
+          contentLabel="Reply"
         />
       )}
     </div>
