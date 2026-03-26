@@ -1,7 +1,7 @@
 import { httpClient } from "./httpClient";
 
 const FILTER_ATTRIBUTES_ENDPOINT = "/api/v1/filters/allAttributes";
-const FILTER_DATA_ENDPOINT = "/api/v1/filters/getData";
+const FILTER_DATA_ENDPOINT = "/api/v1/products/allProducts";
 
 export const filterService = {
   getAllAttributes({ signal } = {}) {
