@@ -24,6 +24,9 @@ export const useAdminReviewReplies = () => {
     loading: false,
     error: "",
   });
+  const [editingReply, setEditingReply] = useState(null);
+  const [editStatus, setEditStatus] = useState({ loading: false, error: "" });
+  const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -121,6 +124,66 @@ export const useAdminReviewReplies = () => {
     setCurrentPage(1);
   };
 
+  const handleEditOpen = (reply) => {
+    setEditingReply(reply);
+    setEditStatus({ loading: false, error: "" });
+  };
+
+  const handleEditClose = () => {
+    setEditingReply(null);
+    setEditStatus({ loading: false, error: "" });
+  };
+
+  const handleEditSubmit = async ({ title, content, rating }) => {
+    if (!editingReply) return;
+
+    setEditStatus({ loading: true, error: "" });
+
+    try {
+      await reviewDiscussionService.update(editingReply.id, {
+        title,
+        content,
+        rating,
+      });
+
+      setReplies((prev) =>
+        prev.map((reply) =>
+          reply.id === editingReply.id
+            ? {
+                ...reply,
+                title,
+                content,
+                rating,
+              }
+            : reply,
+        ),
+      );
+      setEditingReply(null);
+      setEditStatus({ loading: false, error: "" });
+    } catch (error) {
+      setEditStatus({
+        loading: false,
+        error: getAdminReviewReplyErrorMessage(error),
+      });
+    }
+  };
+
+  const handleDelete = async (replyId) => {
+    setDeletingId(replyId);
+
+    try {
+      await reviewDiscussionService.delete(replyId);
+      setReplies((prev) => prev.filter((reply) => reply.id !== replyId));
+    } catch (error) {
+      setStatus((prev) => ({
+        ...prev,
+        error: getAdminReviewReplyErrorMessage(error),
+      }));
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   return {
     currentReplies,
     currentPage: resolvedCurrentPage,
@@ -129,5 +192,12 @@ export const useAdminReviewReplies = () => {
     totalPages,
     setCurrentPage,
     handleSearchChange,
+    editingReply,
+    editStatus,
+    handleEditOpen,
+    handleEditClose,
+    handleEditSubmit,
+    deletingId,
+    handleDelete,
   };
 };

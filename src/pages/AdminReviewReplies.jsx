@@ -12,6 +12,13 @@ const AdminReviewReplies = () => {
     totalPages,
     setCurrentPage,
     handleSearchChange,
+    editingReply,
+    editStatus,
+    handleEditOpen,
+    handleEditClose,
+    handleEditSubmit,
+    deletingId,
+    handleDelete,
   } = useAdminReviewReplies();
 
   return (
@@ -26,6 +33,13 @@ const AdminReviewReplies = () => {
         setCurrentPage={setCurrentPage}
         handleSearchChange={handleSearchChange}
         emptyMessage="No admin review replies found."
+        editingReply={editingReply}
+        editStatus={editStatus}
+        handleEditOpen={handleEditOpen}
+        handleEditClose={handleEditClose}
+        handleEditSubmit={handleEditSubmit}
+        deletingId={deletingId}
+        handleDelete={handleDelete}
       />
     </DashboardPageLayout>
   );

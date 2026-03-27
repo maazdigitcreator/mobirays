@@ -3,6 +3,8 @@ import { httpClient } from "./httpClient";
 const REVIEW_DISCUSSION_BY_REVIEW_ENDPOINT = "/api/v1/reviews/getReviewsById";
 const REVIEW_DISCUSSION_STORE_ENDPOINT = "/api/v1/reviews/store";
 const REVIEW_DISCUSSION_MEMBER_ENDPOINT = "/api/v1/reviews/member";
+const REVIEW_DISCUSSION_EDIT_ENDPOINT = "/api/v1/reviews/edit";
+const REVIEW_DISCUSSION_DELETE_ENDPOINT = "/api/v1/reviews/delete";
 const DEFAULT_PER_PAGE = 100;
 
 const getReviewDiscussionPage = async ({
@@ -86,6 +88,22 @@ export const reviewDiscussionService = {
         content,
         rating,
       }),
+    });
+  },
+
+  update(replyId, { title, content, rating }) {
+    return httpClient.request(`${REVIEW_DISCUSSION_EDIT_ENDPOINT}/${replyId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ title, content, rating }),
+    });
+  },
+
+  delete(replyId) {
+    return httpClient.request(`${REVIEW_DISCUSSION_DELETE_ENDPOINT}/${replyId}`, {
+      method: "DELETE",
     });
   },
 };
