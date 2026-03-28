@@ -25,6 +25,33 @@ import { filterService } from "../services/filterService";
 import { decodeSidebarFilterQuery } from "../utils/sidebarFilters";
 import { filterProductsByCategory } from "../utils/filterHelpers";
 
+const HOME_SECTION_LIMIT = 24;
+const HOME_SECTIONS = [
+  {
+    id: "phones",
+    title: "Latest Phones",
+    category: "Mobile Phones",
+    itemImage: mobileImg,
+    showMoreLink: "/phones",
+    bannerLocation: "home_banner_1",
+  },
+  {
+    id: "tablets",
+    title: "Latest Tabs",
+    category: "Tablets",
+    itemImage: tabImg,
+    showMoreLink: "/tablets",
+    bannerLocation: "home_banner_2",
+  },
+  {
+    id: "watches",
+    title: "Latest Smartwatches",
+    category: "Smartwatches",
+    itemImage: watchImg,
+    showMoreLink: "/smartwatches",
+  },
+];
+
 const Home = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -49,6 +76,7 @@ const Home = () => {
     () => decodeSidebarFilterQuery(filtersParam),
     [filtersParam],
   );
+  const isFilteredView = appliedFilters.length > 0;
 
   const homeBanners = React.useMemo(() => {
     const map = {};
@@ -59,23 +87,21 @@ const Home = () => {
     return map;
   }, [allBanners]);
 
-  // Default view — filter allProducts client-side (already loaded from filter API)
-  const phones = React.useMemo(
-    () => filterProductsByCategory(allProducts, "Mobile Phones"),
-    [allProducts],
-  );
-  const tablets = React.useMemo(
-    () => filterProductsByCategory(allProducts, "Tablets"),
-    [allProducts],
-  );
-  const watches = React.useMemo(
-    () => filterProductsByCategory(allProducts, "Smartwatches"),
-    [allProducts],
-  );
+  const categorizedProducts = React.useMemo(() => {
+    const sourceProducts = isFilteredView ? filteredProducts : allProducts;
+
+    return HOME_SECTIONS.reduce((acc, section) => {
+      acc[section.id] = filterProductsByCategory(
+        sourceProducts,
+        section.category,
+      );
+      return acc;
+    }, {});
+  }, [allProducts, filteredProducts, isFilteredView]);
 
   // Filtered view — call filter API with body when filters are applied
   useEffect(() => {
-    if (appliedFilters.length === 0) return;
+    if (!isFilteredView) return;
 
     const controller = new AbortController();
 
@@ -85,11 +111,12 @@ const Home = () => {
         const response = await filterService.applyFilters({
           categories: appliedFilters,
           page: filteredPage,
+          perPage: HOME_SECTION_LIMIT,
           signal: controller.signal,
         });
         if (controller.signal.aborted) return;
-        setFilteredProducts(response.data);
-        setFilteredProductsMeta(response.meta);
+        setFilteredProducts(Array.isArray(response?.data) ? response.data : []);
+        setFilteredProductsMeta(response?.meta ?? null);
         setFilteredProductsStatus({ loading: false, error: "" });
       } catch (err) {
         if (controller.signal.aborted) return;
@@ -97,14 +124,17 @@ const Home = () => {
         setFilteredProductsMeta(null);
         setFilteredProductsStatus({
           loading: false,
-          error: err?.data?.message || err?.message || "Failed to load filtered products.",
+          error:
+            err?.data?.message ||
+            err?.message ||
+            "Failed to load filtered products.",
         });
       }
     };
 
     void fetchFiltered();
     return () => controller.abort();
-  }, [appliedFilters, filteredPage]);
+  }, [appliedFilters, filteredPage, isFilteredView]);
 
   const handleFilteredPageChange = (page) => {
     const params = new URLSearchParams(location.search);
@@ -136,92 +166,52 @@ const Home = () => {
           <div className="w-full lg:w-3/4">
             <HeroBanner />
 
-            {appliedFilters.length > 0 ? (
-              <div className="mt-6">
-                {filteredProductsStatus.error && (
-                  <div className="border border-red-300 bg-red-100 px-4 py-3 text-sm text-red-700">
-                    {filteredProductsStatus.error}
-                  </div>
-                )}
-                {filteredProductsStatus.loading ? (
-                  <div className="py-10 text-center text-gray-500">
-                    Loading filtered products...
-                  </div>
-                ) : (
-                  <>
-                    <LatestProducts
-                      title="Filtered Products"
-                      products={filteredProducts}
-                      itemImage={mobileImg}
-                    />
-                    {filteredProductsMeta?.last_page > 1 && (
-                      <Pagination
-                        currentPage={filteredProductsMeta.current_page}
-                        totalPages={filteredProductsMeta.last_page}
-                        onPageChange={handleFilteredPageChange}
-                      />
-                    )}
-                  </>
-                )}
+            {isFilteredView && filteredProductsStatus.error && (
+              <div className="mt-6 border border-red-300 bg-red-100 px-4 py-3 text-sm text-red-700">
+                {filteredProductsStatus.error}
+              </div>
+            )}
+
+            {isFilteredView && filteredProductsStatus.loading ? (
+              <div className="py-10 text-center text-gray-500">
+                Loading filtered products...
               </div>
             ) : (
               <>
-                <div>
-                  <LatestProducts
-                    title="Latest Phones"
-                    products={phones}
-                    itemImage={mobileImg}
-                    limit={24}
-                  />
-                  <ProductsSectionButton
-                    showMoreLink="/phones"
-                    comingSoonLink="/coming-soon"
-                  />
-                </div>
+                {HOME_SECTIONS.map((section, index) => (
+                  <React.Fragment key={section.id}>
+                    <div className={index === 0 ? "" : "mt-10"}>
+                      <LatestProducts
+                        title={section.title}
+                        products={categorizedProducts[section.id] || []}
+                        itemImage={section.itemImage}
+                        limit={HOME_SECTION_LIMIT}
+                      />
+                      <ProductsSectionButton
+                        showMoreLink={section.showMoreLink}
+                        comingSoonLink="/coming-soon"
+                      />
+                    </div>
 
-                {homeBanners["home_banner_1"] && (
-                  <div className="mt-7 hidden sm:block">
-                    <BannerAd
-                      banner={homeBanners["home_banner_1"]}
-                      className="h-[200px] sm:w-full"
-                    />
-                  </div>
+                    {section.bannerLocation &&
+                      homeBanners[section.bannerLocation] && (
+                        <div className="mt-7 hidden sm:block">
+                          <BannerAd
+                            banner={homeBanners[section.bannerLocation]}
+                            className="h-[200px] sm:w-full"
+                          />
+                        </div>
+                      )}
+                  </React.Fragment>
+                ))}
+
+                {isFilteredView && filteredProductsMeta?.last_page > 1 && (
+                  <Pagination
+                    currentPage={filteredProductsMeta.current_page}
+                    totalPages={filteredProductsMeta.last_page}
+                    onPageChange={handleFilteredPageChange}
+                  />
                 )}
-
-                <div className="mt-10">
-                  <LatestProducts
-                    title="Latest Tabs"
-                    products={tablets}
-                    itemImage={tabImg}
-                    limit={24}
-                  />
-                  <ProductsSectionButton
-                    showMoreLink="/tablets"
-                    comingSoonLink="/coming-soon"
-                  />
-                </div>
-
-                {homeBanners["home_banner_2"] && (
-                  <div className="mt-7 hidden sm:block">
-                    <BannerAd
-                      banner={homeBanners["home_banner_2"]}
-                      className="h-[200px] sm:w-full"
-                    />
-                  </div>
-                )}
-
-                <div className="mt-10">
-                  <LatestProducts
-                    title="Latest Smartwatches"
-                    products={watches}
-                    itemImage={watchImg}
-                    limit={24}
-                  />
-                  <ProductsSectionButton
-                    showMoreLink="/smartwatches"
-                    comingSoonLink="/coming-soon"
-                  />
-                </div>
               </>
             )}
           </div>
