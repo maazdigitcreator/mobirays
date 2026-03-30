@@ -1,9 +1,9 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import MobileImg from '../assets/mobileImg.jpg'
-import { createSlug } from '../utils/urlHelper'
 import { useData } from '../context/useData';
 import Pagination from './Pagination';
+import { getProductDetailPath } from '../utils/productRoutes';
 
 const LatestProducts = ({ title, products, itemImage, limit, useDummyData = false, category, enablePagination = false, itemsPerPage = 24}) => {
     const navigate = useNavigate();
@@ -81,11 +81,7 @@ const LatestProducts = ({ title, products, itemImage, limit, useDummyData = fals
         // Get the actual image being displayed (product.image or itemImage or MobileImg)
         const productImage = product.image || itemImage || MobileImg;
 
-        // Create URL slug from product slug or name
-        const slug = product.slug || createSlug(product.name);
-
-        // Navigate to product page with slug in URL and pass COMPLETE product data
-        navigate(`/${slug}`, {
+        navigate(getProductDetailPath(product), {
             state: {
                 product: {
                     ...product, // Pass all product data including specifications, price, etc.

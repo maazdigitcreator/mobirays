@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { bannerService } from "../services/bannerService";
 import { filterService } from "../services/filterService";
 import { productLikeService } from "../services/productLikeService";
+import { productService } from "../services/productService";
 import { DataContext } from "./dataContextInstance";
 
 const CACHE_KEY = "mobirays_api_cache_v2";
@@ -19,10 +20,42 @@ export const DataProvider = ({ children }) => {
     error: "",
     loaded: false,
   });
+  const [productVisitorTotals, setProductVisitorTotals] = useState([]);
+  const [productVisitorTotalsStatus, setProductVisitorTotalsStatus] = useState({
+    loading: true,
+    error: "",
+    loaded: false,
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const dataLoadedRef = useRef(false);
+
+  const normalizeVisitorTotals = useCallback((items = []) => {
+    if (!Array.isArray(items)) {
+      return [];
+    }
+
+    return items
+      .map((item) => {
+        const fallbackProduct = item?.product || {};
+        const normalizedId = Number(
+          item?.product_id ?? fallbackProduct?.id ?? item?.id,
+        );
+
+        if (!Number.isFinite(normalizedId) || normalizedId <= 0) {
+          return null;
+        }
+
+        return {
+          id: normalizedId,
+          name: fallbackProduct?.name || item?.name || "Unknown Product",
+          slug: fallbackProduct?.slug || item?.slug || null,
+          visited_count: Number(item?.visited_count ?? item?.views ?? 0),
+        };
+      })
+      .filter(Boolean);
+  }, []);
 
   const fetchAllData = useCallback(async (force = false) => {
     if (!force && dataLoadedRef.current) return;
@@ -186,7 +219,28 @@ export const DataProvider = ({ children }) => {
           loaded: false,
         });
       });
-  }, [fetchAllData]);
+
+    productService
+      .getProductVisitors()
+      .then((response) => {
+        setProductVisitorTotals(normalizeVisitorTotals(response?.data));
+        setProductVisitorTotalsStatus({
+          loading: false,
+          error: "",
+          loaded: true,
+        });
+      })
+      .catch((err) => {
+        setProductVisitorTotalsStatus({
+          loading: false,
+          error:
+            err?.data?.message ||
+            err?.message ||
+            "Failed to load device visitors.",
+          loaded: false,
+        });
+      });
+  }, [fetchAllData, normalizeVisitorTotals]);
 
   const setProductLikeTotalCount = useCallback((productId, likesCount) => {
     const normalizedId = Number(productId);
@@ -199,6 +253,53 @@ export const DataProvider = ({ children }) => {
     );
   }, []);
 
+  const setProductVisitorTotalCount = useCallback(
+    (productId, visitedCount, name, slug) => {
+      const normalizedId = Number(productId);
+
+      if (!Number.isFinite(normalizedId) || normalizedId <= 0) {
+        return;
+      }
+
+      setProductVisitorTotals((current) => {
+        const existingIndex = current.findIndex(
+          (product) => Number(product.id) === normalizedId,
+        );
+
+        const nextCount = Number(visitedCount);
+        const resolvedCount = Number.isFinite(nextCount)
+          ? nextCount
+          : existingIndex >= 0
+            ? Number(current[existingIndex]?.visited_count || 0) + 1
+            : 1;
+
+        if (existingIndex === -1) {
+          return [
+            ...current,
+            {
+              id: normalizedId,
+              name: name || "Unknown Product",
+              slug: slug || null,
+              visited_count: resolvedCount,
+            },
+          ];
+        }
+
+        return current.map((product, index) =>
+          index === existingIndex
+            ? {
+                ...product,
+                name: name || product.name,
+                slug: slug || product.slug || null,
+                visited_count: resolvedCount,
+              }
+            : product,
+        );
+      });
+    },
+    [],
+  );
+
   const value = {
     allProducts,
     allNews,
@@ -207,10 +308,13 @@ export const DataProvider = ({ children }) => {
     allBanners,
     productLikeTotals,
     productLikeTotalsStatus,
+    productVisitorTotals,
+    productVisitorTotalsStatus,
     loading,
     error,
     refreshData: () => fetchAllData(true),
     setProductLikeTotalCount,
+    setProductVisitorTotalCount,
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

@@ -1,9 +1,5 @@
 import { useSidebarLikeStats } from "../../hooks/useSidebarLikeStats";
-
-const VISITOR_DEVICES = Array.from({ length: 8 }, () => ({
-  name: "Xiaomi Poco X3",
-  count: "64,853",
-}));
+import { useSidebarVisitorStats } from "../../hooks/useSidebarVisitorStats";
 
 const StatsSection = ({ label, items, loading, error, emptyMessage }) => (
   <div>
@@ -41,13 +37,20 @@ const StatsSection = ({ label, items, loading, error, emptyMessage }) => (
 );
 
 const SidebarStats = () => {
+  const { visitorDevices, status: visitorStatus } = useSidebarVisitorStats();
   const { likedDevices, status } = useSidebarLikeStats();
 
   return (
     <div className="flex flex-col gap-6">
       <StatsSection
         label="Visitors"
-        items={VISITOR_DEVICES}
+        items={visitorDevices.map((device) => ({
+          id: device.id,
+          name: device.name,
+          count: device.visitedCount.toLocaleString(),
+        }))}
+        loading={visitorStatus.loading}
+        error={visitorStatus.error}
         emptyMessage="No visitor data available."
       />
 

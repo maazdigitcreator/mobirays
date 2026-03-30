@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import MobileImg from '../assets/mobileImg.jpg'
-import { createSlug } from '../utils/urlHelper'
 import { Search } from 'lucide-react'
 import Pagination from './Pagination'
+import { getProductDetailPath } from '../utils/productRoutes'
 
-const WishlistProducts = ({ title, products, itemImage }) => {
+const WishlistProducts = ({ products, itemImage }) => {
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('')
     const [currentPage, setCurrentPage] = useState(1);
@@ -40,11 +40,7 @@ const WishlistProducts = ({ title, products, itemImage }) => {
         // Get the actual image being displayed (product.image or itemImage or MobileImg)
         const productImage = product.image || itemImage || MobileImg;
 
-        // Create URL slug from product name
-        const slug = createSlug(product.name);
-
-        // Navigate to product page with slug in URL (direct slug, no /product prefix)
-        navigate(`/${slug}`, {
+        navigate(getProductDetailPath(product), {
             state: {
                 product: {
                     ...product,

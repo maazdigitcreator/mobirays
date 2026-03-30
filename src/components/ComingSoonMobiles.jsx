@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom' // Added useNavigate
 import MobileImg from '../assets/mobileImg.jpg'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { createSlug } from '../utils/urlHelper' // Import createSlug
+import { getProductDetailPath } from '../utils/productRoutes'
 const END_POINT = '/api/v1/products/phoneComingsoon';
 const ComingSoonMobiles = ({ title, itemImage, endpoint = END_POINT}) => {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -73,8 +73,7 @@ const ComingSoonMobiles = ({ title, itemImage, endpoint = END_POINT}) => {
     };
 
     const handleProductClick = (product) => {
-        const slug = product.slug || createSlug(product.name);
-        navigate(`/${slug}`, {
+        navigate(getProductDetailPath(product), {
             state: {
                 product: {
                     ...product,
