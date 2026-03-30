@@ -1,5 +1,7 @@
+import { Link } from "react-router-dom";
 import { useSidebarLikeStats } from "../../hooks/useSidebarLikeStats";
 import { useSidebarVisitorStats } from "../../hooks/useSidebarVisitorStats";
+import { getProductDetailPath } from "../../utils/productRoutes";
 
 const StatsSection = ({ label, items, loading, error, emptyMessage }) => (
   <div>
@@ -26,7 +28,13 @@ const StatsSection = ({ label, items, loading, error, emptyMessage }) => (
           >
             <div className="flex gap-2">
               <span className="text-gray-600">{index + 1}.</span>
-              <span className="text-gray-700 font-medium">{item.name}</span>
+              <Link
+                to={getProductDetailPath(item)}
+                state={{ product: item }}
+                className="font-medium text-gray-700 transition-colors hover:text-[#0580A5]"
+              >
+                {item.name}
+              </Link>
             </div>
             <span className="text-gray-600">{item.count}</span>
           </div>
@@ -47,6 +55,7 @@ const SidebarStats = () => {
         items={visitorDevices.map((device) => ({
           id: device.id,
           name: device.name,
+          slug: device.slug,
           count: device.visitedCount.toLocaleString(),
         }))}
         loading={visitorStatus.loading}
@@ -59,6 +68,7 @@ const SidebarStats = () => {
         items={likedDevices.map((device) => ({
           id: device.id,
           name: device.name,
+          slug: device.slug,
           count: device.likesCount.toLocaleString(),
         }))}
         loading={status.loading}

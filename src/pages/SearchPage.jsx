@@ -24,7 +24,7 @@ import { advancedSearchService } from '../services/advancedSearchService';
 import { useAdvancedSearchAttributes } from '../hooks/useAdvancedSearchAttributes';
 import {
     buildAdvancedSearchRequestPayload,
-    runAdvancedSearch,
+    getAdvancedSearchAttributesMissingCategoryIds,
 } from '../utils/advancedSearchFilters';
 import { decodeAdvancedSearchQuery } from '../utils/advancedSearchQuery';
 import { filterProductsByCategory } from '../utils/filterHelpers';
@@ -47,13 +47,19 @@ const SearchPage = () => {
         [location.search],
     );
     const searchQuery = searchParams.get('q') || '';
+    const isAdvancedSearchMode = searchParams.get('advanced') === '1';
     const appliedFilters = useMemo(
         () => decodeAdvancedSearchQuery(searchParams.get('filters')),
         [searchParams],
     );
-    const isFilteredView = Object.keys(appliedFilters).length > 0 && !searchQuery;
+    const hasAppliedFilters = Object.keys(appliedFilters).length > 0;
+    const isFilteredView = isAdvancedSearchMode && !searchQuery;
     const advancedRequestCategories = useMemo(
         () => buildAdvancedSearchRequestPayload(attributes, appliedFilters),
+        [attributes, appliedFilters],
+    );
+    const advancedFiltersMissingCategoryIds = useMemo(
+        () => getAdvancedSearchAttributesMissingCategoryIds(attributes, appliedFilters),
         [attributes, appliedFilters],
     );
 
@@ -128,20 +134,28 @@ const SearchPage = () => {
         };
     }, [allNews, allProducts, allReviews]);
 
-    const filterAdvancedResults = useCallback((selectedFilters) => {
-        const filteredProducts = runAdvancedSearch(allProducts, attributes, selectedFilters);
-
-        return {
-            phones: filterProductsByCategory(filteredProducts, 'Mobile Phones'),
-            tablets: filterProductsByCategory(filteredProducts, 'Tablets'),
-            watches: filterProductsByCategory(filteredProducts, 'Smartwatches'),
-            news: [],
-            reviews: [],
-        };
-    }, [allProducts, attributes]);
-
     useEffect(() => {
-        if (!isFilteredView || advancedRequestCategories.length === 0) {
+        if (!isFilteredView) {
+            return;
+        }
+
+        if (hasAppliedFilters && advancedFiltersMissingCategoryIds.length > 0) {
+            setAdvancedProducts([]);
+            setAdvancedStatus({
+                loading: false,
+                error: 'Selected filters are missing brand_category_id.',
+                loaded: false,
+            });
+            return;
+        }
+
+        if (hasAppliedFilters && attributes.length > 0 && advancedRequestCategories.length === 0) {
+            setAdvancedProducts([]);
+            setAdvancedStatus({
+                loading: false,
+                error: 'Advanced search request is missing category mapping.',
+                loaded: false,
+            });
             return;
         }
 
@@ -192,7 +206,7 @@ const SearchPage = () => {
         return () => {
             controller.abort();
         };
-    }, [advancedRequestCategories, isFilteredView]);
+    }, [advancedFiltersMissingCategoryIds.length, advancedRequestCategories, attributes.length, hasAppliedFilters, isFilteredView]);
 
     const searchResults = useMemo(() => {
         if (isFilteredView) {
@@ -204,10 +218,6 @@ const SearchPage = () => {
                     news: [],
                     reviews: [],
                 };
-            }
-
-            if (advancedRequestCategories.length === 0 && allProducts.length > 0 && attributes.length > 0) {
-                return filterAdvancedResults(appliedFilters);
             }
 
             return {
@@ -232,12 +242,7 @@ const SearchPage = () => {
         };
     }, [
         advancedProducts,
-        advancedRequestCategories.length,
         advancedStatus.loaded,
-        allProducts.length,
-        appliedFilters,
-        attributes.length,
-        filterAdvancedResults,
         filterResults,
         isFilteredView,
         searchQuery,

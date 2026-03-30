@@ -1,7 +1,7 @@
 const API_BASE = "https://mobirays.voucherndeals.com";
 
 const CRAWLER_UA =
-  /facebookexternalhit|Twitterbot|LinkedInBot|WhatsApp|TelegramBot|Slackbot|Pinterest|Discordbot|vkShare|W3C_Validator/i;
+  /facebookexternalhit|Facebot|facebookcatalog|Twitterbot|LinkedInBot|WhatsApp|TelegramBot|Slackbot|Pinterest|Discordbot|vkShare|SkypeUriPreview|Googlebot|bingbot|W3C_Validator/i;
 
 function esc(str) {
   return String(str ?? "")
@@ -47,17 +47,19 @@ export default async function middleware(request) {
             <head>
             <meta charset="UTF-8" />
             <title>${title}</title>
+            <meta name="description" content="${description}" />
+            <link rel="canonical" href="${pageUrl}" />
             <meta property="og:type" content="website" />
             <meta property="og:site_name" content="Mobirays" />
             <meta property="og:title" content="${title}" />
             <meta property="og:description" content="${description}" />
             <meta property="og:image" content="${image}" />
+            <meta property="og:image:alt" content="${title}" />
             <meta property="og:url" content="${pageUrl}" />
             <meta name="twitter:card" content="summary_large_image" />
             <meta name="twitter:title" content="${title}" />
             <meta name="twitter:description" content="${description}" />
             <meta name="twitter:image" content="${image}" />
-            <meta http-equiv="refresh" content="0; url=${pageUrl}" />
             </head>
             <body>Redirecting to <a href="${pageUrl}">${title}</a>...</body>
         </html>`,

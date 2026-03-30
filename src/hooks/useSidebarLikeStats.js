@@ -12,6 +12,7 @@ export const useSidebarLikeStats = () => {
         .map((device) => ({
           id: device.id,
           name: device.name,
+          slug: device.slug,
           likesCount: Number(device.likes_count),
         })),
     [productLikeTotals],

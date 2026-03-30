@@ -12,6 +12,7 @@ export const useSidebarVisitorStats = () => {
         .map((device) => ({
           id: device.id,
           name: device.name,
+          slug: device.slug,
           visitedCount: Number(device.visited_count),
         })),
     [productVisitorTotals],

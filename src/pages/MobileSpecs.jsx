@@ -24,6 +24,102 @@ import { productReviewService } from '../services/productReviewService'
 import { productService } from '../services/productService'
 import { useProductPageReviews } from '../hooks/useProductPageReviews'
 
+const PRODUCT_DETAIL_CACHE_KEY = 'mobirays_product_detail_cache_v1';
+const PRODUCT_VISITED_CACHE_KEY = 'mobirays_product_visited_v1';
+
+const readCachedProductDetails = (productId) => {
+    if (typeof window === 'undefined' || !productId) {
+        return null;
+    }
+
+    try {
+        const rawCache = sessionStorage.getItem(PRODUCT_DETAIL_CACHE_KEY);
+        const parsedCache = rawCache ? JSON.parse(rawCache) : {};
+        return parsedCache[String(productId)] ?? null;
+    } catch {
+        return null;
+    }
+};
+
+const writeCachedProductDetails = (product) => {
+    const normalizedProductId = Number(product?.id);
+
+    if (
+        typeof window === 'undefined' ||
+        !Number.isFinite(normalizedProductId) ||
+        normalizedProductId <= 0
+    ) {
+        return;
+    }
+
+    try {
+        const rawCache = sessionStorage.getItem(PRODUCT_DETAIL_CACHE_KEY);
+        const parsedCache = rawCache ? JSON.parse(rawCache) : {};
+        parsedCache[String(normalizedProductId)] = product;
+        sessionStorage.setItem(
+            PRODUCT_DETAIL_CACHE_KEY,
+            JSON.stringify(parsedCache),
+        );
+    } catch {
+        // Ignore cache write failures and continue with in-memory state.
+    }
+};
+
+const readVisitedProductIds = () => {
+    if (typeof window === 'undefined') {
+        return [];
+    }
+
+    try {
+        const rawVisitedIds = sessionStorage.getItem(PRODUCT_VISITED_CACHE_KEY);
+        const parsedVisitedIds = rawVisitedIds ? JSON.parse(rawVisitedIds) : [];
+        return Array.isArray(parsedVisitedIds) ? parsedVisitedIds : [];
+    } catch {
+        return [];
+    }
+};
+
+const hasVisitedProduct = (productId) =>
+    readVisitedProductIds().includes(String(productId));
+
+const markProductAsVisited = (productId) => {
+    if (typeof window === 'undefined' || !productId) {
+        return;
+    }
+
+    try {
+        const visitedIds = readVisitedProductIds();
+        const normalizedProductId = String(productId);
+
+        if (visitedIds.includes(normalizedProductId)) {
+            return;
+        }
+
+        sessionStorage.setItem(
+            PRODUCT_VISITED_CACHE_KEY,
+            JSON.stringify([...visitedIds, normalizedProductId]),
+        );
+    } catch {
+        // Ignore cache write failures and continue without visit deduping.
+    }
+};
+
+const setDocumentDescription = (content) => {
+    if (typeof document === 'undefined') {
+        return;
+    }
+
+    let descriptionTag = document.querySelector('meta[name="description"]');
+
+    if (!descriptionTag) {
+        descriptionTag = document.createElement('meta');
+        descriptionTag.setAttribute('name', 'description');
+        document.head.appendChild(descriptionTag);
+    }
+
+    descriptionTag.setAttribute('content', content);
+};
+
 const MobileSpecs = () => {
     const { productId } = useParams();
     const navigate = useNavigate();
@@ -56,15 +152,15 @@ const MobileSpecs = () => {
     });
 
     const routeProductId = Number(productId);
-    const stateProduct = location.state?.product || null;
+    const stateProduct = location.state?.product ?? null;
 
-    const fallbackProduct = useMemo(() => {
+    const matchedProduct = useMemo(() => {
         if (Number.isFinite(routeProductId) && routeProductId > 0) {
-            return allProducts.find((product) => Number(product.id) === routeProductId) || null;
+            return allProducts.find((product) => Number(product.id) === routeProductId) ?? null;
         }
 
         if (stateProduct?.id) {
-            return allProducts.find((product) => Number(product.id) === Number(stateProduct.id)) || stateProduct;
+            return allProducts.find((product) => Number(product.id) === Number(stateProduct.id)) ?? stateProduct;
         }
         return null;
     }, [allProducts, routeProductId, stateProduct]);
@@ -74,16 +170,36 @@ const MobileSpecs = () => {
             return routeProductId;
         }
 
-        const fallbackId = Number(stateProduct?.id || fallbackProduct?.id);
-        return Number.isFinite(fallbackId) && fallbackId > 0 ? fallbackId : null;
-    }, [fallbackProduct?.id, routeProductId, stateProduct?.id]);
+        const matchedProductId = Number(stateProduct?.id ?? matchedProduct?.id);
+        return Number.isFinite(matchedProductId) && matchedProductId > 0 ? matchedProductId : null;
+    }, [matchedProduct?.id, routeProductId, stateProduct?.id]);
 
     useEffect(() => {
         if (!resolvedProductId) {
             return;
         }
 
+        const cachedProduct = readCachedProductDetails(resolvedProductId);
+
+        if (cachedProduct) {
+            setFetchedProduct(cachedProduct);
+            setProductVisitorTotalCount(
+                cachedProduct.id,
+                cachedProduct.views,
+                cachedProduct.name,
+                cachedProduct.slug,
+            );
+            setProductStatus({
+                loading: false,
+                error: '',
+            });
+            return;
+        }
+
+        setFetchedProduct(null);
+
         const controller = new AbortController();
+        const shouldIncrementView = !hasVisitedProduct(resolvedProductId);
 
         const fetchProduct = async () => {
             setProductStatus({
@@ -94,7 +210,7 @@ const MobileSpecs = () => {
             try {
                 const response = await productService.getProductById({
                     productId: resolvedProductId,
-                    isVisited: 1,
+                    isVisited: shouldIncrementView ? 1 : 0,
                     signal: controller.signal,
                 });
 
@@ -102,14 +218,18 @@ const MobileSpecs = () => {
                     return;
                 }
 
-                const nextProduct = response?.data || null;
+                const nextProduct = response?.data ?? null;
 
                 setFetchedProduct(nextProduct);
+                writeCachedProductDetails(nextProduct);
+                if (shouldIncrementView) {
+                    markProductAsVisited(resolvedProductId);
+                }
                 setProductVisitorTotalCount(
                     nextProduct?.id ?? resolvedProductId,
                     nextProduct?.views,
-                    nextProduct?.name || stateProduct?.name || fallbackProduct?.name,
-                    nextProduct?.slug || stateProduct?.slug || fallbackProduct?.slug,
+                    nextProduct?.name,
+                    nextProduct?.slug,
                 );
                 setProductStatus({
                     loading: false,
@@ -137,15 +257,23 @@ const MobileSpecs = () => {
             controller.abort();
         };
     }, [
-        fallbackProduct?.name,
-        fallbackProduct?.slug,
         resolvedProductId,
         setProductVisitorTotalCount,
-        stateProduct?.name,
-        stateProduct?.slug,
     ]);
 
-    const productData = fetchedProduct || stateProduct || fallbackProduct || null;
+    const productData = fetchedProduct ?? stateProduct ?? matchedProduct ?? null;
+
+    useEffect(() => {
+        if (!productData?.name) {
+            return;
+        }
+
+        const nextTitle = `${productData.name} - Full Specifications | Mobirays`;
+        const nextDescription = `${productData.name} full specs, price, camera, battery, display and more on Mobirays.`;
+
+        document.title = nextTitle;
+        setDocumentDescription(nextDescription);
+    }, [productData?.name]);
 
     const pageBanners = useMemo(() => {
         const map = {};

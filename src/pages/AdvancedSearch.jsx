@@ -11,12 +11,14 @@ import SidebarLatestModels from "../components/SidebarSections/SidebarLatestMode
 import SidebarStats from "../components/SidebarSections/SidebarStats";
 import { useData } from "../context/useData";
 import { useAdvancedSearchAttributes } from "../hooks/useAdvancedSearchAttributes";
+import { advancedSearchService } from "../services/advancedSearchService";
 import {
+  buildAdvancedSearchRequestPayload,
   buildInitialFilterValue,
+  getAdvancedSearchAttributesMissingCategoryIds,
   getRangeFieldConfig,
   getResolvedFieldType,
   isFilterActive,
-  runAdvancedSearch,
 } from "../utils/advancedSearchFilters";
 import {
   decodeAdvancedSearchQuery,
@@ -92,10 +94,7 @@ const normalizeSearchText = (value) =>
     .trim();
 
 const getSectionGridClass = (sectionTitle, attributeCount) => {
-  if (
-    normalizeSearchText(sectionTitle) === "network" &&
-    attributeCount >= 4
-  ) {
+  if (normalizeSearchText(sectionTitle) === "network" && attributeCount >= 4) {
     return "grid grid-cols-2 gap-1.5 sm:grid-cols-4";
   }
 
@@ -245,12 +244,7 @@ const MultiSelectField = ({
   );
 };
 
-const TextField = ({
-  label,
-  value,
-  onChange,
-  placeholder = "Type here",
-}) => (
+const TextField = ({ label, value, onChange, placeholder = "Type here" }) => (
   <div className="flex items-center border border-[#0580A5] bg-white">
     <span className="whitespace-nowrap px-3 py-[8px] text-md uppercase tracking-wide">
       {label}:
@@ -275,9 +269,7 @@ const CheckboxRow = ({ label, checked, onChange }) => (
     </span>
     <div
       className={`flex h-[18px] w-[18px] items-center justify-center border-2 transition-colors ${
-        checked
-          ? "border-[#0580A5] bg-[#0580A5]"
-          : "border-gray-400 bg-white"
+        checked ? "border-[#0580A5] bg-[#0580A5]" : "border-gray-400 bg-white"
       }`}
     >
       {checked && (
@@ -312,7 +304,8 @@ const RangeField = ({
   const maxValue = value?.max ?? "";
   const safeMinBound = Number.isFinite(min) ? min : 0;
   const safeMaxBound = Number.isFinite(max) ? max : 100;
-  const boundedMax = safeMaxBound > safeMinBound ? safeMaxBound : safeMinBound + 1;
+  const boundedMax =
+    safeMaxBound > safeMinBound ? safeMaxBound : safeMinBound + 1;
   const parsedMinValue = parseNumberInput(minValue);
   const parsedMaxValue = parseNumberInput(maxValue);
   const currentMin = Math.max(
@@ -353,7 +346,10 @@ const RangeField = ({
           step={safeStep}
           value={currentMin}
           onChange={(event) =>
-            onChange("min", String(Math.min(Number(event.target.value), currentMax)))
+            onChange(
+              "min",
+              String(Math.min(Number(event.target.value), currentMax)),
+            )
           }
         />
         <input
@@ -363,7 +359,10 @@ const RangeField = ({
           step={safeStep}
           value={currentMax}
           onChange={(event) =>
-            onChange("max", String(Math.max(Number(event.target.value), currentMin)))
+            onChange(
+              "max",
+              String(Math.max(Number(event.target.value), currentMin)),
+            )
           }
         />
       </div>
@@ -389,13 +388,23 @@ const AdvancedSearch = () => {
   const navigate = useNavigate();
   const sharedFilters = useMemo(
     () =>
-      decodeAdvancedSearchQuery(new URLSearchParams(location.search).get("filters")),
+      decodeAdvancedSearchQuery(
+        new URLSearchParams(location.search).get("filters"),
+      ),
     [location.search],
   );
   const { allProducts, allBanners } = useData();
-  const { sections, attributes, status: attributesStatus } =
-    useAdvancedSearchAttributes();
+  const {
+    sections,
+    attributes,
+    status: attributesStatus,
+  } = useAdvancedSearchAttributes();
   const [filters, setFilters] = useState(sharedFilters);
+  const [previewStatus, setPreviewStatus] = useState({
+    loading: false,
+    error: "",
+    count: 0,
+  });
 
   const bannerUrl = useMemo(() => {
     const banner = allBanners.find(
@@ -417,12 +426,6 @@ const AdvancedSearch = () => {
     }
   }, [attributesStatus.error]);
 
-  const previewResults = useMemo(
-    () => runAdvancedSearch(allProducts, attributes, filters),
-    [allProducts, attributes, filters],
-  );
-  const resultCount = previewResults.length;
-
   const totalSelectedFilters = useMemo(
     () =>
       attributes.reduce((total, attribute) => {
@@ -437,6 +440,121 @@ const AdvancedSearch = () => {
       }, 0),
     [attributes, filters],
   );
+  const shareableFilters = useMemo(
+    () =>
+      attributes.reduce((accumulator, attribute) => {
+        const filterValue =
+          filters[attribute.fieldKey] ?? buildInitialFilterValue(attribute);
+
+        if (!isFilterActive(attribute, filterValue)) {
+          return accumulator;
+        }
+
+        accumulator[attribute.fieldKey] = filterValue;
+        return accumulator;
+      }, {}),
+    [attributes, filters],
+  );
+  const advancedRequestCategories = useMemo(
+    () => buildAdvancedSearchRequestPayload(attributes, filters),
+    [attributes, filters],
+  );
+  const missingCategoryAttributes = useMemo(
+    () => getAdvancedSearchAttributesMissingCategoryIds(attributes, filters),
+    [attributes, filters],
+  );
+  const resultCount = previewStatus.count;
+
+  useEffect(() => {
+    if (attributesStatus.loading) {
+      return;
+    }
+
+    if (totalSelectedFilters === 0) {
+      setPreviewStatus({
+        loading: false,
+        error: "",
+        count: allProducts.length,
+      });
+      return;
+    }
+
+    if (missingCategoryAttributes.length > 0) {
+      setPreviewStatus({
+        loading: false,
+        error: "Selected filters are missing brand_category_id.",
+        count: 0,
+      });
+      return;
+    }
+
+    if (advancedRequestCategories.length === 0) {
+      setPreviewStatus({
+        loading: false,
+        error: "Advanced search request is missing category mapping.",
+        count: 0,
+      });
+      return;
+    }
+
+    const controller = new AbortController();
+
+    setPreviewStatus((currentStatus) => ({
+      ...currentStatus,
+      loading: true,
+      error: "",
+    }));
+
+    const fetchPreviewCount = async () => {
+      try {
+        const response = await advancedSearchService.getData({
+          categories: advancedRequestCategories,
+          signal: controller.signal,
+        });
+
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        setPreviewStatus({
+          loading: false,
+          error: "",
+          count: Array.isArray(response?.data) ? response.data.length : 0,
+        });
+      } catch (error) {
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        setPreviewStatus({
+          loading: false,
+          error:
+            error?.data?.message ||
+            error?.message ||
+            "Failed to load preview count.",
+          count: 0,
+        });
+      }
+    };
+
+    void fetchPreviewCount();
+
+    return () => {
+      controller.abort();
+    };
+  }, [
+    advancedRequestCategories,
+    allProducts.length,
+    attributesStatus.loading,
+    missingCategoryAttributes.length,
+    totalSelectedFilters,
+  ]);
+
+  useEffect(() => {
+    if (previewStatus.error) {
+      console.error("Error fetching preview count:", previewStatus.error);
+    }
+  }, [previewStatus.error]);
 
   const setFilterValue = (fieldKey, value) => {
     setFilters((currentFilters) => ({
@@ -472,18 +590,8 @@ const AdvancedSearch = () => {
   };
 
   const handleSearch = () => {
-    const shareableFilters = attributes.reduce((accumulator, attribute) => {
-      const filterValue =
-        filters[attribute.fieldKey] ?? buildInitialFilterValue(attribute);
-
-      if (!isFilterActive(attribute, filterValue)) {
-        return accumulator;
-      }
-
-      accumulator[attribute.fieldKey] = filterValue;
-      return accumulator;
-    }, {});
     const params = new URLSearchParams();
+    params.set("advanced", "1");
 
     if (Object.keys(shareableFilters).length > 0) {
       params.set("filters", encodeAdvancedSearchQuery(shareableFilters));
@@ -531,6 +639,12 @@ const AdvancedSearch = () => {
               </div>
             )}
 
+            {!attributesStatus.error && previewStatus.error && (
+              <div className="mx-2 mb-4 border border-red-300 bg-red-100 px-3 py-2 text-sm text-red-700">
+                {previewStatus.error}
+              </div>
+            )}
+
             {!attributesStatus.error && attributesStatus.loading && (
               <div className="px-4 py-8 text-center text-gray-500">
                 Loading advanced search filters...
@@ -543,7 +657,12 @@ const AdvancedSearch = () => {
                 <div key={section.title}>
                   <SectionHeader title={section.title} />
                   <div className="space-y-1.5 px-2 py-5 pb-10">
-                    <div className={getSectionGridClass(section.title, section.attributes.length)}>
+                    <div
+                      className={getSectionGridClass(
+                        section.title,
+                        section.attributes.length,
+                      )}
+                    >
                       {section.attributes.map((attribute, attributeIndex) => (
                         <div
                           key={attribute.fieldKey}
@@ -561,7 +680,11 @@ const AdvancedSearch = () => {
                                 buildInitialFilterValue(attribute)
                               }
                               onChange={(bound, value) =>
-                                setRangeFilterValue(attribute.fieldKey, bound, value)
+                                setRangeFilterValue(
+                                  attribute.fieldKey,
+                                  bound,
+                                  value,
+                                )
                               }
                               min={attribute.min ?? 0}
                               max={attribute.max ?? 100}
@@ -582,7 +705,10 @@ const AdvancedSearch = () => {
                               label={attribute.name}
                               value={filters[attribute.fieldKey] ?? []}
                               onToggle={(value) =>
-                                toggleMultiSelectValue(attribute.fieldKey, value)
+                                toggleMultiSelectValue(
+                                  attribute.fieldKey,
+                                  value,
+                                )
                               }
                               options={attribute.values}
                               disabled={attribute.values.length === 0}
@@ -608,7 +734,7 @@ const AdvancedSearch = () => {
                 Result
               </span>
               <span className="border-2 border-[#0580A5] px-8 py-1 text-3xl">
-                {resultCount.toLocaleString()}
+                {previewStatus.loading ? "..." : resultCount.toLocaleString()}
               </span>
               <button
                 onClick={handleSearch}
@@ -627,8 +753,8 @@ const AdvancedSearch = () => {
               IN THE RESULTS.
             </p>
             <p>
-              *BATTERY STAND-BY AND TALK TIME BASED ON THE OFFICIAL
-              MANUFACTURER SPECIFICATIONS, NOT ON REAL-LIFE TESTS
+              *BATTERY STAND-BY AND TALK TIME BASED ON THE OFFICIAL MANUFACTURER
+              SPECIFICATIONS, NOT ON REAL-LIFE TESTS
             </p>
             <p>
               *IN FREE TEXT FIELD YOU CAN SEARCH FOR OTHER FEATURES, NOT

@@ -187,6 +187,27 @@ export const runAdvancedSearch = (allProducts, attributes, filters) => {
   );
 };
 
+export const getAdvancedSearchAttributesMissingCategoryIds = (
+  attributes,
+  filters,
+) =>
+  attributes.filter((attribute) => {
+    const filterValue =
+      filters[attribute.fieldKey] ?? buildInitialFilterValue(attribute);
+
+    if (!isFilterActive(attribute, filterValue)) {
+      return false;
+    }
+
+    const brandCategoryIds = Array.isArray(attribute.brandCategoryIds)
+      ? attribute.brandCategoryIds
+          .map((value) => normalizeCategoryId(value))
+          .filter(Boolean)
+      : [];
+
+    return brandCategoryIds.length === 0;
+  });
+
 export const buildAdvancedSearchRequestPayload = (attributes, filters) => {
   const categories = new Map();
 
