@@ -60,7 +60,7 @@ function App() {
             <Route path="/comparison" element={<Comparison />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/advanced-search" element={<AdvancedSearch />} />
-            <Route path="/:productSlug" element={<MobileSpecs />} />
+            <Route path="/product/:productId/:productSlug?" element={<MobileSpecs />} />
           </Routes>
         </Layout>
       </BrowserRouter>
