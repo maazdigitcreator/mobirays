@@ -2,8 +2,8 @@ import { useEffect, useRef, } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import mobileImg from '../../assets/mobileImg.jpg';
-import { createSlug } from '../../utils/urlHelper';
 import { useData } from '../../context/useData';
+import { getProductDetailPath } from '../../utils/productRoutes';
 
 const SearchModal = ({ isOpen, onClose, searchQuery }) => {
     const modalRef = useRef(null);
@@ -113,11 +113,10 @@ const SearchModal = ({ isOpen, onClose, searchQuery }) => {
                                 <h3 className="text-xs font-bold text-gray-600 mb-3 pb-2 border-b border-gray-300">DEVICES</h3>
                                 <div className="space-y-2">
                                     {filteredDevices.map((device) => {
-                                        const slug = device.slug || createSlug(device.name);
                                         return (
                                             <Link
                                                 key={device.id}
-                                                to={`/${slug}`}
+                                                to={getProductDetailPath(device)}
                                                 state={{ product: device }}
                                                 onClick={onClose}
                                                 className="flex items-start gap-2 hover:bg-gray-50 p-1.5 rounded transition-colors"

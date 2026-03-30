@@ -1,10 +1,10 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import MobileImg from '../assets/mobileImg.jpg'
-import { createSlug } from '../utils/urlHelper'
 import { Search } from 'lucide-react'
 import Pagination from './Pagination'
 import { useLikedProducts } from '../hooks/useLikedProducts'
+import { getProductDetailPath } from '../utils/productRoutes'
 
 const LikedProductsList = ({ title = "Liked Products", products, itemImage }) => {
     const navigate = useNavigate();
@@ -21,11 +21,12 @@ const LikedProductsList = ({ title = "Liked Products", products, itemImage }) =>
     const handleProductClick = (product) => {
         // Get the actual image being displayed (product.image or itemImage or MobileImg)
         const productImage = product.image || itemImage || MobileImg;
-        const slug = product.slug || createSlug(product.name);
-        navigate(`/${slug}`, {
+        const normalizedProduct = product.product || product;
+
+        navigate(getProductDetailPath(normalizedProduct), {
             state: {
                 product: {
-                    ...product.product,
+                    ...normalizedProduct,
                     image: productImage
                 }
             }

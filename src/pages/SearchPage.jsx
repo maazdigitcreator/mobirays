@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import LatestProducts from '../components/LatestProducts';
 import ProductsSectionButton from '../components/ProductsSectionButton';
-import homeBanner3 from '../assets/homeBanner3.png';
 import LatestNews from '../components/LatestNews';
 import LatestReviews from '../components/LatestReviews';
 import HeroBanner from '../components/Layout/HeroBanner';
@@ -21,20 +20,42 @@ import SidebarBanner1 from '../components/SidebarSections/SidebarBanner1';
 import SidebarBanner2 from '../components/SidebarSections/SidebarBanner2';
 import SidebarBanner3 from '../components/SidebarSections/SidebarBanner3';
 import { useData } from '../context/useData';
+import { advancedSearchService } from '../services/advancedSearchService';
+import { useAdvancedSearchAttributes } from '../hooks/useAdvancedSearchAttributes';
+import {
+    buildAdvancedSearchRequestPayload,
+    runAdvancedSearch,
+} from '../utils/advancedSearchFilters';
+import { decodeAdvancedSearchQuery } from '../utils/advancedSearchQuery';
+import { filterProductsByCategory } from '../utils/filterHelpers';
 
 const SearchPage = () => {
     const location = useLocation();
     const { allProducts, allNews, allReviews, loading } = useData();
-    const [searchQuery, setSearchQuery] = useState('');
+    const { attributes } = useAdvancedSearchAttributes();
     const resultsRef = useRef(null);
 
-    // Filtered data states
-    const [phones, setPhones] = useState([]);
-    const [tablets, setTablets] = useState([]);
-    const [watches, setWatches] = useState([]);
-    const [news, setNews] = useState([]);
-    const [reviews, setReviews] = useState([]);
     const [pageBanners, setPageBanners] = useState({});
+    const [advancedProducts, setAdvancedProducts] = useState([]);
+    const [advancedStatus, setAdvancedStatus] = useState({
+        loading: false,
+        error: '',
+        loaded: false,
+    });
+    const searchParams = useMemo(
+        () => new URLSearchParams(location.search),
+        [location.search],
+    );
+    const searchQuery = searchParams.get('q') || '';
+    const appliedFilters = useMemo(
+        () => decodeAdvancedSearchQuery(searchParams.get('filters')),
+        [searchParams],
+    );
+    const isFilteredView = Object.keys(appliedFilters).length > 0 && !searchQuery;
+    const advancedRequestCategories = useMemo(
+        () => buildAdvancedSearchRequestPayload(attributes, appliedFilters),
+        [attributes, appliedFilters],
+    );
 
     // Fetch banners from API
     useEffect(() => {
@@ -57,17 +78,7 @@ const SearchPage = () => {
         fetchBanners();
     }, []);
 
-    useEffect(() => {
-        const params = new URLSearchParams(location.search);
-        const query = params.get('q') || '';
-        setSearchQuery(query);
-
-        if (query && allProducts.length > 0) {
-            filterResults(query);
-        }
-    }, [location.search, allProducts, allNews, allReviews]);
-
-    const filterResults = (query) => {
+    const filterResults = useCallback((query) => {
         const lowerQuery = query.toLowerCase();
 
         // Filter all products matching the search query by name
@@ -108,22 +119,141 @@ const SearchPage = () => {
             (r.subtitle && r.subtitle.toLowerCase().includes(lowerQuery))
         );
 
-        setPhones(allPhones);
-        setTablets(filteredTablets);
-        setWatches(filteredWatches);
-        setNews(filteredNews);
-        setReviews(filteredReviews);
-    };
+        return {
+            phones: allPhones,
+            tablets: filteredTablets,
+            watches: filteredWatches,
+            news: filteredNews,
+            reviews: filteredReviews,
+        };
+    }, [allNews, allProducts, allReviews]);
+
+    const filterAdvancedResults = useCallback((selectedFilters) => {
+        const filteredProducts = runAdvancedSearch(allProducts, attributes, selectedFilters);
+
+        return {
+            phones: filterProductsByCategory(filteredProducts, 'Mobile Phones'),
+            tablets: filterProductsByCategory(filteredProducts, 'Tablets'),
+            watches: filterProductsByCategory(filteredProducts, 'Smartwatches'),
+            news: [],
+            reviews: [],
+        };
+    }, [allProducts, attributes]);
+
+    useEffect(() => {
+        if (!isFilteredView || advancedRequestCategories.length === 0) {
+            return;
+        }
+
+        const controller = new AbortController();
+
+        const fetchAdvancedResults = async () => {
+            setAdvancedStatus({
+                loading: true,
+                error: '',
+                loaded: false,
+            });
+
+            try {
+                const response = await advancedSearchService.getData({
+                    categories: advancedRequestCategories,
+                    signal: controller.signal,
+                });
+
+                if (controller.signal.aborted) {
+                    return;
+                }
+
+                setAdvancedProducts(Array.isArray(response?.data) ? response.data : []);
+                setAdvancedStatus({
+                    loading: false,
+                    error: '',
+                    loaded: true,
+                });
+            } catch (error) {
+                if (controller.signal.aborted) {
+                    return;
+                }
+
+                setAdvancedProducts([]);
+                setAdvancedStatus({
+                    loading: false,
+                    error:
+                        error?.data?.message ||
+                        error?.message ||
+                        'Failed to load filtered products.',
+                    loaded: false,
+                });
+            }
+        };
+
+        void fetchAdvancedResults();
+
+        return () => {
+            controller.abort();
+        };
+    }, [advancedRequestCategories, isFilteredView]);
+
+    const searchResults = useMemo(() => {
+        if (isFilteredView) {
+            if (advancedStatus.loaded) {
+                return {
+                    phones: filterProductsByCategory(advancedProducts, 'Mobile Phones'),
+                    tablets: filterProductsByCategory(advancedProducts, 'Tablets'),
+                    watches: filterProductsByCategory(advancedProducts, 'Smartwatches'),
+                    news: [],
+                    reviews: [],
+                };
+            }
+
+            if (advancedRequestCategories.length === 0 && allProducts.length > 0 && attributes.length > 0) {
+                return filterAdvancedResults(appliedFilters);
+            }
+
+            return {
+                phones: [],
+                tablets: [],
+                watches: [],
+                news: [],
+                reviews: [],
+            };
+        }
+
+        if (searchQuery && allProducts.length > 0) {
+            return filterResults(searchQuery);
+        }
+
+        return {
+            phones: [],
+            tablets: [],
+            watches: [],
+            news: [],
+            reviews: [],
+        };
+    }, [
+        advancedProducts,
+        advancedRequestCategories.length,
+        advancedStatus.loaded,
+        allProducts.length,
+        appliedFilters,
+        attributes.length,
+        filterAdvancedResults,
+        filterResults,
+        isFilteredView,
+        searchQuery,
+    ]);
+
+    const { phones, tablets, watches, news, reviews } = searchResults;
 
     // Auto-scroll to results when searching
     useEffect(() => {
-        if (!loading && searchQuery && resultsRef.current) {
+        if (!loading && (searchQuery || isFilteredView) && resultsRef.current) {
             resultsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-    }, [loading, searchQuery]);
+    }, [loading, searchQuery, isFilteredView]);
 
-    if (loading) {
-        return <div className="text-center py-20">Searching for "{searchQuery}"...</div>;
+    if (loading || advancedStatus.loading) {
+        return <div className="text-center py-20">{isFilteredView ? 'Loading filtered results...' : `Searching for "${searchQuery}"...`}</div>;
     }
 
     return (
@@ -150,15 +280,23 @@ const SearchPage = () => {
                     <div className="w-full lg:w-3/4">
                         <HeroBanner />
 
+                        {isFilteredView && advancedRequestCategories.length > 0 && advancedStatus.error && (
+                            <div className="mb-4 border border-red-300 bg-red-100 px-4 py-3 text-sm text-red-700">
+                                {advancedStatus.error}
+                            </div>
+                        )}
+
                         <div className="mb-4" ref={resultsRef}>
-                            <h1 className="text-2xl font-bold px-4">Search Results for "{searchQuery}"</h1>
+                            <h1 className="text-2xl font-bold px-4">
+                                {isFilteredView ? 'Filtered Results' : `Search Results for "${searchQuery}"`}
+                            </h1>
                         </div>
 
                         {/* Phones Section */}
                         {phones.length > 0 && (
                             <div>
                                 <LatestProducts title="Phones Results" products={phones} itemImage={mobileImg} limit={8} />
-                                {phones.length > 8 && (
+                                {!isFilteredView && phones.length > 8 && (
                                     <ProductsSectionButton showMoreLink={`/phones?q=${searchQuery}`} comingSoonLink="/coming-soon" />
                                 )}
                             </div>
@@ -170,7 +308,7 @@ const SearchPage = () => {
                         {tablets.length > 0 && (
                             <div className='mt-10'>
                                 <LatestProducts title="Tablets Results" products={tablets} itemImage={tabImg} limit={8} />
-                                {tablets.length > 8 && (
+                                {!isFilteredView && tablets.length > 8 && (
                                     <ProductsSectionButton showMoreLink={`/tablets?q=${searchQuery}`} comingSoonLink="/coming-soon" />
                                 )}
                             </div>
@@ -182,7 +320,7 @@ const SearchPage = () => {
                         {watches.length > 0 && (
                             <div className='mt-10'>
                                 <LatestProducts title="Smartwatches Results" products={watches} itemImage={watchImg} limit={8} />
-                                {watches.length > 8 && (
+                                {!isFilteredView && watches.length > 8 && (
                                     <ProductsSectionButton showMoreLink={`/smartwatches?q=${searchQuery}`} comingSoonLink="/coming-soon" />
                                 )}
                             </div>
@@ -190,28 +328,36 @@ const SearchPage = () => {
 
                         {/* No Product Results Message */}
                         {phones.length === 0 && tablets.length === 0 && watches.length === 0 && (
-                            <div className="p-4 text-gray-500">No products found matching "{searchQuery}".</div>
+                            <div className="p-4 text-gray-500">
+                                {isFilteredView
+                                    ? 'No products found for the selected filters.'
+                                    : `No products found matching "${searchQuery}".`}
+                            </div>
                         )}
 
                         {pageBanners['searchpage_banner_3'] && <div className='mt-7'><BannerAd banner={pageBanners['searchpage_banner_3']} className='h-[200px] sm:h-auto sm:w-full' /></div>}
 
                         {/* News Section */}
-                        <div className='mt-10'>
-                            {news.length > 0 ? (
-                                <LatestNews title="News Results" gridCols="sm:grid-cols-3" newsData={news} limit={6} showMoreLink={`/news?q=${searchQuery}`} />
-                            ) : (
-                                <div className="p-4 text-center text-gray-500">No news found matching "{searchQuery}".</div>
-                            )}
-                        </div>
+                        {!isFilteredView && (
+                            <div className='mt-10'>
+                                {news.length > 0 ? (
+                                    <LatestNews title="News Results" gridCols="sm:grid-cols-3" newsData={news} limit={6} showMoreLink={`/news?q=${searchQuery}`} />
+                                ) : (
+                                    <div className="p-4 text-center text-gray-500">No news found matching "{searchQuery}".</div>
+                                )}
+                            </div>
+                        )}
 
                         {/* Reviews Section */}
-                        <div className='mt-10'>
-                            {reviews.length > 0 ? (
-                                <LatestReviews title="Reviews Results" gridCols="sm:grid-cols-4" reviewsData={reviews} limit={8} showMoreLink={`/reviews?q=${searchQuery}`} />
-                            ) : (
-                                <div className="p-4 text-center text-gray-500">No reviews found matching "{searchQuery}".</div>
-                            )}
-                        </div>
+                        {!isFilteredView && (
+                            <div className='mt-10'>
+                                {reviews.length > 0 ? (
+                                    <LatestReviews title="Reviews Results" gridCols="sm:grid-cols-4" reviewsData={reviews} limit={8} showMoreLink={`/reviews?q=${searchQuery}`} />
+                                ) : (
+                                    <div className="p-4 text-center text-gray-500">No reviews found matching "{searchQuery}".</div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

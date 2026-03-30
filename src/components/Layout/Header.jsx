@@ -151,9 +151,9 @@ const Header = () => {
                             {user ? (
                                 <div className="ml-2 flex items-center gap-3 p-2 bg-[#fff] border-2 border-[#0580A5]">
                                     <User size={22} className="text-[#0580A5]" />
-                                    <span className="text-[#0580A5] text-sm font-medium max-w-[100px] truncate">
-                                        {user.name || user.email}
-                                    </span>
+                                    <Link className="text-[#0580A5] text-sm font-medium max-w-[100px] truncate" to="/wishlist">
+                                        Dashboard
+                                    </Link>
                                     <button
                                         onClick={handleLogout}
                                         className="text-[#0580A5] hover:text-red-500 transition-colors cursor-pointer"
@@ -199,9 +199,9 @@ const Header = () => {
                     {user ? (
                         <div className="flex items-center gap-2 border-2 border-[#0580A5] px-2 py-1">
                             <User size={22} className="text-[#0580A5]" />
-                            <span className="text-[#0580A5] text-xs font-medium max-w-[70px] truncate">
-                                {user.name || user.email}
-                            </span>
+                            <Link className="text-[#0580A5] text-xs font-medium max-w-[70px] truncate" to="/wishlist">
+                            Dashboard
+                            </Link>
                             <button
                                 onClick={handleLogout}
                                 className="text-[#0580A5] hover:text-red-500 transition-colors cursor-pointer"

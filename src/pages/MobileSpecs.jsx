@@ -21,15 +21,23 @@ import SidebarBanner3 from '../components/SidebarSections/SidebarBanner3'
 import RelatedReviews from '../components/SidebarSections/RelatedReviews'
 import RelatedNews from '../components/SidebarSections/RelatedNews'
 import { productReviewService } from '../services/productReviewService'
+import { productService } from '../services/productService'
 import { useProductPageReviews } from '../hooks/useProductPageReviews'
 
 const MobileSpecs = () => {
-    const { productSlug } = useParams();
+    const { productId } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
     const { user } = useAuth();
-    const { allProducts, allNews, allReviews, allBanners } = useData();
+    const {
+        allProducts,
+        allNews,
+        allReviews,
+        allBanners,
+        setProductVisitorTotalCount,
+    } = useData();
     const topRef = useRef(null);
+    const commentsSectionRef = useRef(null);
     const reviewFormRef = useRef(null);
     const [reviewForm, setReviewForm] = useState({
         title: '',
@@ -41,14 +49,103 @@ const MobileSpecs = () => {
         error: '',
         success: '',
     });
+    const [fetchedProduct, setFetchedProduct] = useState(null);
+    const [productStatus, setProductStatus] = useState({
+        loading: false,
+        error: '',
+    });
 
-    const productData = useMemo(() => {
-        if (location.state?.product && location.state.product.slug === productSlug) {
-            return location.state.product;
+    const routeProductId = Number(productId);
+    const stateProduct = location.state?.product || null;
+
+    const fallbackProduct = useMemo(() => {
+        if (Number.isFinite(routeProductId) && routeProductId > 0) {
+            return allProducts.find((product) => Number(product.id) === routeProductId) || null;
         }
 
-        return allProducts.find((product) => product.slug === productSlug) || null;
-    }, [allProducts, productSlug, location.state]);
+        if (stateProduct?.id) {
+            return allProducts.find((product) => Number(product.id) === Number(stateProduct.id)) || stateProduct;
+        }
+        return null;
+    }, [allProducts, routeProductId, stateProduct]);
+
+    const resolvedProductId = useMemo(() => {
+        if (Number.isFinite(routeProductId) && routeProductId > 0) {
+            return routeProductId;
+        }
+
+        const fallbackId = Number(stateProduct?.id || fallbackProduct?.id);
+        return Number.isFinite(fallbackId) && fallbackId > 0 ? fallbackId : null;
+    }, [fallbackProduct?.id, routeProductId, stateProduct?.id]);
+
+    useEffect(() => {
+        if (!resolvedProductId) {
+            return;
+        }
+
+        const controller = new AbortController();
+
+        const fetchProduct = async () => {
+            setProductStatus({
+                loading: true,
+                error: '',
+            });
+
+            try {
+                const response = await productService.getProductById({
+                    productId: resolvedProductId,
+                    isVisited: 1,
+                    signal: controller.signal,
+                });
+
+                if (controller.signal.aborted) {
+                    return;
+                }
+
+                const nextProduct = response?.data || null;
+
+                setFetchedProduct(nextProduct);
+                setProductVisitorTotalCount(
+                    nextProduct?.id ?? resolvedProductId,
+                    nextProduct?.views,
+                    nextProduct?.name || stateProduct?.name || fallbackProduct?.name,
+                    nextProduct?.slug || stateProduct?.slug || fallbackProduct?.slug,
+                );
+                setProductStatus({
+                    loading: false,
+                    error: '',
+                });
+            } catch (error) {
+                if (controller.signal.aborted) {
+                    return;
+                }
+
+                setFetchedProduct(null);
+                setProductStatus({
+                    loading: false,
+                    error:
+                        error?.data?.message ||
+                        error?.message ||
+                        'Failed to load product details.',
+                });
+            }
+        };
+
+        void fetchProduct();
+
+        return () => {
+            controller.abort();
+        };
+    }, [
+        fallbackProduct?.name,
+        fallbackProduct?.slug,
+        resolvedProductId,
+        setProductVisitorTotalCount,
+        stateProduct?.name,
+        stateProduct?.slug,
+    ]);
+
+    const productData = fetchedProduct || stateProduct || fallbackProduct || null;
 
     const pageBanners = useMemo(() => {
         const map = {};
@@ -70,7 +167,7 @@ const MobileSpecs = () => {
             behavior: 'smooth',
             block: 'start',
         });
-    }, [productSlug]);
+    }, [resolvedProductId]);
 
     // Define related news and reviews with unique names to avoid shadowing components
     const filteredRelatedNews = useMemo(() => {
@@ -132,6 +229,13 @@ const MobileSpecs = () => {
             ...prev,
             rating,
         }));
+    };
+
+    const handleCommentsClick = () => {
+        commentsSectionRef.current?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+        });
     };
 
     const getReviewErrorMessage = (error) => {
@@ -216,6 +320,24 @@ const MobileSpecs = () => {
         }
     };
 
+    if (productStatus.loading && !productData) {
+        return (
+            <div ref={topRef} className="py-20 text-center text-gray-500">
+                Loading product details...
+            </div>
+        );
+    }
+
+    if (!productData) {
+        return (
+            <div ref={topRef} className="py-20 text-center">
+                <p className="text-gray-700">
+                    {productStatus.error || 'Product details could not be found.'}
+                </p>
+            </div>
+        );
+    }
+
     return (
         <div ref={topRef}>
             <div className='flex flex-col lg:flex-row gap-2'>
@@ -240,7 +362,11 @@ const MobileSpecs = () => {
                 {/* Main Content Column */}
                 <div className="w-full lg:w-3/4">
                     {/* Mobile Specs Detail Component */}
-                    <MobileSpecsDetail key={productData?.id || productSlug} productData={productData} />
+                    <MobileSpecsDetail
+                        key={productData?.id || resolvedProductId}
+                        productData={productData}
+                        onCommentsClick={handleCommentsClick}
+                    />
 
                     {/* Specifications Table */}
                     <div className="mt-4 ">
@@ -429,7 +555,7 @@ const MobileSpecs = () => {
                         </div>
                     </div>
 
-                    <div>
+                    <div ref={commentsSectionRef}>
                         <div className="relative w-full flex items-end justify-center lg:justify-start mb-5 mt-6">
                             {/* Horizontal Line Background */}
                             <div className="absolute bottom-0 left-0 w-full h-[10px] sm:h-[16px] bg-[#0580A5]"></div>
