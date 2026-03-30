@@ -20,7 +20,7 @@ import SingleReviewDetail from './pages/SingleReviewDetail';
 import Videos from './pages/Videos';
 import Dictionary from './pages/Dictionary';
 import TermsAndConditions from './pages/TermsAndConditions';
-// import PrivacyPolicy from './pages/PrivacyPolicy';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 import BrandPage from './pages/BrandPage';
 import Comparison from './pages/Comparison';
 import SearchPage from './pages/SearchPage';
@@ -50,7 +50,7 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/terms" element={<TermsAndConditions />} />
-            {/* <Route path="/privacy" element={<PrivacyPolicy />} /> */}
+            <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/login" element={<Login />} />
             <Route path="/news/:newsSlug" element={<SingleNewsDetail />} />
