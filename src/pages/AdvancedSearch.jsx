@@ -1,0 +1,781 @@
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import HeroBanner from "../components/Layout/HeroBanner";
+import LatestProducts from "../components/LatestProducts";
+import SidebarBanner1 from "../components/SidebarSections/SidebarBanner1";
+import SidebarBanner2 from "../components/SidebarSections/SidebarBanner2";
+import SidebarBrands from "../components/SidebarSections/SidebarBrands";
+import SidebarFilters from "../components/SidebarSections/SidebarFilters";
+import SidebarIntro from "../components/SidebarSections/SidebarIntro";
+import SidebarLatestModels from "../components/SidebarSections/SidebarLatestModels";
+import SidebarStats from "../components/SidebarSections/SidebarStats";
+import { useData } from "../context/useData";
+import { useAdvancedSearchAttributes } from "../hooks/useAdvancedSearchAttributes";
+import { advancedSearchService } from "../services/advancedSearchService";
+import {
+  buildAdvancedSearchRequestPayload,
+  buildInitialFilterValue,
+  getAdvancedSearchAttributesMissingCategoryIds,
+  getRangeFieldConfig,
+  getResolvedFieldType,
+  isFilterActive,
+} from "../utils/advancedSearchFilters";
+import {
+  decodeAdvancedSearchQuery,
+  encodeAdvancedSearchQuery,
+} from "../utils/advancedSearchQuery";
+
+const SectionHeader = ({ title }) => (
+  <div
+    className="px-4 py-2.5 text-xl font-medium text-white"
+    style={{
+      background:
+        "linear-gradient(to right, #0580A5 0%, #3a9dbc 30%, #7ec4d9 60%, #c5e5ef 80%, #ffffff 100%)",
+    }}
+  >
+    {title}
+  </div>
+);
+
+const sliderCSS = `
+.dual-range-wrap { position: relative; height: 24px; display: flex; align-items: center; width: 100%; }
+.dual-range-wrap input[type=range] {
+  -webkit-appearance: none; appearance: none;
+  position: absolute; width: 100%; height: 4px;
+  background: transparent; pointer-events: none; margin: 0; top: 50%; transform: translateY(-50%);
+}
+.dual-range-wrap input[type=range]::-webkit-slider-runnable-track { height: 4px; background: transparent; }
+.dual-range-wrap input[type=range]::-moz-range-track { height: 4px; background: transparent; }
+.dual-range-wrap input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #0580A5; border: 3px solid #b0dde9;
+  box-shadow: 0 1px 3px rgba(0,0,0,.2);
+  cursor: pointer; pointer-events: auto; margin-top: -6px;
+}
+.dual-range-wrap input[type=range]::-moz-range-thumb {
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #0580A5; border: none; box-shadow: 0 1px 3px rgba(0,0,0,.2);
+  cursor: pointer; pointer-events: auto;
+}
+.slider-track {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 100%; height: 4px; background: #e0e0e0; border-radius: 4px;
+}
+.slider-highlight {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  height: 4px; background: #034D63; border-radius: 4px;
+}
+`;
+
+if (
+  typeof document !== "undefined" &&
+  !document.getElementById("advanced-search-range-css")
+) {
+  const style = document.createElement("style");
+  style.id = "advanced-search-range-css";
+  style.textContent = sliderCSS;
+  document.head.appendChild(style);
+}
+
+const parseNumberInput = (value) => {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  const parsedValue = Number(String(value).replace(/[^0-9.-]/g, ""));
+  return Number.isFinite(parsedValue) ? parsedValue : null;
+};
+
+const normalizeSearchText = (value) =>
+  String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+
+const getSectionGridClass = (sectionTitle, attributeCount) => {
+  if (normalizeSearchText(sectionTitle) === "network" && attributeCount >= 4) {
+    return "grid grid-cols-2 gap-1.5 sm:grid-cols-4";
+  }
+
+  return "grid grid-cols-1 gap-1.5 sm:grid-cols-2";
+};
+
+const getFieldWrapperClass = (sectionTitle, attributeCount, attributeIndex) => {
+  const isNetworkSection = normalizeSearchText(sectionTitle) === "network";
+  const isLastOddItem =
+    !isNetworkSection &&
+    attributeCount % 2 === 1 &&
+    attributeIndex === attributeCount - 1;
+
+  return isLastOddItem ? "sm:col-span-2" : "";
+};
+
+const MultiSelectField = ({
+  label,
+  value,
+  onToggle,
+  options,
+  disabled = false,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const handlePointerDown = (event) => {
+      if (!containerRef.current?.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+    };
+  }, [isOpen]);
+
+  const filteredOptions = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+
+    if (!normalizedQuery) {
+      return options;
+    }
+
+    return options.filter((option) =>
+      option.toLowerCase().includes(normalizedQuery),
+    );
+  }, [options, query]);
+
+  const displayValue = value.length > 0 ? value.join(", ") : "";
+
+  return (
+    <div ref={containerRef} className="relative">
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() =>
+          setIsOpen((currentValue) => {
+            const nextValue = !currentValue;
+
+            if (!nextValue) {
+              setQuery("");
+            }
+
+            return nextValue;
+          })
+        }
+        className="flex w-full items-center border border-[#0580A5] bg-white disabled:cursor-default disabled:opacity-60"
+      >
+        <span className="whitespace-nowrap px-3 py-[8px] text-md uppercase tracking-wide">
+          {label}:
+        </span>
+        <span
+          className="flex-1 truncate px-3 py-[8px] text-left text-md"
+          style={{ paddingRight: "30px" }}
+        >
+          {disabled ? "No values available" : displayValue || "\u00a0"}
+        </span>
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute right-[10px] top-1/2 h-3 w-3 -translate-y-1/2 bg-no-repeat"
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234a5568' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E\")",
+            backgroundPosition: "center",
+            backgroundSize: "12px 12px",
+            transform: isOpen
+              ? "translateY(-50%) rotate(180deg)"
+              : "translateY(-50%)",
+          }}
+        ></span>
+      </button>
+
+      {isOpen && !disabled && (
+        <div className="absolute left-0 right-0 z-20 mt-1 border border-[#0580A5] bg-white shadow-lg">
+          <div className="border-b border-[#0580A5] p-2">
+            <input
+              type="text"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder={`Search ${label.toLowerCase()}`}
+              className="w-full border border-[#0580A5] px-3 py-2 text-sm outline-none"
+            />
+          </div>
+          <div className="max-h-64 overflow-y-auto py-1">
+            {filteredOptions.length === 0 ? (
+              <div className="px-3 py-2 text-sm text-gray-500">
+                No matching values
+              </div>
+            ) : (
+              filteredOptions.map((option) => {
+                const isSelected = value.includes(option);
+
+                return (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => onToggle(option)}
+                    className="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-[#EDF6F9]"
+                  >
+                    <span className="pr-3">{option}</span>
+                    <span
+                      className={`flex h-4 w-4 items-center justify-center border text-[10px] ${
+                        isSelected
+                          ? "border-[#0580A5] bg-[#0580A5] text-white"
+                          : "border-gray-400 bg-white text-transparent"
+                      }`}
+                    >
+                      ✓
+                    </span>
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const TextField = ({ label, value, onChange, placeholder = "Type here" }) => (
+  <div className="flex items-center border border-[#0580A5] bg-white">
+    <span className="whitespace-nowrap px-3 py-[8px] text-md uppercase tracking-wide">
+      {label}:
+    </span>
+    <input
+      type="text"
+      value={value}
+      onChange={(event) => onChange(event.target.value)}
+      placeholder={placeholder}
+      className="flex-1 border-none bg-transparent px-3 py-[8px] text-md outline-none"
+    />
+  </div>
+);
+
+const CheckboxRow = ({ label, checked, onChange }) => (
+  <div
+    className="flex cursor-pointer select-none items-center justify-between border border-[#0580A5] bg-white px-3 py-[8px]"
+    onClick={() => onChange(!checked)}
+  >
+    <span className="whitespace-nowrap text-md uppercase tracking-wide">
+      {label}:
+    </span>
+    <div
+      className={`flex h-[18px] w-[18px] items-center justify-center border-2 transition-colors ${
+        checked ? "border-[#0580A5] bg-[#0580A5]" : "border-gray-400 bg-white"
+      }`}
+    >
+      {checked && (
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="white"
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+      )}
+    </div>
+  </div>
+);
+
+const RangeField = ({
+  label,
+  value,
+  onChange,
+  min = 0,
+  max = 100,
+  step = 1,
+  prefix = "",
+  unit = "",
+}) => {
+  const minValue = value?.min ?? "";
+  const maxValue = value?.max ?? "";
+  const safeMinBound = Number.isFinite(min) ? min : 0;
+  const safeMaxBound = Number.isFinite(max) ? max : 100;
+  const boundedMax =
+    safeMaxBound > safeMinBound ? safeMaxBound : safeMinBound + 1;
+  const parsedMinValue = parseNumberInput(minValue);
+  const parsedMaxValue = parseNumberInput(maxValue);
+  const currentMin = Math.max(
+    safeMinBound,
+    Math.min(parsedMinValue ?? safeMinBound, boundedMax),
+  );
+  const currentMax = Math.max(
+    currentMin,
+    Math.min(parsedMaxValue ?? boundedMax, boundedMax),
+  );
+  const safeStep = Number.isFinite(step) && step > 0 ? step : 1;
+
+  return (
+    <div className="flex items-center border border-[#0580A5] bg-white">
+      <span className="min-w-[72px] whitespace-nowrap px-2 py-[7px] text-md uppercase tracking-wide">
+        {label}:
+      </span>
+      <input
+        type="text"
+        value={minValue}
+        onChange={(event) => onChange("min", event.target.value)}
+        placeholder={`${prefix}${safeMinBound}`}
+        className="w-[62px] border-none px-1 py-[5px] text-center text-[11px] outline-none"
+      />
+      <div className="dual-range-wrap flex-1 px-1">
+        <div className="slider-track"></div>
+        <div
+          className="slider-highlight"
+          style={{
+            left: `${((currentMin - safeMinBound) / (boundedMax - safeMinBound)) * 100}%`,
+            width: `${((currentMax - currentMin) / (boundedMax - safeMinBound)) * 100}%`,
+          }}
+        ></div>
+        <input
+          type="range"
+          min={safeMinBound}
+          max={boundedMax}
+          step={safeStep}
+          value={currentMin}
+          onChange={(event) =>
+            onChange(
+              "min",
+              String(Math.min(Number(event.target.value), currentMax)),
+            )
+          }
+        />
+        <input
+          type="range"
+          min={safeMinBound}
+          max={boundedMax}
+          step={safeStep}
+          value={currentMax}
+          onChange={(event) =>
+            onChange(
+              "max",
+              String(Math.max(Number(event.target.value), currentMin)),
+            )
+          }
+        />
+      </div>
+      <input
+        type="text"
+        value={maxValue}
+        onChange={(event) => onChange("max", event.target.value)}
+        placeholder={`${prefix}${boundedMax}`}
+        className="w-[62px] border-none px-1 py-[5px] text-center text-[11px] outline-none"
+      />
+      {(prefix || unit) && (
+        <span className="pr-2 text-[11px] text-gray-500">
+          {prefix}
+          {unit}
+        </span>
+      )}
+    </div>
+  );
+};
+
+const AdvancedSearch = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const sharedFilters = useMemo(
+    () =>
+      decodeAdvancedSearchQuery(
+        new URLSearchParams(location.search).get("filters"),
+      ),
+    [location.search],
+  );
+  const { allProducts, allBanners } = useData();
+  const {
+    sections,
+    attributes,
+    status: attributesStatus,
+  } = useAdvancedSearchAttributes();
+  const [filters, setFilters] = useState(sharedFilters);
+  const [previewStatus, setPreviewStatus] = useState({
+    loading: false,
+    error: "",
+    count: 0,
+  });
+
+  const bannerUrl = useMemo(() => {
+    const banner = allBanners.find(
+      (item) => item.location === "advancesearch_banner_1",
+    );
+    return banner?.image || "";
+  }, [allBanners]);
+
+  useEffect(() => {
+    setFilters(sharedFilters);
+  }, [sharedFilters]);
+
+  useEffect(() => {
+    if (attributesStatus.error) {
+      console.error(
+        "Error fetching advanced search attributes:",
+        attributesStatus.error,
+      );
+    }
+  }, [attributesStatus.error]);
+
+  const totalSelectedFilters = useMemo(
+    () =>
+      attributes.reduce((total, attribute) => {
+        const filterValue =
+          filters[attribute.fieldKey] ?? buildInitialFilterValue(attribute);
+
+        if (getResolvedFieldType(attribute) === "multi_select") {
+          return total + (Array.isArray(filterValue) ? filterValue.length : 0);
+        }
+
+        return total + (isFilterActive(attribute, filterValue) ? 1 : 0);
+      }, 0),
+    [attributes, filters],
+  );
+  const shareableFilters = useMemo(
+    () =>
+      attributes.reduce((accumulator, attribute) => {
+        const filterValue =
+          filters[attribute.fieldKey] ?? buildInitialFilterValue(attribute);
+
+        if (!isFilterActive(attribute, filterValue)) {
+          return accumulator;
+        }
+
+        accumulator[attribute.fieldKey] = filterValue;
+        return accumulator;
+      }, {}),
+    [attributes, filters],
+  );
+  const advancedRequestCategories = useMemo(
+    () => buildAdvancedSearchRequestPayload(attributes, filters),
+    [attributes, filters],
+  );
+  const missingCategoryAttributes = useMemo(
+    () => getAdvancedSearchAttributesMissingCategoryIds(attributes, filters),
+    [attributes, filters],
+  );
+  const resultCount = previewStatus.count;
+
+  useEffect(() => {
+    if (attributesStatus.loading) {
+      return;
+    }
+
+    if (totalSelectedFilters === 0) {
+      setPreviewStatus({
+        loading: false,
+        error: "",
+        count: allProducts.length,
+      });
+      return;
+    }
+
+    if (missingCategoryAttributes.length > 0) {
+      setPreviewStatus({
+        loading: false,
+        error: "Selected filters are missing brand_category_id.",
+        count: 0,
+      });
+      return;
+    }
+
+    if (advancedRequestCategories.length === 0) {
+      setPreviewStatus({
+        loading: false,
+        error: "Advanced search request is missing category mapping.",
+        count: 0,
+      });
+      return;
+    }
+
+    const controller = new AbortController();
+
+    setPreviewStatus((currentStatus) => ({
+      ...currentStatus,
+      loading: true,
+      error: "",
+    }));
+
+    const fetchPreviewCount = async () => {
+      try {
+        const response = await advancedSearchService.getData({
+          categories: advancedRequestCategories,
+          signal: controller.signal,
+        });
+
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        setPreviewStatus({
+          loading: false,
+          error: "",
+          count: Array.isArray(response?.data) ? response.data.length : 0,
+        });
+      } catch (error) {
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        setPreviewStatus({
+          loading: false,
+          error:
+            error?.data?.message ||
+            error?.message ||
+            "Failed to load preview count.",
+          count: 0,
+        });
+      }
+    };
+
+    void fetchPreviewCount();
+
+    return () => {
+      controller.abort();
+    };
+  }, [
+    advancedRequestCategories,
+    allProducts.length,
+    attributesStatus.loading,
+    missingCategoryAttributes.length,
+    totalSelectedFilters,
+  ]);
+
+  useEffect(() => {
+    if (previewStatus.error) {
+      console.error("Error fetching preview count:", previewStatus.error);
+    }
+  }, [previewStatus.error]);
+
+  const setFilterValue = (fieldKey, value) => {
+    setFilters((currentFilters) => ({
+      ...currentFilters,
+      [fieldKey]: value,
+    }));
+  };
+
+  const toggleMultiSelectValue = (fieldKey, value) => {
+    setFilters((currentFilters) => {
+      const currentValues = Array.isArray(currentFilters[fieldKey])
+        ? currentFilters[fieldKey]
+        : [];
+      const nextValues = currentValues.includes(value)
+        ? currentValues.filter((item) => item !== value)
+        : [...currentValues, value];
+
+      return {
+        ...currentFilters,
+        [fieldKey]: nextValues,
+      };
+    });
+  };
+
+  const setRangeFilterValue = (fieldKey, bound, value) => {
+    setFilters((currentFilters) => ({
+      ...currentFilters,
+      [fieldKey]: {
+        ...(currentFilters[fieldKey] || { min: "", max: "" }),
+        [bound]: value,
+      },
+    }));
+  };
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    params.set("advanced", "1");
+
+    if (Object.keys(shareableFilters).length > 0) {
+      params.set("filters", encodeAdvancedSearchQuery(shareableFilters));
+    }
+
+    navigate({
+      pathname: "/search",
+      search: params.toString() ? `?${params.toString()}` : "",
+    });
+  };
+
+  return (
+    <div>
+      <div className="flex flex-col gap-2 lg:flex-row">
+        <div className="hidden w-full lg:block lg:w-1/3">
+          <div className="flex flex-col gap-2">
+            <SidebarIntro />
+            <SidebarBrands />
+            <SidebarFilters />
+            <SidebarBanner1 />
+            <div className="flex flex-col gap-6">
+              <SidebarStats />
+              <SidebarBanner2 />
+              <SidebarLatestModels />
+            </div>
+          </div>
+        </div>
+
+        <div className="w-full lg:w-3/4">
+          <HeroBanner />
+
+          <div className="mb-0 overflow-hidden bg-white">
+            <div className="relative mb-4 flex w-full items-end">
+              <div className="absolute bottom-0 left-0 h-[10px] w-full bg-[#0580A5] sm:h-[16px]"></div>
+              <div className="latest-products-clip relative z-10 flex h-10 w-fit items-center bg-[#0580A5] text-white sm:h-14">
+                <h2 className="pl-2 text-[18px] sm:pl-4 sm:text-[26px]">
+                  Advanced Search
+                </h2>
+              </div>
+            </div>
+
+            {attributesStatus.error && (
+              <div className="mx-2 mb-4 border border-red-300 bg-red-100 px-3 py-2 text-sm text-red-700">
+                {attributesStatus.error}
+              </div>
+            )}
+
+            {!attributesStatus.error && previewStatus.error && (
+              <div className="mx-2 mb-4 border border-red-300 bg-red-100 px-3 py-2 text-sm text-red-700">
+                {previewStatus.error}
+              </div>
+            )}
+
+            {!attributesStatus.error && attributesStatus.loading && (
+              <div className="px-4 py-8 text-center text-gray-500">
+                Loading advanced search filters...
+              </div>
+            )}
+
+            {!attributesStatus.loading &&
+              !attributesStatus.error &&
+              sections.map((section) => (
+                <div key={section.title}>
+                  <SectionHeader title={section.title} />
+                  <div className="space-y-1.5 px-2 py-5 pb-10">
+                    <div
+                      className={getSectionGridClass(
+                        section.title,
+                        section.attributes.length,
+                      )}
+                    >
+                      {section.attributes.map((attribute, attributeIndex) => (
+                        <div
+                          key={attribute.fieldKey}
+                          className={getFieldWrapperClass(
+                            section.title,
+                            section.attributes.length,
+                            attributeIndex,
+                          )}
+                        >
+                          {getResolvedFieldType(attribute) === "range" ? (
+                            <RangeField
+                              label={attribute.name}
+                              value={
+                                filters[attribute.fieldKey] ??
+                                buildInitialFilterValue(attribute)
+                              }
+                              onChange={(bound, value) =>
+                                setRangeFilterValue(
+                                  attribute.fieldKey,
+                                  bound,
+                                  value,
+                                )
+                              }
+                              min={attribute.min ?? 0}
+                              max={attribute.max ?? 100}
+                              step={getRangeFieldConfig(attribute).step}
+                              prefix={getRangeFieldConfig(attribute).prefix}
+                            />
+                          ) : getResolvedFieldType(attribute) === "text" ? (
+                            <TextField
+                              label={attribute.name}
+                              value={filters[attribute.fieldKey] || ""}
+                              onChange={(value) =>
+                                setFilterValue(attribute.fieldKey, value)
+                              }
+                              placeholder={attribute.placeholder || "Type here"}
+                            />
+                          ) : (
+                            <MultiSelectField
+                              label={attribute.name}
+                              value={filters[attribute.fieldKey] ?? []}
+                              onToggle={(value) =>
+                                toggleMultiSelectValue(
+                                  attribute.fieldKey,
+                                  value,
+                                )
+                              }
+                              options={attribute.values}
+                              disabled={attribute.values.length === 0}
+                            />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+            {!attributesStatus.loading &&
+              !attributesStatus.error &&
+              sections.length === 0 && (
+                <div className="px-4 py-8 text-center text-gray-500">
+                  No advanced search filters available.
+                </div>
+              )}
+
+            <div className="flex items-center justify-center gap-3 px-4 py-5">
+              <span className="border-[2px] border-[#0580A5] rounded-l-full px-4 sm:px-4 py-2 text-xl sm:text-3xl flex items-center whitespace-nowrap">
+                Result
+              </span>
+              <span className="border-[2px] border-l-2 border-[#0580A5] px-10 sm:px-8 text-xl sm:text-3xl py-2 flex items-center">
+                {previewStatus.loading ? "..." : resultCount.toLocaleString()}
+              </span>
+              <button
+                onClick={handleSearch}
+                className="bg-[#0580A5] hover:bg-[#046a88] text-white border-[2px] border-l-0 border-[#0580A5] font-light px-5 sm:px-6 py-2 text-xl sm:text-3xl transition-colors cursor-pointer rounded-r-full whitespace-nowrap"
+              >
+                SHOW ALL
+                {totalSelectedFilters > 0 ? ` (${totalSelectedFilters})` : ""}
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-4 px-2 py-6 leading-relaxed">
+            <p>
+              *PRICE BASED ON THE LOWEST ONLINE SIM-FREE PRICE, EXCLUDING TAXES,
+              SUBSIDIES AND SHIPMENT. ONLY PHONES WITH KNOWN PRICES WILL APPEAR
+              IN THE RESULTS.
+            </p>
+            <p>
+              *BATTERY STAND-BY AND TALK TIME BASED ON THE OFFICIAL MANUFACTURER
+              SPECIFICATIONS, NOT ON REAL-LIFE TESTS
+            </p>
+            <p>
+              *IN FREE TEXT FIELD YOU CAN SEARCH FOR OTHER FEATURES, NOT
+              MENTIONED ABOVE. FOR EXAMPLE - "FAST BATTERY CHARGING", "WIRELESS
+              CHARGING", "POWER BANK", "ANT+", "GALILEO", "APTX" AND SO ON. IN
+              SOME CASES IT CAN BE VERY USEFUL, BUT THE RESULTS ARE LESS
+              RELIABLE.
+            </p>
+          </div>
+
+          {bannerUrl && (
+            <img
+              className="mt-7 w-auto sm:w-full"
+              src={bannerUrl}
+              alt="Advanced Search Banner"
+            />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AdvancedSearch;
