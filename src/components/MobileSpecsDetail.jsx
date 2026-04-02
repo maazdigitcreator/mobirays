@@ -228,9 +228,9 @@ const MobileSpecsDetail = ({ productData, onCommentsClick }) => {
   return (
     <div className="w-full">
       {/* Header Section with Device Name and Stats */}
-      <div className="relative z-10 w-full mb-2 overflow-visible">
+      <div className="relative z-10 w-full mb-2 mt-1 overflow-visible">
         {/* Background bar */}
-        <div className="w-full h-10 sm:h-14 flex items-center justify-between">
+        <div className="w-full h-10 sm:h-12 flex items-center justify-between">
           {/* Left side - Device name with slanted edge */}
           <div className="absolute -bottom-1 left-0 w-full h-[10px] sm:h-[16px] bg-[#0580A5]"></div>
 
@@ -238,7 +238,7 @@ const MobileSpecsDetail = ({ productData, onCommentsClick }) => {
             {/* Horizontal Line Background */}
 
             {/* Title Box */}
-            <div className="latest-products-clip bg-[#0580A5] text-white w-fit sm:h-14 h-10 flex items-center relative z-10">
+            <div className="latest-products-clip bg-[#0580A5] text-white w-fit sm:h-14 h-12 mr-2 flex items-center relative z-10">
               <h1 className="sm:text-[26px] text-[16px] pl-2 sm:pl-4">
                 {device.name}
               </h1>
@@ -246,7 +246,7 @@ const MobileSpecsDetail = ({ productData, onCommentsClick }) => {
           </div>
 
           {/* Right side - Stats */}
-          <div className="h-full flex sm:gap-10 gap-12 justify-between items-start">
+          <div className="h-full items-center pb-4 sm:pb-0 flex sm:gap-10 gap-4 justify-between sm:items-start">
             <button
               type="button"
               onClick={handleToggleWishlist}
@@ -267,8 +267,8 @@ const MobileSpecsDetail = ({ productData, onCommentsClick }) => {
                 </span>
               </div>
             </button>
-            <div className="h-fit flex items-center text-[#0580A5]">
-              <div className="w-8 sm:w-12">
+            <div className="h-fit flex gap-2 sm:gap-0 items-center text-[#0580A5]">
+              <div className="w-5 sm:w-12">
                 <img src={viewsIcon} alt="" />
               </div>
 
@@ -285,10 +285,10 @@ const MobileSpecsDetail = ({ productData, onCommentsClick }) => {
               type="button"
               onClick={handleToggleLike}
               disabled={likesLoading || !likesReady}
-              className={`h-fit flex items-center ${isLiked ? "text-[#046a8a]" : "text-[#0580A5]"} disabled:opacity-70 hover:cursor-pointer transition-colors`}
+              className={`h-fit flex  gap-2 sm:gap-0 items-center ${isLiked ? "text-[#046a8a]" : "text-[#0580A5]"} disabled:opacity-70 hover:cursor-pointer transition-colors`}
             >
-              <div className="w-5 sm:w-10">
-              <img src={likesIcon} alt="" />
+              <div className="w-4 sm:w-10">
+                <img src={likesIcon} alt="" />
               </div>
               <div className="flex flex-col">
                 <span className="text-xs sm:text-lg  leading-none">
