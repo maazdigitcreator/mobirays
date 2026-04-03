@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useData } from "../context/useData";
 import LatestProducts from "../components/LatestProducts";
 import Pagination from "../components/Pagination";
+import ProductsSectionButton from "../components/ProductsSectionButton";
 import LatestNews from "../components/LatestNews";
 import LatestReviews from "../components/LatestReviews";
 
@@ -178,19 +179,30 @@ const Home = () => {
               <>
                 {HOME_SECTIONS.map((section, index) => {
                   const sectionProducts = categorizedProducts[section.id] || [];
-                  // Hide section entirely if no products
-                  if (sectionProducts.length === 0) return null;
+
+                  // In filtered view: hide section if empty
+                  if (isFilteredView && sectionProducts.length === 0) return null;
+
+                  // In normal view: always show all 3 sections (original behaviour)
+                  const displayProducts = isFilteredView
+                    ? sectionProducts
+                    : sectionProducts.slice(0, ITEMS_PER_PAGE);
 
                   return (
                     <React.Fragment key={section.id}>
                       <div className={index === 0 ? "" : "mt-10"}>
                         <LatestProducts
                           title={section.title}
-                          products={sectionProducts}
+                          products={displayProducts}
                           itemImage={section.itemImage}
-                          enablePagination={true}
-                          itemsPerPage={ITEMS_PER_PAGE}
                         />
+                        {/* Normal view: Show More + Coming Soon buttons */}
+                        {!isFilteredView && (
+                          <ProductsSectionButton
+                            showMoreLink={section.showMoreLink}
+                            comingSoonLink="/coming-soon"
+                          />
+                        )}
                       </div>
 
                       {section.bannerLocation &&

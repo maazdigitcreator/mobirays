@@ -32,7 +32,7 @@ const AllBrandsHero = ({ title = "All Brands", backgroundImage }) => {
 
                     {/* Right side - Share Icon */}
                     <div className="h-full flex gap-20 justify-between">
-                        <button className="hover:cursor-pointer flex items-center transition-colors w-fit pb-7 ">
+                        <button className="hover:cursor-pointer flex items-center transition-colors w-fit pb-5 sm:pb-7 ">
                             <img src={shareIcon} width={25} alt="" />
                         </button>
                     </div>

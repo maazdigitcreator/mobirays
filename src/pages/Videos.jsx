@@ -125,16 +125,16 @@ const Videos = () => {
                         {video.channel ? video.channel.charAt(0).toUpperCase() : 'V'}
                     </span>
                 </div>
-                <div className="">
-                    <h3 className="text-sm font-medium text-black line-clamp-2 leading-tight mb-1">
+                <div className="min-w-0">
+                    <h3 className="text-[0.75rem] sm:text-sm font-medium text-black line-clamp-2 leading-tight sm:mb-1">
                         {video.title}
                     </h3>
                     <div className="flex items-start gap-2">
                         <div className="flex-1 min-w-0">
                             {video.channel && (
-                                <p className="text-xs text-gray-700 font-medium">{video.channel}</p>
+                                <p className="text-[0.65rem] sm:text-xs text-gray-700 font-medium truncate">{video.channel}</p>
                             )}
-                            <p className="text-xs text-gray-600">
+                            <p className="text-[0.65rem] sm:text-xs text-gray-600 line-clamp-1">
                                 {formatViews(video.views)}{video.time_ago ? ` • ${video.time_ago}` : ''}
                             </p>
                         </div>
@@ -165,23 +165,20 @@ const Videos = () => {
                 </div>
             </div>
 
-            <div className="relative w-full mb-5 overflow-hidden">
-                {/* Background bar */}
-                <div className="w-full h-10 sm:h-14 flex items-center justify-between">
-                    {/* Left side - Device name with slanted edge */}
-                    <div className="absolute -bottom-1 left-0 w-full h-[10px] sm:h-[16px] bg-[#0580A5]"></div>
+            {/* Desktop & Mobile Responsive Header */}
+            <div className="w-full mb-5">
+                {/* DESKTOP LAYOUT */}
+                <div className="hidden sm:flex relative w-full h-14 items-center justify-between overflow-hidden">
+                    {/* Full width blue line */}
+                    <div className="absolute -bottom-1 left-0 w-full h-[16px] bg-[#0580A5]"></div>
 
-                    <div className="relative w-full flex items-end">
-                        {/* Title Box */}
-                        <div
-                            className="latest-products-clip bg-[#0580A5] text-white w-fit sm:h-14 h-10 flex items-center relative z-10"
-                        >
-                            <h1 className="sm:text-[26px] text-[18px] pl-2 sm:pl-4">Reviews Videos</h1>
+                    <div className="relative flex items-end">
+                        <div className="latest-products-clip bg-[#0580A5] text-white w-fit h-14 flex items-center relative z-10">
+                            <h1 className="text-[26px] pl-4 pr-6">Reviews Videos</h1>
                         </div>
                     </div>
 
-                    {/* Search Bar */}
-                    <div className="flex gap-4 mb-4 justify-start items-start z-10">
+                    <div className="flex z-10 mb-4 items-start pr-0">
                         <div className="flex">
                             <input
                                 type="text"
@@ -189,14 +186,42 @@ const Videos = () => {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 onKeyDown={(e) => e.key === 'Enter' && setSearchQuery(searchQuery.trim())}
-                                className="w-full sm:w-[350px] border-2 border-[#0580A5] py-1 px-2 focus:outline-none focus:border-[#046a8a] text-black placeholder-gray-500"
+                                className="w-[350px] border-2 border-[#0580A5] py-1 px-3 focus:outline-none focus:border-[#046a8a] text-black placeholder-gray-500"
                             />
                             <button
                                 onClick={() => setSearchQuery(searchQuery.trim())}
-                                className="right-0 top-0 min-h-full px-4 bg-[#0580A5] hover:bg-[#046a8a] transition-colors flex items-center justify-center">
+                                className="px-4 bg-[#0580A5] hover:bg-[#046a8a] transition-colors flex items-center justify-center">
                                 <Search className="text-white" size={20} />
                             </button>
                         </div>
+                    </div>
+                </div>
+
+                {/* MOBILE LAYOUT */}
+                <div className="flex sm:hidden flex-col-reverse gap-4">
+                    <div className="relative w-full h-10 overflow-hidden">
+                        {/* Mobile full width blue line */}
+                        <div className="absolute -bottom-1 left-0 w-full h-[12px] bg-[#0580A5]"></div>
+
+                        <div className="latest-products-clip bg-[#0580A5] text-white w-fit h-10 flex items-center relative z-10">
+                            <h1 className="text-[18px] pl-2 pr-6">Reviews Videos</h1>
+                        </div>
+                    </div>
+
+                    <div className="flex w-full z-10">
+                        <input
+                            type="text"
+                            placeholder="Search videos..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && setSearchQuery(searchQuery.trim())}
+                            className="flex-1 w-full border-2 border-[#0580A5] py-1.5 px-3 focus:outline-none focus:border-[#046a8a] text-black placeholder-gray-500"
+                        />
+                        <button
+                            onClick={() => setSearchQuery(searchQuery.trim())}
+                            className="px-4 bg-[#0580A5] hover:bg-[#046a8a] transition-colors flex items-center justify-center">
+                            <Search className="text-white" size={20} />
+                        </button>
                     </div>
                 </div>
             </div>
@@ -234,7 +259,7 @@ const Videos = () => {
             {!loading && !error && filteredVideos.length > 0 && (
                 <>
                     {/* First 16 videos */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4">
                         {filteredVideos.slice(0, 16).map((video) => (
                             <VideoCard key={video.id} video={video} />
                         ))}
@@ -248,7 +273,7 @@ const Videos = () => {
                                     <BannerAd banner={pageBanners['videos_banner_1']} />
                                 </div>
                             )}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                                 {filteredVideos.slice(16, 32).map((video) => (
                                     <VideoCard key={video.id} video={video} />
                                 ))}
@@ -264,7 +289,7 @@ const Videos = () => {
                                     <BannerAd banner={pageBanners['videos_banner_2']} />
                                 </div>
                             )}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                                 {filteredVideos.slice(32).map((video) => (
                                     <VideoCard key={video.id} video={video} />
                                 ))}
