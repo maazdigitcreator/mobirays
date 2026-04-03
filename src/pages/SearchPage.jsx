@@ -211,10 +211,19 @@ const SearchPage = () => {
     const searchResults = useMemo(() => {
         if (isFilteredView) {
             if (advancedStatus.loaded) {
+                // Categorize matched products using existing helper
+                const filteredPhones = filterProductsByCategory(advancedProducts, 'Phones');
+                const filteredTablets = filterProductsByCategory(advancedProducts, 'Tablets');
+                const filteredWatches = filterProductsByCategory(advancedProducts, 'Smartwatches');
+
+                // Products that don't match any known category — still show them in phones
+                const categorizedIds = new Set([...filteredPhones, ...filteredTablets, ...filteredWatches].map(p => p.id));
+                const uncategorized = advancedProducts.filter(p => !categorizedIds.has(p.id));
+
                 return {
-                    phones: filterProductsByCategory(advancedProducts, 'Mobile Phones'),
-                    tablets: filterProductsByCategory(advancedProducts, 'Tablets'),
-                    watches: filterProductsByCategory(advancedProducts, 'Smartwatches'),
+                    phones: [...filteredPhones, ...uncategorized],
+                    tablets: filteredTablets,
+                    watches: filteredWatches,
                     news: [],
                     reviews: [],
                 };
@@ -243,6 +252,7 @@ const SearchPage = () => {
     }, [
         advancedProducts,
         advancedStatus.loaded,
+        allProducts.length,
         filterResults,
         isFilteredView,
         searchQuery,
@@ -300,10 +310,7 @@ const SearchPage = () => {
                         {/* Phones Section */}
                         {phones.length > 0 && (
                             <div>
-                                <LatestProducts title="Phones Results" products={phones} itemImage={mobileImg} limit={8} />
-                                {!isFilteredView && phones.length > 8 && (
-                                    <ProductsSectionButton showMoreLink={`/phones?q=${searchQuery}`} comingSoonLink="/coming-soon" />
-                                )}
+                                <LatestProducts title="Phones Results" products={phones} itemImage={mobileImg} enablePagination={true} itemsPerPage={24} />
                             </div>
                         )}
 
@@ -312,10 +319,7 @@ const SearchPage = () => {
                         {/* Tabs Section */}
                         {tablets.length > 0 && (
                             <div className='mt-10'>
-                                <LatestProducts title="Tablets Results" products={tablets} itemImage={tabImg} limit={8} />
-                                {!isFilteredView && tablets.length > 8 && (
-                                    <ProductsSectionButton showMoreLink={`/tablets?q=${searchQuery}`} comingSoonLink="/coming-soon" />
-                                )}
+                                <LatestProducts title="Tablets Results" products={tablets} itemImage={tabImg} enablePagination={true} itemsPerPage={24} />
                             </div>
                         )}
 
@@ -324,10 +328,7 @@ const SearchPage = () => {
                         {/* Smartwatches Section */}
                         {watches.length > 0 && (
                             <div className='mt-10'>
-                                <LatestProducts title="Smartwatches Results" products={watches} itemImage={watchImg} limit={8} />
-                                {!isFilteredView && watches.length > 8 && (
-                                    <ProductsSectionButton showMoreLink={`/smartwatches?q=${searchQuery}`} comingSoonLink="/coming-soon" />
-                                )}
+                                <LatestProducts title="Smartwatches Results" products={watches} itemImage={watchImg} enablePagination={true} itemsPerPage={24} />
                             </div>
                         )}
 

@@ -3,8 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useData } from "../context/useData";
 import LatestProducts from "../components/LatestProducts";
 import Pagination from "../components/Pagination";
-
-import ProductsSectionButton from "../components/ProductsSectionButton";
 import LatestNews from "../components/LatestNews";
 import LatestReviews from "../components/LatestReviews";
 
@@ -25,7 +23,7 @@ import { filterService } from "../services/filterService";
 import { decodeSidebarFilterQuery } from "../utils/sidebarFilters";
 import { filterProductsByCategory } from "../utils/filterHelpers";
 
-const HOME_SECTION_LIMIT = 24;
+const ITEMS_PER_PAGE = 24;
 const HOME_SECTIONS = [
   {
     id: "phones",
@@ -111,7 +109,7 @@ const Home = () => {
         const response = await filterService.applyFilters({
           categories: appliedFilters,
           page: filteredPage,
-          perPage: HOME_SECTION_LIMIT,
+          perPage: ITEMS_PER_PAGE,
           signal: controller.signal,
         });
         if (controller.signal.aborted) return;
@@ -178,32 +176,35 @@ const Home = () => {
               </div>
             ) : (
               <>
-                {HOME_SECTIONS.map((section, index) => (
-                  <React.Fragment key={section.id}>
-                    <div className={index === 0 ? "" : "mt-10"}>
-                      <LatestProducts
-                        title={section.title}
-                        products={categorizedProducts[section.id] || []}
-                        itemImage={section.itemImage}
-                        limit={HOME_SECTION_LIMIT}
-                      />
-                      <ProductsSectionButton
-                        showMoreLink={section.showMoreLink}
-                        comingSoonLink="/coming-soon"
-                      />
-                    </div>
+                {HOME_SECTIONS.map((section, index) => {
+                  const sectionProducts = categorizedProducts[section.id] || [];
+                  // Hide section entirely if no products
+                  if (sectionProducts.length === 0) return null;
 
-                    {section.bannerLocation &&
-                      homeBanners[section.bannerLocation] && (
-                        <div className="mt-7 hidden sm:block">
-                          <BannerAd
-                            banner={homeBanners[section.bannerLocation]}
-                            className="h-[200px] sm:w-full"
-                          />
-                        </div>
-                      )}
-                  </React.Fragment>
-                ))}
+                  return (
+                    <React.Fragment key={section.id}>
+                      <div className={index === 0 ? "" : "mt-10"}>
+                        <LatestProducts
+                          title={section.title}
+                          products={sectionProducts}
+                          itemImage={section.itemImage}
+                          enablePagination={true}
+                          itemsPerPage={ITEMS_PER_PAGE}
+                        />
+                      </div>
+
+                      {section.bannerLocation &&
+                        homeBanners[section.bannerLocation] && (
+                          <div className="mt-7 hidden sm:block">
+                            <BannerAd
+                              banner={homeBanners[section.bannerLocation]}
+                              className="h-[200px] sm:w-full"
+                            />
+                          </div>
+                        )}
+                    </React.Fragment>
+                  );
+                })}
 
                 {isFilteredView && filteredProductsMeta?.last_page > 1 && (
                   <Pagination
