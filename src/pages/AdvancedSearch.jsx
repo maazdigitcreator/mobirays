@@ -13,6 +13,11 @@ import { useData } from "../context/useData";
 import { useAdvancedSearchAttributes } from "../hooks/useAdvancedSearchAttributes";
 import { advancedSearchService } from "../services/advancedSearchService";
 import {
+  ADVANCED_SEARCH_TABS,
+  getAdvancedSearchTabByCategoryId,
+  isAdvancedSearchAttributeInCategory,
+} from "../utils/advancedSearchConfig";
+import {
   buildAdvancedSearchRequestPayload,
   buildInitialFilterValue,
   getAdvancedSearchAttributesMissingCategoryIds,
@@ -24,6 +29,7 @@ import {
   decodeAdvancedSearchQuery,
   encodeAdvancedSearchQuery,
 } from "../utils/advancedSearchQuery";
+import { filterProductsByCategory } from "../utils/filterHelpers";
 
 const SectionHeader = ({ title }) => (
   <div
@@ -87,6 +93,17 @@ const parseNumberInput = (value) => {
   return Number.isFinite(parsedValue) ? parsedValue : null;
 };
 
+const parseCategoryId = (value) => {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  const parsedValue = Number(value);
+  return Number.isFinite(parsedValue) ? parsedValue : null;
+};
+
+const DEFAULT_ADVANCED_SEARCH_CATEGORY_ID = ADVANCED_SEARCH_TABS[0]?.id ?? 3;
+
 const normalizeSearchText = (value) =>
   String(value || "")
     .toLowerCase()
@@ -148,11 +165,24 @@ const MultiSelectField = ({
     }
 
     return options.filter((option) =>
-      option.toLowerCase().includes(normalizedQuery),
+      option.label.toLowerCase().includes(normalizedQuery),
     );
   }, [options, query]);
 
-  const displayValue = value.length > 0 ? value.join(", ") : "";
+  const optionLookup = useMemo(
+    () =>
+      new Map(options.map((option) => [String(option.value), option.label])),
+    [options],
+  );
+  const displayValue =
+    value.length > 0
+      ? value
+          .map((selectedValue) => {
+            const normalizedValue = String(selectedValue);
+            return optionLookup.get(normalizedValue) || normalizedValue;
+          })
+          .join(", ")
+      : "";
 
   return (
     <div ref={containerRef} className="relative">
@@ -197,7 +227,7 @@ const MultiSelectField = ({
       </button>
 
       {isOpen && !disabled && (
-        <div className="absolute left-0 right-0 z-20 mt-1 border border-[#0580A5] bg-white shadow-lg">
+        <div className="absolute left-0 right-0 z-[80] mt-1 border border-[#0580A5] bg-white shadow-lg">
           <div className="border-b border-[#0580A5] p-2">
             <input
               type="text"
@@ -214,16 +244,16 @@ const MultiSelectField = ({
               </div>
             ) : (
               filteredOptions.map((option) => {
-                const isSelected = value.includes(option);
+                const isSelected = value.includes(option.value);
 
                 return (
                   <button
-                    key={option}
+                    key={`${option.label}-${String(option.value)}`}
                     type="button"
-                    onClick={() => onToggle(option)}
+                    onClick={() => onToggle(option.value)}
                     className="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-[#EDF6F9]"
                   >
-                    <span className="pr-3">{option}</span>
+                    <span className="pr-3">{option.label}</span>
                     <span
                       className={`flex h-4 w-4 items-center justify-center border text-[10px] ${
                         isSelected
@@ -300,6 +330,7 @@ const RangeField = ({
   prefix = "",
   unit = "",
 }) => {
+  const [activeHandle, setActiveHandle] = useState(null);
   const minValue = value?.min ?? "";
   const maxValue = value?.max ?? "";
   const safeMinBound = Number.isFinite(min) ? min : 0;
@@ -317,6 +348,18 @@ const RangeField = ({
     Math.min(parsedMaxValue ?? boundedMax, boundedMax),
   );
   const safeStep = Number.isFinite(step) && step > 0 ? step : 1;
+  const minZIndex =
+    activeHandle === "min"
+      ? 3
+      : activeHandle === "max"
+        ? 1
+        : 2;
+  const maxZIndex =
+    activeHandle === "max"
+      ? 3
+      : activeHandle === "min"
+        ? 2
+        : 1;
 
   return (
     <div className="flex items-center border border-[#0580A5] bg-white">
@@ -345,6 +388,9 @@ const RangeField = ({
           max={boundedMax}
           step={safeStep}
           value={currentMin}
+          style={{ zIndex: minZIndex }}
+          onPointerDown={() => setActiveHandle("min")}
+          onPointerUp={() => setActiveHandle(null)}
           onChange={(event) =>
             onChange(
               "min",
@@ -358,6 +404,9 @@ const RangeField = ({
           max={boundedMax}
           step={safeStep}
           value={currentMax}
+          style={{ zIndex: maxZIndex }}
+          onPointerDown={() => setActiveHandle("max")}
+          onPointerUp={() => setActiveHandle(null)}
           onChange={(event) =>
             onChange(
               "max",
@@ -386,20 +435,27 @@ const RangeField = ({
 const AdvancedSearch = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const sharedFilters = useMemo(
-    () =>
-      decodeAdvancedSearchQuery(
-        new URLSearchParams(location.search).get("filters"),
-      ),
+  const searchParams = useMemo(
+    () => new URLSearchParams(location.search),
     [location.search],
+  );
+  const sharedFilters = useMemo(
+    () => decodeAdvancedSearchQuery(searchParams.get("filters")),
+    [searchParams],
+  );
+  const sharedCategoryId = useMemo(
+    () => parseCategoryId(searchParams.get("category")),
+    [searchParams],
   );
   const { allProducts, allBanners } = useData();
   const {
     sections,
-    attributes,
     status: attributesStatus,
   } = useAdvancedSearchAttributes();
   const [filters, setFilters] = useState(sharedFilters);
+  const [activeCategoryId, setActiveCategoryId] = useState(
+    sharedCategoryId ?? DEFAULT_ADVANCED_SEARCH_CATEGORY_ID,
+  );
   const [previewStatus, setPreviewStatus] = useState({
     loading: false,
     error: "",
@@ -418,6 +474,12 @@ const AdvancedSearch = () => {
   }, [sharedFilters]);
 
   useEffect(() => {
+    if (sharedCategoryId !== null) {
+      setActiveCategoryId(sharedCategoryId);
+    }
+  }, [sharedCategoryId]);
+
+  useEffect(() => {
     if (attributesStatus.error) {
       console.error(
         "Error fetching advanced search attributes:",
@@ -426,9 +488,36 @@ const AdvancedSearch = () => {
     }
   }, [attributesStatus.error]);
 
+  const activeTab = useMemo(
+    () =>
+      getAdvancedSearchTabByCategoryId(activeCategoryId) ||
+      getAdvancedSearchTabByCategoryId(DEFAULT_ADVANCED_SEARCH_CATEGORY_ID),
+    [activeCategoryId],
+  );
+  const visibleSections = useMemo(
+    () =>
+      sections
+        .map((section) => ({
+          ...section,
+          attributes: section.attributes.filter((attribute) =>
+            isAdvancedSearchAttributeInCategory(attribute, activeCategoryId),
+          ),
+        }))
+        .filter((section) => section.attributes.length > 0),
+    [activeCategoryId, sections],
+  );
+  const visibleAttributes = useMemo(
+    () => visibleSections.flatMap((section) => section.attributes),
+    [visibleSections],
+  );
+  const baseCategoryResultCount = useMemo(
+    () => filterProductsByCategory(allProducts, activeTab?.label).length,
+    [activeTab?.label, allProducts],
+  );
+
   const totalSelectedFilters = useMemo(
     () =>
-      attributes.reduce((total, attribute) => {
+      visibleAttributes.reduce((total, attribute) => {
         const filterValue =
           filters[attribute.fieldKey] ?? buildInitialFilterValue(attribute);
 
@@ -438,11 +527,11 @@ const AdvancedSearch = () => {
 
         return total + (isFilterActive(attribute, filterValue) ? 1 : 0);
       }, 0),
-    [attributes, filters],
+    [filters, visibleAttributes],
   );
   const shareableFilters = useMemo(
     () =>
-      attributes.reduce((accumulator, attribute) => {
+      visibleAttributes.reduce((accumulator, attribute) => {
         const filterValue =
           filters[attribute.fieldKey] ?? buildInitialFilterValue(attribute);
 
@@ -453,15 +542,21 @@ const AdvancedSearch = () => {
         accumulator[attribute.fieldKey] = filterValue;
         return accumulator;
       }, {}),
-    [attributes, filters],
+    [filters, visibleAttributes],
   );
   const advancedRequestCategories = useMemo(
-    () => buildAdvancedSearchRequestPayload(attributes, filters),
-    [attributes, filters],
+    () =>
+      buildAdvancedSearchRequestPayload(visibleAttributes, filters, {
+        activeCategoryId,
+      }),
+    [activeCategoryId, filters, visibleAttributes],
   );
   const missingCategoryAttributes = useMemo(
-    () => getAdvancedSearchAttributesMissingCategoryIds(attributes, filters),
-    [attributes, filters],
+    () =>
+      getAdvancedSearchAttributesMissingCategoryIds(visibleAttributes, filters, {
+        activeCategoryId,
+      }),
+    [activeCategoryId, filters, visibleAttributes],
   );
   const resultCount = previewStatus.count;
 
@@ -474,7 +569,7 @@ const AdvancedSearch = () => {
       setPreviewStatus({
         loading: false,
         error: "",
-        count: allProducts.length,
+        count: baseCategoryResultCount,
       });
       return;
     }
@@ -544,8 +639,8 @@ const AdvancedSearch = () => {
     };
   }, [
     advancedRequestCategories,
-    allProducts.length,
     attributesStatus.loading,
+    baseCategoryResultCount,
     missingCategoryAttributes.length,
     totalSelectedFilters,
   ]);
@@ -592,6 +687,7 @@ const AdvancedSearch = () => {
   const handleSearch = () => {
     const params = new URLSearchParams();
     params.set("advanced", "1");
+    params.set("category", String(activeCategoryId));
 
     if (Object.keys(shareableFilters).length > 0) {
       params.set("filters", encodeAdvancedSearchQuery(shareableFilters));
@@ -623,7 +719,7 @@ const AdvancedSearch = () => {
         <div className="w-full lg:w-3/4">
           <HeroBanner />
 
-          <div className="mb-0 overflow-hidden bg-white">
+          <div className="mb-0 overflow-visible bg-white">
             <div className="relative mb-4 flex w-full items-end">
               <div className="absolute bottom-0 left-0 h-[10px] w-full bg-[#0580A5] sm:h-[16px]"></div>
               <div className="latest-products-clip relative z-10 flex h-10 w-fit items-center bg-[#0580A5] text-white sm:h-14">
@@ -645,6 +741,31 @@ const AdvancedSearch = () => {
               </div>
             )}
 
+            {!attributesStatus.error && (
+              <div className="mb-4 overflow-x-auto px-2">
+                <div className="flex min-w-max items-end gap-1 border-b-[6px] border-[#0580A5] pb-1">
+                  {ADVANCED_SEARCH_TABS.map((tab) => {
+                    const isActive = tab.id === activeCategoryId;
+
+                    return (
+                      <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => setActiveCategoryId(tab.id)}
+                        className={`px-4 py-2 text-sm font-medium uppercase tracking-wide transition-colors sm:text-base ${
+                          isActive
+                            ? "bg-[#0580A5] text-white"
+                            : "bg-[#8cc9dc] text-[#034D63] hover:bg-[#70bad1]"
+                        }`}
+                      >
+                        {tab.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {!attributesStatus.error && attributesStatus.loading && (
               <div className="px-4 py-8 text-center text-gray-500">
                 Loading advanced search filters...
@@ -653,7 +774,7 @@ const AdvancedSearch = () => {
 
             {!attributesStatus.loading &&
               !attributesStatus.error &&
-              sections.map((section) => (
+              visibleSections.map((section) => (
                 <div key={section.title}>
                   <SectionHeader title={section.title} />
                   <div className="space-y-1.5 px-2 py-5 pb-10">
@@ -710,8 +831,8 @@ const AdvancedSearch = () => {
                                   value,
                                 )
                               }
-                              options={attribute.values}
-                              disabled={attribute.values.length === 0}
+                              options={attribute.options}
+                              disabled={attribute.options.length === 0}
                             />
                           )}
                         </div>
@@ -723,9 +844,9 @@ const AdvancedSearch = () => {
 
             {!attributesStatus.loading &&
               !attributesStatus.error &&
-              sections.length === 0 && (
+              visibleSections.length === 0 && (
                 <div className="px-4 py-8 text-center text-gray-500">
-                  No advanced search filters available.
+                  No advanced search filters available for {activeTab?.label}.
                 </div>
               )}
 

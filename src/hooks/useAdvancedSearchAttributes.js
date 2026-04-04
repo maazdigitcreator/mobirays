@@ -1,22 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { advancedSearchService } from "../services/advancedSearchService";
+import { getAdvancedSearchConfiguredFieldType } from "../utils/advancedSearchConfig";
 
 const normalizeText = (value) => String(value || "").trim();
-
-const normalizeKey = (value) =>
-  normalizeText(value)
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "_")
-    .replace(/^_+|_+$/g, "");
-
-const normalizeValues = (values) =>
-  Array.from(
-    new Set(
-      (Array.isArray(values) ? values : [])
-        .map((value) => normalizeText(value))
-        .filter(Boolean),
-    ),
-  );
 
 const normalizeCategoryId = (value) => {
   const normalizedValue = normalizeText(
@@ -57,38 +43,94 @@ const parseOptionalNumber = (value) => {
   return Number.isFinite(parsedValue) ? parsedValue : null;
 };
 
-const normalizeInputType = (value) => {
-  const normalizedValue = normalizeKey(value);
-
-  if (
-    normalizedValue === "select" ||
-    normalizedValue === "dropdown" ||
-    normalizedValue === "multi_select"
-  ) {
-    return "multi_select";
+const normalizeOptionValue = (value) => {
+  if (value === null || value === undefined || value === "") {
+    return null;
   }
 
-  if (
-    normalizedValue === "range" ||
-    normalizedValue === "slider" ||
-    normalizedValue === "min_max"
-  ) {
-    return "range";
+  if (typeof value === "number") {
+    return value;
   }
 
-  if (
-    normalizedValue === "checkbox" ||
-    normalizedValue === "boolean" ||
-    normalizedValue === "toggle"
-  ) {
-    return "checkbox";
+  const normalizedValue = normalizeText(value);
+
+  if (!normalizedValue) {
+    return null;
   }
 
-  if (normalizedValue === "text" || normalizedValue === "input") {
-    return "text";
+  const parsedValue = Number(normalizedValue);
+  return Number.isFinite(parsedValue) ? parsedValue : normalizedValue;
+};
+
+const normalizeOptions = (values) => {
+  const seenValues = new Set();
+
+  return (Array.isArray(values) ? values : []).reduce((accumulator, value) => {
+    const option =
+      value && typeof value === "object" && !Array.isArray(value)
+        ? {
+            label: normalizeText(
+              value.name ?? value.label ?? value.value ?? value.id,
+            ),
+            value: normalizeOptionValue(
+              value.id ?? value.value ?? value.slug ?? value.name,
+            ),
+          }
+        : {
+            label: normalizeText(value),
+            value: normalizeOptionValue(value),
+          };
+
+    if (!option.label || option.value === null) {
+      return accumulator;
+    }
+
+    const dedupeKey = `${typeof option.value}:${String(option.value)}`;
+
+    if (seenValues.has(dedupeKey)) {
+      return accumulator;
+    }
+
+    seenValues.add(dedupeKey);
+    accumulator.push(option);
+    return accumulator;
+  }, []);
+};
+
+const resolveRangeBounds = (attribute, options, inputType) => {
+  const rangeConfig = attribute?.range || {};
+  const explicitMin = parseOptionalNumber(attribute?.min ?? rangeConfig?.min);
+  const explicitMax = parseOptionalNumber(attribute?.max ?? rangeConfig?.max);
+
+  if (explicitMin !== null || explicitMax !== null) {
+    return {
+      min: explicitMin,
+      max: explicitMax,
+    };
   }
 
-  return "";
+  if (inputType !== "range") {
+    return {
+      min: null,
+      max: null,
+    };
+  }
+
+  const numericOptions = options
+    .map((option) => parseOptionalNumber(option.value))
+    .filter((value) => value !== null);
+
+  if (numericOptions.length === 0) {
+    return {
+      min: null,
+      max: null,
+    };
+  }
+
+  return {
+    min: Math.min(...numericOptions),
+    max: Math.max(...numericOptions),
+  };
 };
 
 const normalizeAttributes = (attributes, sectionTitle, sectionCategoryIds) =>
@@ -96,8 +138,7 @@ const normalizeAttributes = (attributes, sectionTitle, sectionCategoryIds) =>
     .map((attribute) => {
       const name = normalizeText(attribute?.name);
       const attributeId = normalizeText(attribute?.attribute_id ?? name);
-      const fieldKey = normalizeKey(attributeId || name);
-      const rangeConfig = attribute?.range || {};
+      const fieldKey = attributeId || normalizeText(`${sectionTitle}_${name}`);
       const brandCategoryIds = normalizeCategoryIds(
         attribute?.brand_category_id,
         attribute?.brand_category_ids,
@@ -105,30 +146,34 @@ const normalizeAttributes = (attributes, sectionTitle, sectionCategoryIds) =>
         attribute?.brand_categories,
         sectionCategoryIds,
       );
-      const inputType = normalizeInputType(
-        attribute?.input_type ||
-          attribute?.inputType ||
-          attribute?.control_type ||
-          attribute?.filter_type ||
-          attribute?.type,
-      );
+      const options = normalizeOptions(attribute?.values);
+      const inputType = getAdvancedSearchConfiguredFieldType({
+        fieldKey,
+        sectionTitle,
+        name,
+      });
+      const rangeBounds = resolveRangeBounds(attribute, options, inputType);
 
       if (!name || !fieldKey) {
         return null;
       }
 
+      const normalizedPayloadKey = name?.trim().toLowerCase() || name;
+
       return {
         attributeId,
         fieldKey,
+        payloadKey: normalizedPayloadKey,
         name,
         sectionTitle,
-        values: normalizeValues(attribute?.values),
+        values: options.map((option) => option.label),
+        options,
         inputType,
-        min: parseOptionalNumber(attribute?.min ?? rangeConfig?.min),
-        max: parseOptionalNumber(attribute?.max ?? rangeConfig?.max),
-        step: parseOptionalNumber(attribute?.step ?? rangeConfig?.step),
-        unit: normalizeText(attribute?.unit ?? rangeConfig?.unit),
-        prefix: normalizeText(attribute?.prefix ?? rangeConfig?.prefix),
+        min: rangeBounds.min,
+        max: rangeBounds.max,
+        step: parseOptionalNumber(attribute?.step ?? attribute?.range?.step),
+        unit: normalizeText(attribute?.unit ?? attribute?.range?.unit),
+        prefix: normalizeText(attribute?.prefix ?? attribute?.range?.prefix),
         placeholder: normalizeText(attribute?.placeholder),
         brandCategoryIds,
       };

@@ -29,6 +29,15 @@ import {
 import { decodeAdvancedSearchQuery } from '../utils/advancedSearchQuery';
 import { filterProductsByCategory } from '../utils/filterHelpers';
 
+const parseCategoryId = (value) => {
+    if (value === null || value === undefined || value === '') {
+        return null;
+    }
+
+    const parsedValue = Number(value);
+    return Number.isFinite(parsedValue) ? parsedValue : null;
+};
+
 const SearchPage = () => {
     const location = useLocation();
     const { allProducts, allNews, allReviews, loading } = useData();
@@ -48,6 +57,10 @@ const SearchPage = () => {
     );
     const searchQuery = searchParams.get('q') || '';
     const isAdvancedSearchMode = searchParams.get('advanced') === '1';
+    const activeCategoryId = useMemo(
+        () => parseCategoryId(searchParams.get('category')),
+        [searchParams],
+    );
     const appliedFilters = useMemo(
         () => decodeAdvancedSearchQuery(searchParams.get('filters')),
         [searchParams],
@@ -55,12 +68,17 @@ const SearchPage = () => {
     const hasAppliedFilters = Object.keys(appliedFilters).length > 0;
     const isFilteredView = isAdvancedSearchMode && !searchQuery;
     const advancedRequestCategories = useMemo(
-        () => buildAdvancedSearchRequestPayload(attributes, appliedFilters),
-        [attributes, appliedFilters],
+        () => buildAdvancedSearchRequestPayload(attributes, appliedFilters, {
+            activeCategoryId,
+            includeEmptyActiveCategory: activeCategoryId !== null,
+        }),
+        [activeCategoryId, appliedFilters, attributes],
     );
     const advancedFiltersMissingCategoryIds = useMemo(
-        () => getAdvancedSearchAttributesMissingCategoryIds(attributes, appliedFilters),
-        [attributes, appliedFilters],
+        () => getAdvancedSearchAttributesMissingCategoryIds(attributes, appliedFilters, {
+            activeCategoryId,
+        }),
+        [activeCategoryId, appliedFilters, attributes],
     );
 
     // Fetch banners from API
