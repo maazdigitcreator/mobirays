@@ -17,7 +17,7 @@ const AnnouncementModal = ({ announcement, onClose, isOpen }) => {
       />
 
       {/* Modal Container */}
-      <div className="relative w-[700px] h-[90%] transform overflow-hidden bg-white shadow-2xl transition-all duration-300 animate-in fade-in zoom-in slide-in-from-bottom-4 mx-4 flex flex-col">
+      <div className="relative w-full max-w-[700px] h-auto sm:h-[90%] max-h-[90vh] overflow-y-auto sm:overflow-hidden bg-white shadow-2xl transition-all duration-300 animate-in fade-in zoom-in flex flex-col">
         {/* Top Accent Bar */}
         <div className="h-1.5 w-full bg-gradient-to-r from-[#0580A5] to-[#046a8a]" />
 
