@@ -80,8 +80,8 @@ const SignUp = () => {
                 <div className="w-full lg:w-3/4">
                     <PageBanner heading="Sign Up" banner={pageBanners['signup_banner_1']} />
                     <div>
-                        <div className="w-full flex px-4 pt-5 md:px-8 lg:px-0">
-                            <div className="text-black text-[24px] leading-tight space-y-2 px-3">
+                        <div className="w-full flex pt-5 md:px-8 lg:px-0">
+                            <div className="text-black sm:text-[24px] text-base leading-tight space-y-2 px-3">
 
                                 <div className="space-y-2">
                                     <p>Why register</p>
@@ -99,7 +99,7 @@ const SignUp = () => {
 
                         <div className="w-full flex mt-8">
                             <div className="w-full bg-[#F0F0F0] p-8">
-                                <h2 className="text-[32px] font-bold text-black mb-6">Create account</h2>
+                                <h2 className="sm:text-[32px] text-[20px] font-bold text-black mb-6">Create account</h2>
 
                                 {status.error && (
                                     <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 text-sm">
@@ -115,7 +115,7 @@ const SignUp = () => {
                                 <form className="space-y-6" onSubmit={handleSubmit}>
                                     {/* Name Field */}
                                     <div>
-                                        <label className="block text-black mb-2 text-[24px]">
+                                        <label className="block text-black mb-2 sm:text-[24px] text-base">
                                             Your Nickname
                                         </label>
                                         <input
@@ -124,14 +124,14 @@ const SignUp = () => {
                                             value={form.name}
                                             onChange={handleChange}
                                             required
-                                            className="w-full px-4 py-3 border-1 border-[#0580A5] bg-white focus:outline-none focus:border-[#0580A5]"
+                                            className="w-full px-4 sm:py-3 py-2 border-1 border-[#0580A5] bg-white focus:outline-none focus:border-[#0580A5]"
                                             placeholder=""
                                         />
                                     </div>
 
                                     {/* Email Field */}
                                     <div>
-                                        <label className="block text-black text-[24px] mb-2">
+                                        <label className="block text-black sm:text-[24px] text-base mb-2">
                                             Your Email
                                         </label>
                                         <input
@@ -140,14 +140,14 @@ const SignUp = () => {
                                             value={form.email}
                                             onChange={handleChange}
                                             required
-                                            className="w-full px-4 py-3 border-1 border-[#0580A5] bg-white focus:outline-none focus:border-[#0580A5]"
+                                            className="w-full px-4 sm:py-3 py-2 border-1 border-[#0580A5] bg-white focus:outline-none focus:border-[#0580A5]"
                                             placeholder=""
                                         />
                                     </div>
 
                                     {/* Password Field */}
                                     <div>
-                                        <label className="block text-black text-[24px] mb-2">
+                                        <label className="block text-black sm:text-[24px] text-base mb-2">
                                             Password (6 to 20 characters)
                                         </label>
                                         <input
@@ -156,7 +156,7 @@ const SignUp = () => {
                                             value={form.password}
                                             onChange={handleChange}
                                             required
-                                            className="w-full px-4 py-3 border-1 border-[#0580A5] bg-white focus:outline-none focus:border-[#0580A5]"
+                                            className="w-full px-4 sm:py-3 py-2 border-1 border-[#0580A5] bg-white focus:outline-none focus:border-[#0580A5]"
                                             placeholder=""
                                             minLength="6"
                                             maxLength="20"
@@ -177,7 +177,7 @@ const SignUp = () => {
                                                 />
                                                 <div className="w-11 h-6 bg-[#BEBEBF] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0580A5]"></div>
                                             </label>
-                                            <span className="text-[20px] font-medium text-black">
+                                            <span className="sm:text-[20px] text-sm text-black ">
                                                 I agree for MobiRays to store my email address, nickname and password
                                             </span>
                                         </div>
@@ -194,7 +194,7 @@ const SignUp = () => {
                                                 />
                                                 <div className="w-11 h-6 bg-[#BEBEBF] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0580A5]"></div>
                                             </label>
-                                            <span className="text-[20px] text-black font-medium">
+                                            <span className="sm:text-[20px] text-sm text-black ">
                                                 I am at least 16 years old
                                             </span>
                                         </div>
@@ -205,7 +205,7 @@ const SignUp = () => {
                                         <button
                                             type="submit"
                                             disabled={status.loading}
-                                            className="bg-[#0580A5] text-white px-12 py-3 text-lg font-semibold hover:bg-[#046a8a] cursor-pointer transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                                            className="bg-[#0580A5] text-white px-7 sm:px-12 py-1.5 sm:py-3 text-sm sm:text-lg font-semibold hover:bg-[#046a8a] cursor-pointer transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                                         >
                                             {status.loading ? 'Creating account...' : 'Submit'}
                                         </button>

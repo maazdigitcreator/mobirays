@@ -21,19 +21,19 @@ const SubNewsBanner = ({ heading, bannerImage, date, commentsCount, onCommentsCl
                     {/* Left side - Device name with slanted edge */}
                     <div className="absolute -bottom-1 left-0 w-full h-[10px] sm:h-[16px] bg-[#0580A5]"></div>
 
-                    <div className="relative w-full flex items-end">
+                    <div className="relative w-full flex items-end h-full">
                         {/* Title Box */}
                         <div
-                            className="latest-products-clip bg-[#0580A5] text-white w-fit sm:h-14 h-10 flex items-center relative z-10"
+                            className="latest-products-clip bg-[#0580A5] text-white w-fit max-w-[80%] sm:max-w-none sm:h-14 h-10 flex items-center relative z-10"
                         >
-                            <h1 className="sm:text-[26px] text-[18px] pl-2 sm:pl-4">{heading}</h1>
+                            <h1 className="sm:text-[26px] text-[13px] pl-2 sm:pl-4 truncate whitespace-nowrap">{heading}</h1>
                         </div>
                     </div>
 
                     {/* Right side - Share Icon */}
-                    <div className="h-full flex gap-20 justify-between">
-                        <button className="hover:cursor-pointer flex items-center transition-colors w-fit pb-7 ">
-                            <img src={shareIcon} width={25} alt="" />
+                    <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center z-20 pb-5 sm:pb-8">
+                        <button className="hover:cursor-pointer flex items-center transition-colors">
+                            <img src={shareIcon} className="w-[18px] sm:w-[25px]" alt="Share" />
                         </button>
                     </div>
                 </div>
@@ -41,26 +41,25 @@ const SubNewsBanner = ({ heading, bannerImage, date, commentsCount, onCommentsCl
 
             {/* Hero Section with Background Image */}
             <div
-                className="w-full sm:h-[63vh] relative bg-cover bg-top mb-2"
+                className="w-full h-[200px] sm:h-[63vh] relative bg-cover bg-top mb-2"
                 style={{ backgroundImage: `url(${bannerImage})` }}
             >
                 {/* Bottom Section - Search Bar and Icons */}
-                <div className="absolute bg-[#0580A58A]/54 bottom-0 left-0 right-0 grid grid-cols-12 items-center justify-between gap-4 p-4 sm:px-10 sm:py-5 ">
+                <div className="absolute bg-[#0580A58A] bottom-0 left-0 right-0 flex flex-row items-center justify-between gap-3 p-2 sm:px-10 sm:py-5">
 
-                    <div className='col-span-5  text-white text-2xl w-full'>
+                    <div className='text-white text-xs sm:text-2xl whitespace-nowrap'>
                         {date}
                     </div>
 
-
                     {/* Icons Row - Right Side */}
-                    <div className="col-span-7 grid grid-cols-2 gap-0 items-center">
-                        <button onClick={onCommentsClick} className="flex items-center gap-3 cursor-pointer">
-                            <img src={commentsIcon} alt="Comments" className="w-8 h-8 sm:w-10 sm:h-10 " />
-                            <p className="text-white text-xl font-light">Comments ({commentsCount || 0})</p>
+                    <div className="flex flex-row items-center justify-end gap-3 sm:gap-8">
+                        <button onClick={onCommentsClick} className="flex items-center sm:gap-3 gap-2 cursor-pointer">
+                            <img src={commentsIcon} alt="Comments" className="w-6 h-6 sm:w-10 sm:h-10 object-contain" />
+                            <p className="text-white text-xs sm:text-xl font-light whitespace-nowrap">Comments ({commentsCount || 0})</p>
                         </button>
-                        <button onClick={onPostCommentClick} className="flex items-center gap-3 cursor-pointer">
-                            <img src={commentsIcon} alt="Comments" className="w-8 h-8 sm:w-10 sm:h-10 " />
-                            <p className="text-white text-xl font-light">Post your comment</p>
+                        <button onClick={onPostCommentClick} className="flex items-center sm:gap-3 gap-2 cursor-pointer">
+                            <img src={commentsIcon} alt="Comments" className="w-6 h-6 sm:w-10 sm:h-10 object-contain" />
+                            <p className="text-white text-xs sm:text-xl font-light whitespace-nowrap">Post your comment</p>
                         </button>
                     </div>
                 </div>

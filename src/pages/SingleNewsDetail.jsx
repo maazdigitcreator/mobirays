@@ -219,13 +219,13 @@ const SingleNewsDetail = () => {
             <div>
               <div>
                 <div className="bg-gradient-to-r from-[#1fa3b8] via-[#8fd0de] to-white p-3">
-                  <h1 className="text-3xl text-black">
+                  <h1 className="sm:text-3xl text-[22px] text-black">
                     {newsData?.name ||
                       "Galaxy S20 FE (Fan Edition) Review, The price champion"}
                   </h1>
                 </div>
 
-                <p className="my-3 text-2xl px-4 pt-2">
+                <p className="my-3 text-base sm:text-2xl sm:px-4 px-2 pt-2">
                   {newsData?.description ||
                     "Just a day after the One UI 3.0 beta for the original Galaxy $20 trio went public in South Korea, Samsung started rolling it out to users in the US as well. Soon, the update should also reach Europe (Germany, Poland, the UK), India and China."}
                 </p>
@@ -252,7 +252,7 @@ const SingleNewsDetail = () => {
                       style={{
                         clipPath:
                           "polygon(0% 100%, 0px 0%, calc(100% - 60px) 0%, 100% 100%)",
-                        paddingLeft: "0px",
+                        paddingLeft: "5px",
                         paddingRight: "60px",
                       }}
                     >
@@ -283,7 +283,7 @@ const SingleNewsDetail = () => {
                     {/* Box 2: Rating Breakdown */}
                     <div className="border-2 border-[#0580A5] p-6">
                       <h3 className="text-lg font-semibold mb-4 text-black text-center">
-                        RATING BREAKDOWN
+                        OVERALL RATING
                       </h3>
                       <div className="space-y-2 text-black">
                         {[5, 4, 3, 2, 1].map((star) => {
@@ -413,8 +413,7 @@ const SingleNewsDetail = () => {
                           onChange={handleReviewChange}
                           placeholder="Add Title"
                           required
-                          className="border-1 px-3 py-1 focus:outline-none bg-white border-[#0580A5] flex-shrink-0 placeholder-black text-black placeholder:font-semibold placeholder:text-lg"
-                          style={{ width: "300px" }}
+                          className="border-1 px-3 py-1 focus:outline-none bg-white border-[#0580A5] flex-shrink-0 placeholder-black text-black placeholder:font-semibold placeholder:text-lg w-[170px] sm:w-[250px]"
                         />
                         <div className="flex items-center gap-1">
                           {[...Array(5)].map((_, i) => (
@@ -456,14 +455,14 @@ const SingleNewsDetail = () => {
                       </div>
                     </form>
 
-                    <div className="flex flex-col sm:flex-row gap-4 justify-end items-center mt-2">
+                    <div className="flex sm:flex-row gap-4 justify-between sm:justify-end items-center mt-2 mb-10 sm:mb-0">
                       <Link
                         to="/reviews"
-                        className="flex items-center justify-center border-2 border-[#0580A5] text-black px-6 py-2 rounded-full hover:bg-[#0580A5] hover:text-white transition-colors text-base cursor-pointer uppercase"
+                        className="flex items-center justify-center border-2 border-[#0580A5] text-black sm:px-6 px-4 py-2 rounded-full hover:bg-[#0580A5] hover:text-white transition-colors text-base cursor-pointer"
                       >
                         Read All Reviews&gt;&gt;
                       </Link>
-                      <button className="border-2 border-[#0580A5] text-black px-6 py-2 rounded-full hover:bg-[#0580A5] hover:text-white transition-colors  text-base cursor-pointer uppercase">
+                      <button className="border-2 border-[#0580A5] text-black sm:px-6 px-4 py-2 rounded-full hover:bg-[#0580A5] hover:text-white transition-colors text-base cursor-pointer">
                         Post a Suggestion&gt;&gt;
                       </button>
                     </div>

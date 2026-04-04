@@ -8,21 +8,21 @@ const GlossarySection = ({ letter, terms, extraPadding = false, isNumeric = fals
 
   return (
     <div className="flex gap-1 relative">
-      <div className="w-[12%] flex-shrink-0 text-black px-2 py-1.5 flex items-center border border-[#0580A5] justify-center">
+      <div className="w-[25%] sm:w-[12%] flex-shrink-0 text-black px-2 py-1.5 flex items-center border border-[#0580A5] justify-center">
         <span className={`${isNumeric ? 'text-5xl font-semibold' : 'text-7xl font-bold'} ${!isNumeric ? getLetterClass() : ''}`}>
           {letter}
         </span>
       </div>
 
-      <div className="w-[4%] flex-shrink-0 relative mt-1.5 -mb-1.5">
+      <div className="w-[6%] sm:w-[4%] flex-shrink-0 relative mt-1.5 -mb-1.5">
         <div className="border-none flex h-full">
-          <div className="w-full h-full border border-[#0580A5]" style={{ transform: 'skewY(14deg)' }}>
-            <div className="p-4 text-white" style={{ transform: 'skewY(14deg)' }}></div>
+          <div className="w-full h-full border border-[#0580A5] skew-y-[22deg] sm:skew-y-[14deg]">
+            <div className="p-4 text-white skew-y-[10deg] sm:skew-y-[14deg]"></div>
           </div>
         </div>
       </div>
 
-      <div className=" border border-[#0580A5] px-3 py-2.5 items-center mt-3 h-full w-[84%]">
+      <div className=" border border-[#0580A5] px-3 py-2.5 items-center mt-3 h-full w-[70%] sm:w-[84%]">
         <span className="text-black text-xs sm:text-base">
           {terms.map((term, index) => (
             <p key={index}>{term}</p>

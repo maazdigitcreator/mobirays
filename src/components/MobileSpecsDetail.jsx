@@ -230,7 +230,7 @@ const MobileSpecsDetail = ({ productData, onCommentsClick }) => {
       {/* Header Section with Device Name and Stats */}
       <div className="relative z-10 w-full mb-2 mt-1 overflow-visible">
         {/* Background bar */}
-        <div className="w-full h-10 sm:h-12 flex items-center justify-between">
+        <div className="w-full h-auto sm:h-12 flex items-center justify-between">
           {/* Left side - Device name with slanted edge */}
           <div className="absolute -bottom-1 left-0 w-full h-[10px] sm:h-[16px] bg-[#0580A5]"></div>
 
@@ -238,7 +238,7 @@ const MobileSpecsDetail = ({ productData, onCommentsClick }) => {
             {/* Horizontal Line Background */}
 
             {/* Title Box */}
-            <div className="latest-products-clip bg-[#0580A5] text-white w-fit sm:h-14 h-12 mr-2 flex items-center relative z-10">
+            <div className="latest-products-clip bg-[#0580A5] text-white w-fit sm:h-14 mr-2 flex items-center relative z-10">
               <h1 className="sm:text-[26px] text-[16px] pl-2 sm:pl-4">
                 {device.name}
               </h1>

@@ -80,8 +80,8 @@ const Login = () => {
                 <div className="w-full lg:w-3/4">
                     <PageBanner heading="Login" banner={pageBanners['signup_banner_1']} />
                     <div>
-                        <div className="w-full flex px-4 pt-5 md:px-8 lg:px-0">
-                            <div className="text-black text-[24px] leading-tight space-y-2 px-3">
+                        <div className="w-full flex pt-5 md:px-8 lg:px-0">
+                            <div className="text-black sm:text-[24px] text-base leading-tight space-y-2 px-3">
 
                                 <div className="space-y-2">
                                     <p>Welcome back!</p>
@@ -94,7 +94,7 @@ const Login = () => {
 
                         <div className="w-full flex mt-8">
                             <div className="w-full bg-[#F0F0F0] p-8">
-                                <h2 className="text-[32px] font-bold text-black mb-6">Login</h2>
+                                <h2 className="sm:text-[32px] text-[20px] font-bold text-black mb-6">Login</h2>
 
                                 {status.error && (
                                     <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 text-sm">
@@ -105,7 +105,7 @@ const Login = () => {
                                 <form className="space-y-6" onSubmit={handleSubmit}>
                                     {/* Email Field */}
                                     <div>
-                                        <label className="block text-black text-[24px] mb-2">
+                                        <label className="block text-black sm:text-[24px] text-base mb-2">
                                             Your Email
                                         </label>
                                         <input
@@ -114,14 +114,14 @@ const Login = () => {
                                             value={form.email}
                                             onChange={handleChange}
                                             required
-                                            className="w-full px-4 py-3 border-1 border-[#0580A5] bg-white focus:outline-none focus:border-[#0580A5]"
+                                            className="w-full px-4 sm:py-3 py-2 border-1 border-[#0580A5] bg-white focus:outline-none focus:border-[#0580A5]"
                                             placeholder=""
                                         />
                                     </div>
 
                                     {/* Password Field */}
                                     <div>
-                                        <label className="block text-black text-[24px] mb-2">
+                                        <label className="block text-black sm:text-[24px] text-base mb-2">
                                             Password
                                         </label>
                                         <input
@@ -130,7 +130,7 @@ const Login = () => {
                                             value={form.password}
                                             onChange={handleChange}
                                             required
-                                            className="w-full px-4 py-3 border-1 border-[#0580A5] bg-white focus:outline-none focus:border-[#0580A5]"
+                                            className="w-full px-4 sm:py-3 py-2 border-1 border-[#0580A5] bg-white focus:outline-none focus:border-[#0580A5]"
                                             placeholder=""
                                         />
                                     </div>
@@ -140,7 +140,7 @@ const Login = () => {
                                         <button
                                             type="submit"
                                             disabled={status.loading}
-                                            className="bg-[#0580A5] text-white px-12 py-3 text-lg font-semibold hover:bg-[#046a8a] cursor-pointer transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                                            className="bg-[#0580A5] text-white px-7 sm:px-12 py-1.5 sm:py-3 text-sm sm:text-lg font-semibold hover:bg-[#046a8a] cursor-pointer transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                                         >
                                             {status.loading ? 'Logging in...' : 'Login'}
                                         </button>

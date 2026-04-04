@@ -628,7 +628,7 @@ const MobileSpecs = () => {
                                 <h2 className="sm:text-2xl text-[18px] lg:pl-2 sm:lg:pl-4">User Reviews</h2>
                             </div>
                             <div>
-                                <Link to="/reviews" className='text-[#0060FF] text-xl underline cursor-pointer '>Read All User Reviews</Link>
+                                <Link to="/reviews" className='text-[#0060FF] sm:text-xl underline cursor-pointer text-sm'>Read All User Reviews</Link>
                             </div>
                         </div>
 
@@ -762,14 +762,14 @@ const MobileSpecs = () => {
 
                                 {/* Title and Stars Row */}
                                 <div className="flex items-center gap-4 mb-3">
-                                     <input
+                                    <input
                                         type="text"
                                         name="title"
                                         value={reviewForm.title}
                                         onChange={handleReviewChange}
                                         placeholder="Add Title"
                                         required
-                                        className="border-1 px-3 py-1 focus:outline-none bg-white border-[#0580A5] flex-shrink-0 placeholder-black text-black placeholder:font-semibold placeholder:text-lg w-[250px]"
+                                        className="border-1 px-3 py-1 focus:outline-none bg-white border-[#0580A5] flex-shrink-0 placeholder-black text-black placeholder:font-semibold placeholder:text-lg w-[170px] sm:w-[250px]"
 
                                     />
                                     <div className="flex items-center gap-1">
@@ -814,10 +814,10 @@ const MobileSpecs = () => {
                             </form>
 
                             <div className="flex sm:flex-row gap-4 justify-between sm:justify-end items-center mt-2">
-                                <Link to="/reviews" className="flex items-center justify-center border-2 border-[#0580A5] text-black sm:px-6 px-5 py-2 rounded-full hover:bg-[#0580A5] hover:text-white transition-colors text-base cursor-pointer">
+                                <Link to="/reviews" className="flex items-center justify-center border-2 border-[#0580A5] text-black sm:px-6 px-4 py-2 rounded-full hover:bg-[#0580A5] hover:text-white transition-colors text-base cursor-pointer">
                                     Read All Reviews&gt;&gt;
                                 </Link>
-                                <button className="border-2 border-[#0580A5] text-black sm:px-6 px-5 py-2 rounded-full hover:bg-[#0580A5] hover:text-white transition-colors  text-base cursor-pointer ">
+                                <button className="border-2 border-[#0580A5] text-black sm:px-6 px-4 py-2 rounded-full hover:bg-[#0580A5] hover:text-white transition-colors  text-base cursor-pointer ">
                                     Post a Suggestion&gt;&gt;
                                 </button>
                             </div>

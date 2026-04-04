@@ -36,39 +36,66 @@ const LikedProductsList = ({ title = "Liked Products", products, itemImage }) =>
     return (
         <div className="w-full container">
             <div>
-                <div className="relative w-full mb-9 overflow-hidden">
-                    {/* Background bar */}
-                    <div className="w-full h-10 sm:h-14 flex items-center justify-between">
-                        {/* Left side - Device name with slanted edge */}
-                        <div className="absolute -bottom-1 left-0 w-full h-[10px] sm:h-[16px] bg-[#0580A5]"></div>
+            {/* Desktop & Mobile Responsive Header */}
+            <div className="w-full mb-9">
+                {/* DESKTOP LAYOUT */}
+                <div className="hidden sm:flex relative w-full h-14 items-center justify-between overflow-hidden">
+                    {/* Full width blue line */}
+                    <div className="absolute -bottom-1 left-0 w-full h-[16px] bg-[#0580A5]"></div>
 
-                        <div className="relative w-full flex items-end">
-                            {/* Title Box */}
-                            <div
-                                className="latest-products-clip bg-[#0580A5] text-white w-fit sm:h-14 h-10 flex items-center relative z-10"
-                            >
-                                <h1 className="sm:text-[26px] text-[18px] pl-2 sm:pl-4">{title}</h1>
-                            </div>
+                    <div className="relative flex items-end">
+                        <div className="latest-products-clip bg-[#0580A5] text-white w-fit h-14 flex items-center relative z-10">
+                            <h1 className="text-[26px] pl-4 pr-6">{title}</h1>
                         </div>
+                    </div>
 
-                        {/* Right side */}
-                        <div className="flex gap-20 mb-4 justify-start items-start ">
-                            {/* Search Bar */}
-                            <div className="flex">
-                                <input
-                                    type="text"
-                                    placeholder="Search"
-                                    value={searchQuery}
-                                    onChange={handleSearchChange}
-                                    className="w-full sm:w-[400px] border-2 border-[#0580A5] py-1 px-2 focus:outline-none focus:border-[#046a8a] text-black placeholder-gray-500"
-                                />
-                                <button className=" right-0 top-0 min-h-full px-4 bg-[#0580A5] hover:bg-[#046a8a] transition-colors flex items-center justify-center">
-                                    <Search className="text-white" size={20} />
-                                </button>
-                            </div>
+                    <div className="flex z-10 mb-4 items-start pr-0">
+                        <div className="flex">
+                            <input
+                                type="text"
+                                placeholder="Search"
+                                value={searchQuery}
+                                onChange={handleSearchChange}
+                                className="w-[350px] border-2 border-[#0580A5] py-1 px-3 focus:outline-none focus:border-[#046a8a] text-black placeholder-gray-500"
+                            />
+                            <button
+                                type="button"
+                                className="px-4 bg-[#0580A5] hover:bg-[#046a8a] transition-colors flex items-center justify-center"
+                            >
+                                <Search className="text-white" size={20} />
+                            </button>
                         </div>
                     </div>
                 </div>
+
+                {/* MOBILE LAYOUT */}
+                <div className="flex sm:hidden flex-col-reverse gap-4">
+                    <div className="relative w-full h-10 overflow-hidden">
+                        {/* Mobile full width blue line */}
+                        <div className="absolute -bottom-1 left-0 w-full h-[12px] bg-[#0580A5]"></div>
+
+                        <div className="latest-products-clip bg-[#0580A5] text-white w-fit h-10 flex items-center relative z-10">
+                            <h1 className="text-[18px] pl-2 pr-6">{title}</h1>
+                        </div>
+                    </div>
+
+                    <div className="flex w-full z-10">
+                        <input
+                            type="text"
+                            placeholder="Search"
+                            value={searchQuery}
+                            onChange={handleSearchChange}
+                            className="flex-1 w-full border-2 border-[#0580A5] py-1.5 px-3 focus:outline-none focus:border-[#046a8a] text-black placeholder-gray-500"
+                        />
+                        <button
+                            type="button"
+                            className="px-4 bg-[#0580A5] hover:bg-[#046a8a] transition-colors flex items-center justify-center"
+                        >
+                            <Search className="text-white" size={20} />
+                        </button>
+                    </div>
+                </div>
+            </div>
 
 
             </div>

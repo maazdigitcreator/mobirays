@@ -14,7 +14,7 @@ const DashboardSidebar = () => {
   ];
 
   return (
-    <div className="col-span-3 bg-[#0580A8] min-h-screen">
+    <div className="w-full lg:col-span-3 bg-[#0580A8] lg:min-h-screen mb-4 lg:mb-0">
       <ul className="flex flex-col gap-2 text-white font-medium items-center py-4 px-2">
         {navItems.map((item) => {
           const isActive = currentPath === item.path;

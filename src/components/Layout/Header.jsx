@@ -222,11 +222,11 @@ const Header = () => {
                     )}
                 </div>
 
-                <div className="px-4 py-3 sm:bg-white search-container bg-[#0891b2]">
+                <div className="px-4 py-3 sm:bg-white search-container bg-[#0891b2] max-w-100vw">
                     <div className="flex gap-4 items-center justify-between">
                         {/* Search Input - Same as Desktop */}
                         <div className="relative flex-1">
-                            <div className="flex items-center border bg-white border-[#0891b2] overflow-hidden">
+                            <div className="flex items-center border bg-white border-[#0891b2] overflow-hidden sm:w-full">
                                 <div className="flex items-center px-3 py-1 flex-1 relative">
 
                                     <input
@@ -238,7 +238,7 @@ const Header = () => {
                                             setIsSearchModalOpen(true);
                                         }}
                                         onFocus={() => setIsSearchModalOpen(true)}
-                                        className="flex-1 outline-none text-sm placeholder-[#1E1E1E] pr-6"
+                                        className="flex-1 outline-none text-sm placeholder-[#1E1E1E]"
                                     />
                                     {searchQuery && (
                                         <button

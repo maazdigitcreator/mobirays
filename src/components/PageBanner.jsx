@@ -4,7 +4,7 @@ const PageBanner = ({ heading, banner }) => {
     return (
         <div className="w-full mb-2">
             {/* Heading Section */}
-            <div className="relative w-full flex items-end justify-center lg:justify-start mb-2">
+            <div className="relative w-full flex items-end justify-start lg:justify-start mb-2">
                 {/* Horizontal Line Background */}
                 <div className="absolute bottom-0 left-0 w-full h-[10px] sm:h-[16px] bg-[#0580A5]"></div>
 

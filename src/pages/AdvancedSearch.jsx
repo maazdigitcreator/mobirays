@@ -733,7 +733,7 @@ const AdvancedSearch = () => {
               <span className="border-[2px] border-[#0580A5] rounded-l-full px-4 sm:px-4 py-2 text-xl sm:text-3xl flex items-center whitespace-nowrap">
                 Result
               </span>
-              <span className="border-[2px] border-l-2 border-[#0580A5] px-10 sm:px-8 text-xl sm:text-3xl py-2 flex items-center">
+              <span className="border-[2px] border-l-2 border-[#0580A5] px-6 sm:px-8 text-xl sm:text-3xl py-2 flex items-center">
                 {previewStatus.loading ? "..." : resultCount.toLocaleString()}
               </span>
               <button

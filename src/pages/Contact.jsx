@@ -95,8 +95,8 @@ const Contact = () => {
                 <div className="w-full lg:w-3/4">
                     <PageBanner heading="Contact Us" banner={pageBanners['contactus_banner_1']} />
                     <div>
-                        <div className="w-full flex justify-center px-4 md:px-8 lg:px-0">
-                            <div className="text-black text-[24px] leading-tight space-y-2 px-3">
+                        <div className="w-full flex justify-center md:px-8 lg:px-0">
+                            <div className="text-black sm:text-[24px] text-base leading-tight space-y-2 px-3">
 
                                 <div className="space-y-2">
                                     <p>We do appreciate your feedback</p>
@@ -110,7 +110,7 @@ const Contact = () => {
                                     <li>- You have a suggestion for improving mobirays.com or you want to request a feature.</li>
                                 </ul>
 
-                                <div className="space-y-2 mt-10">
+                                <div className="space-y-2 sm:mt-10 mt-5">
                                     <p>Before sending us an email, please keep in mind:</p>
                                 </div>
 
@@ -130,7 +130,7 @@ const Contact = () => {
 
                         <div className="w-full flex mt-8">
                             <div className="w-full bg-[#F0F0F0] p-8">
-                                <h2 className="text-[32px] font-bold text-black mb-6">Contact Form</h2>
+                                <h2 className="sm:text-[32px] text-[20px] font-bold text-black mb-6">Contact Form</h2>
 
                                 {status.error && (
                                     <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 text-sm">
@@ -147,7 +147,7 @@ const Contact = () => {
                                 <form className="space-y-6" onSubmit={handleSubmit}>
                                     {/* Name Field */}
                                     <div>
-                                        <label className="block text-black mb-2 text-[24px]">
+                                        <label className="block text-black mb-2 sm:text-[24px] text-base">
                                             Name
                                         </label>
                                         <input
@@ -156,14 +156,14 @@ const Contact = () => {
                                             value={form.name}
                                             onChange={handleChange}
                                             required
-                                            className="w-full px-4 py-3 border-1 border-[#0580A5] bg-white focus:outline-none focus:border-[#0580A5]"
+                                            className="w-full px-4 sm:py-3 py-2 border-1 border-[#0580A5] bg-white focus:outline-none focus:border-[#0580A5]"
                                             placeholder=""
                                         />
                                     </div>
 
                                     {/* Email Field */}
                                     <div>
-                                        <label className="block text-black text-[24px] mb-2">
+                                        <label className="block text-black sm:text-[24px] text-base mb-2">
                                             Your Email
                                         </label>
                                         <input
@@ -172,14 +172,14 @@ const Contact = () => {
                                             value={form.email}
                                             onChange={handleChange}
                                             required
-                                            className="w-full px-4 py-3 border-1 border-[#0580A5] bg-white focus:outline-none focus:border-[#0580A5]"
+                                            className="w-full px-4 sm:py-3 py-2 border-1 border-[#0580A5] bg-white focus:outline-none focus:border-[#0580A5]"
                                             placeholder=""
                                         />
                                     </div>
 
                                     {/* Phone Number Field */}
                                     <div>
-                                        <label className="block text-black text-[24px]  mb-2">
+                                        <label className="block text-black sm:text-[24px] text-base mb-2">
                                             Phone Number
                                         </label>
                                         <input
@@ -188,14 +188,14 @@ const Contact = () => {
                                             value={form.phone}
                                             onChange={handleChange}
                                             required
-                                            className="w-full px-4 py-3 border-1 border-[#0580A5] bg-white focus:outline-none focus:border-[#0580A5]"
+                                            className="w-full px-4 sm:py-3 py-2 border-1 border-[#0580A5] bg-white focus:outline-none focus:border-[#0580A5]"
                                             placeholder=""
                                         />
                                     </div>
 
                                     {/* Message Field */}
                                     <div>
-                                        <label className="block text-black mb-2 text-[24px]">
+                                        <label className="block text-black sm:text-[24px] text-base mb-2">
                                             Your Message
                                         </label>
                                         <textarea
@@ -214,7 +214,7 @@ const Contact = () => {
                                         <button
                                             type="submit"
                                             disabled={status.loading}
-                                            className="bg-[#0580A5] text-white px-12 py-3 text-lg font-semibold hover:bg-[#046a8a] cursor-pointer transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                                            className="bg-[#0580A5] text-white px-7 sm:px-12 py-1.5 sm:py-3 text-lg font-semibold hover:bg-[#046a8a] cursor-pointer transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                                         >
                                             {status.loading ? 'Submitting...' : 'Submit'}
                                         </button>

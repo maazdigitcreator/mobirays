@@ -55,10 +55,10 @@ const SingleReviewDetail = () => {
   const description = reviewData?.description;
   const date = reviewData
     ? new Date(reviewData.updated_at).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "2-digit",
-      })
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+    })
     : "";
   const pageBanners = useMemo(() => {
     const banners = {};
@@ -265,7 +265,7 @@ const SingleReviewDetail = () => {
             <div>
               <div>
                 <div className="bg-gradient-to-r from-[#1fa3b8] via-[#8fd0de] to-white p-3">
-                  <h1 className="text-3xl text-black">{title}</h1>
+                  <h1 className="sm:text-3xl text-[22px] text-black">{title}</h1>
                 </div>
 
                 {/* Dynamic Description */}
@@ -301,18 +301,18 @@ const SingleReviewDetail = () => {
 
                 {/* Description content (moved here if it was commented out, or just ensure flow) */}
                 <div
-                  className="my-4 px-4 text-2xl text-black space-y-4"
+                  className="my-4 sm:px-4 px-2 text-base sm:text-2xl text-black space-y-4"
                   dangerouslySetInnerHTML={{ __html: description }}
                 />
 
                 <div>
-                  <div className="relative w-full flex items-end justify-center lg:justify-start mb-8 mt-3">
+                  <div className="relative w-full flex items-end lg:justify-start mb-8 mt-3">
                     {/* Horizontal Line Background */}
                     <div className="absolute bottom-0 left-0 w-full h-[10px] sm:h-[16px] bg-[#0580A5]"></div>
 
                     {/* Title Box */}
                     <div
-                      className="latest-news-clip lg:latest-products-clip bg-[#0580A5] text-white w-fit h-10 sm:h-12 flex items-center justify-center relative z-10"
+                      className="latest-news-clip lg:latest-products-clip bg-[#0580A5] text-white w-fit h-10 sm:h-12 flex items-center gap-4 sm:gap-0 justify-center relative z-10"
                       style={{
                         clipPath:
                           "polygon(0% 100%, 0px 0%, calc(100% - 60px) 0%, 100% 100%)",
@@ -354,7 +354,7 @@ const SingleReviewDetail = () => {
                       }
 
                       return (
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-15 max-w-5xl mx-auto">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-15 max-w-5xl mx-auto">
                           {/* Left Column */}
                           <div className="space-y-3">
                             {leftColumn.map((item, index) => (
@@ -378,7 +378,7 @@ const SingleReviewDetail = () => {
                                   href={item.link}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="bg-[#0580A5] text-white px-6 py-2 hover:bg-[#046a8a] transition-colors cursor-pointer text-sm rounded-r-full flex items-center"
+                                  className="bg-[#0580A5] text-white px-6 py-2 hover:bg-[#046a8a] transition-colors cursor-pointer text-sm rounded-r-full flex items-center justify-center"
                                 >
                                   GO TO BUYING
                                 </a>
@@ -391,7 +391,7 @@ const SingleReviewDetail = () => {
                             {rightColumn.map((item, index) => (
                               <div
                                 key={index}
-                                className="flex items-stretch gap-2 justify-center lg:justify-start"
+                                className="flex items-stretch gap-2 sm:justify-start justify-center lg:justify-start"
                               >
                                 <div className="border-2 border-[#0580A5] rounded-l-full px-5 py-2 flex items-center justify-center min-w-[100px]">
                                   <span className="font-semibold text-gray-800">
@@ -409,7 +409,7 @@ const SingleReviewDetail = () => {
                                   href={item.link}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="bg-[#0580A5] text-white px-6 py-2 hover:bg-[#046a8a] transition-colors cursor-pointer text-sm rounded-r-full flex items-center"
+                                  className="bg-[#0580A5] text-white px-6 py-2 hover:bg-[#046a8a] transition-colors cursor-pointer text-sm rounded-r-full flex items-center justify-center"
                                 >
                                   GO TO BUYING
                                 </a>
@@ -421,8 +421,8 @@ const SingleReviewDetail = () => {
                     })()}
 
                     {/* Disclaimer Text */}
-                    <div className="mt-6 text-center max-w-4xl mx-auto">
-                      <p className="text-sm text-black leading-relaxed font-medium text-[17px]">
+                    <div className="mt-6 text-center max-w-4xl mx-auto px-2 sm:px-0">
+                      <p className="text-sm sm:font-medium text-black leading-relaxed sm:text-[17px]">
                         <span className="font-semibold">Disclaimer.</span>{" "}
                         Prices are updated daily from local shops and dealers
                         but we cannot guarantee 100% accuracy. Always visit your
@@ -446,14 +446,14 @@ const SingleReviewDetail = () => {
                           paddingRight: "60px",
                         }}
                       >
-                        <h2 className="sm:text-2xl text-[18px] lg:pl-2 sm:lg:pl-2">
+                        <h2 className="sm:text-2xl text-[18px] lg:pl-2 sm:lg:pl-4">
                           User Reviews
                         </h2>
                       </div>
                       <div>
                         <Link
                           to="/reviews"
-                          className="text-[#0060FF] text-xl underline cursor-pointer "
+                          className="text-[#0060FF] sm:text-xl underline cursor-pointer text-sm"
                         >
                           Read All User Reviews
                         </Link>
@@ -463,14 +463,14 @@ const SingleReviewDetail = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-2 sm:px-4">
                       {/* Box 1: Overall Rating */}
                       <div className="border-2 border-[#0580A5] p-6 flex flex-col items-center justify-evenly">
-                        <h3 className="text-lg font-semibold mb-2 text-black">
+                        <h3 className="text-lg font-semibold mb-2 text-black text-center">
                           OVERALL RATING
                         </h3>
                         <div className="text-6xl font-bold text-black">
                           {discussionStats.averageRating}
                           <span className="text-4xl">/5</span>
                         </div>
-                        <p className="text-base text-black mt-2 text-sm">
+                        <p className="text-base text-black mt-2 text-sm text-center">
                           BASED ON{" "}
                           {discussionStats.totalDiscussions.toLocaleString()}{" "}
                           USER REVIEW(S)
@@ -480,7 +480,7 @@ const SingleReviewDetail = () => {
                       {/* Box 2: Rating Breakdown */}
                       <div className="border-2 border-[#0580A5] p-6">
                         <h3 className="text-lg font-semibold mb-4 text-black text-center">
-                          RATING BREAKDOWN
+                          OVERALL RATING
                         </h3>
                         <div className="space-y-2 text-black">
                           {[5, 4, 3, 2, 1].map((star) => {
@@ -540,7 +540,7 @@ const SingleReviewDetail = () => {
                 </div>
 
                 <div
-                  className="my-4 px-4 text-2xl text-black space-y-4"
+                  className="my-4 px-4 text-base sm:text-2xl text-black space-y-4"
                   dangerouslySetInnerHTML={{ __html: description }}
                 />
 
@@ -595,7 +595,7 @@ const SingleReviewDetail = () => {
 
                 <div>
                   <div ref={commentsListRef}>
-                    <div className="relative w-full flex items-end justify-center lg:justify-start mb-5 mt-10">
+                    <div className="relative w-full flex items-end justify-start lg:justify-start mb-5 mt-10">
                       {/* Horizontal Line Background */}
                       <div className="absolute bottom-0 left-0 w-full h-[10px] sm:h-[16px] bg-[#0580A5]"></div>
 
@@ -605,7 +605,7 @@ const SingleReviewDetail = () => {
                         style={{
                           clipPath:
                             "polygon(0% 100%, 0px 0%, calc(100% - 60px) 0%, 100% 100%)",
-                          paddingLeft: "0px",
+                          paddingLeft: "5px",
                           paddingRight: "60px",
                         }}
                       >
@@ -691,8 +691,7 @@ const SingleReviewDetail = () => {
                             onChange={handleReviewChange}
                             placeholder="Add Title"
                             required
-                            className="border-1 px-3 py-1 focus:outline-none bg-white border-[#0580A5] flex-shrink-0 placeholder-black text-black placeholder:font-semibold placeholder:text-lg"
-                            style={{ width: "300px" }}
+                            className="border-1 px-3 py-1 focus:outline-none bg-white border-[#0580A5] flex-shrink-0 placeholder-black text-black placeholder:font-semibold placeholder:text-lg w-[170px] sm:w-[250px]"
                           />
                           <div className="flex items-center gap-1">
                             {[...Array(5)].map((_, i) => (
@@ -734,14 +733,14 @@ const SingleReviewDetail = () => {
                         </div>
                       </form>
 
-                      <div className="flex flex-col sm:flex-row gap-4 justify-end items-center mt-2">
+                      <div className="flex sm:flex-row gap-4 justify-between sm:justify-end items-center mt-2 mb-10 sm:mb-0">
                         <Link
                           to="/reviews"
-                          className="flex items-center justify-center border-2 border-[#0580A5] text-black px-6 py-2 rounded-full hover:bg-[#0580A5] hover:text-white transition-colors text-base cursor-pointer"
+                          className="flex items-center justify-center border-2 border-[#0580A5] text-black sm:px-6 px-4 py-2 rounded-full hover:bg-[#0580A5] hover:text-white transition-colors text-base cursor-pointer"
                         >
                           Read All Reviews&gt;&gt;
                         </Link>
-                        <button className="border-2 border-[#0580A5] text-black px-6 py-2 rounded-full hover:bg-[#0580A5] hover:text-white transition-colors  text-base cursor-pointer ">
+                        <button className="border-2 border-[#0580A5] text-black sm:px-6 px-4 py-2 rounded-full hover:bg-[#0580A5] hover:text-white transition-colors text-base cursor-pointer">
                           Post a Suggestion&gt;&gt;
                         </button>
                       </div>

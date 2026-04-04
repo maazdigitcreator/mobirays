@@ -43,41 +43,65 @@ const ReviewedProductsList = ({
   return (
     <div className="w-full container">
       <div>
-        <div className="relative w-full mb-9 overflow-hidden">
-          {/* Background bar */}
-          <div className="w-full h-10 sm:h-14 flex items-center justify-between">
-            {/* Left side - Device name with slanted edge */}
-            <div className="absolute -bottom-1 left-0 w-full h-[10px] sm:h-[16px] bg-[#0580A5]"></div>
+        {/* Desktop & Mobile Responsive Header */}
+        <div className="w-full mb-9">
+            {/* DESKTOP LAYOUT */}
+            <div className="hidden sm:flex relative w-full h-14 items-center justify-between overflow-hidden">
+                {/* Full width blue line */}
+                <div className="absolute -bottom-1 left-0 w-full h-[16px] bg-[#0580A5]"></div>
 
-            <div className="relative w-full flex items-end">
-              {/* Title Box */}
-              <div className="latest-products-clip bg-[#0580A5] text-white w-fit sm:h-14 h-10 flex items-center relative z-10">
-                <h1 className="sm:text-[26px] text-[18px] pl-2 sm:pl-4">
-                  {title}
-                </h1>
-              </div>
+                <div className="relative flex items-end">
+                    <div className="latest-products-clip bg-[#0580A5] text-white w-fit h-14 flex items-center relative z-10">
+                        <h1 className="text-[26px] pl-4 pr-6">{title}</h1>
+                    </div>
+                </div>
+
+                <div className="flex z-10 mb-4 items-start pr-0">
+                    <div className="flex">
+                        <input
+                            type="text"
+                            placeholder="Search"
+                            value={searchQuery}
+                            onChange={handleSearchChange}
+                            className="w-[350px] border-2 border-[#0580A5] py-1 px-3 focus:outline-none focus:border-[#046a8a] text-black placeholder-gray-500"
+                        />
+                        <button
+                            type="button"
+                            className="px-4 bg-[#0580A5] hover:bg-[#046a8a] transition-colors flex items-center justify-center"
+                        >
+                            <Search className="text-white" size={20} />
+                        </button>
+                    </div>
+                </div>
             </div>
 
-            {/* Right side */}
-            <div className="flex gap-20 mb-4 justify-start items-start ">
-              {/* Search Bar */}
-              <div className="flex">
-                <input
-                  type="text"
-                  placeholder="Search"
-                  value={searchQuery}
-                  onChange={handleSearchChange}
-                  className="w-full sm:w-[400px] border-2 border-[#0580A5] py-1 px-2 focus:outline-none focus:border-[#046a8a] text-black placeholder-gray-500"
-                />
-                <button
-                  type="button"
-                  className="right-0 top-0 min-h-full px-4 bg-[#0580A5] hover:bg-[#046a8a] transition-colors flex items-center justify-center"
-                >
-                  <Search className="text-white" size={20} />
-                </button>
-              </div>
+            {/* MOBILE LAYOUT */}
+            <div className="flex sm:hidden flex-col-reverse gap-4">
+                <div className="relative w-full h-10 overflow-hidden">
+                    {/* Mobile full width blue line */}
+                    <div className="absolute -bottom-1 left-0 w-full h-[12px] bg-[#0580A5]"></div>
+
+                    <div className="latest-products-clip bg-[#0580A5] text-white w-fit h-10 flex items-center relative z-10">
+                        <h1 className="text-[18px] pl-2 pr-6">{title}</h1>
+                    </div>
+                </div>
+
+                <div className="flex w-full z-10">
+                    <input
+                        type="text"
+                        placeholder="Search"
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        className="flex-1 w-full border-2 border-[#0580A5] py-1.5 px-3 focus:outline-none focus:border-[#046a8a] text-black placeholder-gray-500"
+                    />
+                    <button
+                        type="button"
+                        className="px-4 bg-[#0580A5] hover:bg-[#046a8a] transition-colors flex items-center justify-center"
+                    >
+                        <Search className="text-white" size={20} />
+                    </button>
+                </div>
             </div>
-          </div>
         </div>
       </div>
 
@@ -98,34 +122,35 @@ const ReviewedProductsList = ({
             : "No reviewed products found."}
         </div>
       ) : (
-        <div className="flex flex-col gap-6 px-2 sm:px-0">
+        <div className="flex flex-col gap-6 px-0 sm:px-2">
           {currentReviews.map((review) => (
             <div
               key={review.id}
-              className="flex flex-col md:flex-row gap-6 items-start"
+              className="flex md:flex-row sm:gap-6 gap-1 items-start"
             >
               {/* Left Side: Product Image and Name */}
               <div
-                className="w-full md:w-1/4 flex flex-col group cursor-pointer"
+                className="sm:w-full w-[25%] md:w-1/4 flex flex-col group cursor-pointer"
                 onClick={() => handleProductClick(review.product)}
               >
-                <div className="relative mb-3 flex justify-center items-center p-2 bg-blue-50/50 rounded-lg h-48 transition-transform group-hover:scale-105">
-                  <div className="w-full h-full flex items-center justify-center text-6xl text-blue-200">
+                <div className="relative mb-3 flex justify-center items-center p-2 rounded-lg h-auto transition-transform group-hover:scale-105">
+                  <div className="w-full h-full flex items-start justify-center text-6xl">
                     <img
                       src={review.productImage || itemImage || MobileImg}
                       alt={review.productName}
                     />
                   </div>
                 </div>
-                <h3 className="text-[18px] leading-tight uppercase text-[#1E1E1E] line-clamp-2 text-center overflow-hidden px-5">
+                <h3 className="sm:text-[18px] leading-tight uppercase text-[#1E1E1E] line-clamp-2 text-center text-xs
+                 text-start overflow-hidden px-2 sm:px-5">
                   {review.productName}
                 </h3>
               </div>
 
               {/* Right Side: Review Content */}
-              <div className="w-full md:w-3/4 border-2 border-[#0580A5] p-4 relative">
+              <div className="w-full md:w-3/4 border-1 sm:border-2 border-[#0580A5] sm:p-4 p-2 relative">
                 <div className="flex justify-between items-start mb-2">
-                  <h3 className="text-2xl font-normal text-black">
+                  <h3 className="sm:text-2xl text-xl font-normal text-black">
                     {review.title}
                   </h3>
                   <div className="flex flex-col items-end">
@@ -168,7 +193,7 @@ const ReviewedProductsList = ({
                   {review.reviewText}
                 </p>
 
-                <div className="absolute bottom-4 right-4 flex items-center gap-4">
+                <div className="absolute bottom-2 sm:bottom-4 right-4 flex items-center gap-4 sm:text-base text-sm">
                   <button
                     type="button"
                     onClick={() => handleEditOpen(review)}

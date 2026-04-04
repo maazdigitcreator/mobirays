@@ -47,10 +47,10 @@ const SpecificationsTable = ({ productData }) => {
         return (
             <div className="w-full">
                 <div className="relative w-full mb-0 overflow-hidden">
-                    <div className="w-full h-10 sm:h-14 flex items-center justify-between">
+                    <div className="w-full h-auto sm:h-14 flex items-center justify-between">
                         <div className="absolute -bottom-1 left-0 w-full h-[10px] sm:h-[16px] bg-[#0580A5]"></div>
                         <div className="relative w-full flex items-end">
-                            <div className="latest-products-clip bg-[#0580A5] text-white w-fit sm:h-14 h-10 flex items-center relative z-10">
+                            <div className="latest-products-clip bg-[#0580A5] text-white w-fit flex items-center relative z-10">
                                 <h1 className="sm:text-[26px] text-[18px] pl-2 sm:pl-4">
                                     {productData?.name || "Product"} Specifications
                                 </h1>
@@ -71,11 +71,11 @@ const SpecificationsTable = ({ productData }) => {
         <div className="w-full">
             {/* Header */}
             <div className="relative w-full mb-0 overflow-hidden">
-                <div className="w-full h-10 sm:h-14 flex items-center justify-between">
+                <div className="w-full h-auto sm:h-14 flex items-center justify-between">
                     <div className="absolute -bottom-1 left-0 w-full h-[10px] sm:h-[16px] bg-[#0580A5]"></div>
                     <div className="relative w-full flex items-end">
 
-                        <div className="latest-products-clip bg-[#0580A5] text-white w-fit sm:h-14 h-10 flex items-center relative z-10">
+                        <div className="latest-products-clip bg-[#0580A5] text-white w-fit sm:h-14 h-auto flex items-center relative z-10">
                             <h1 className="sm:text-[26px] text-[18px] pl-2 sm:pl-4">
                                 {productData?.name || "Samsung Galaxy Note 20"} Specifications
                             </h1>
@@ -90,7 +90,7 @@ const SpecificationsTable = ({ productData }) => {
                     <div key={sectionIndex} className="flex gap-1">
                         {/* Category Column - Left side (spans all rows) */}
                         <div className="w-[20%] flex-shrink-0  border-2 border-[#0580A5] flex items-center justify-center">
-                            <span className="text-black font-semibold text-base sm:text-xl text-center px-2">
+                            <span className="text-black font-semibold text-sm sm:text-xl text-center px-1 break-words sm:break-words w-full">
                                 {section.category}
                             </span>
                         </div>

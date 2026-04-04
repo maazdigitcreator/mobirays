@@ -29,7 +29,7 @@ const About = () => {
     return (
         <div className="w-full">
             {/* About Banner */}
-            <div className="relative w-full flex items-end justify-center lg:justify-start mb-2 mt-1">
+            <div className="relative w-full flex items-end justify-start lg:justify-start mb-2 mt-1">
                 {/* Horizontal Line Background */}
                 <div className="absolute bottom-0 left-0 w-full h-[10px] sm:h-[16px] bg-[#0580A5]"></div>
 
@@ -52,7 +52,7 @@ const About = () => {
                 </div>
             )}
             <div className="w-full flex justify-center px-4 md:px-8 mb-4 lg:px-0">
-                <div className="text-black leading-relaxed space-y-6 text-[24px]">
+                <div className="text-black leading-relaxed space-y-6 sm:text-[24px] text-base">
 
                     <p>
                         Mobirays has always been about more than just phones. Our blog is a side project born from the same passion that fuels everything we do — a love for technology, innovation, and the little gadgets that make life exciting.

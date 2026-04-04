@@ -109,7 +109,7 @@ const AllBrandsHero = ({ title = "All Brands", backgroundImage }) => {
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder="Custom Search"
-                            className="flex-1 pl-20 pr-4 text-lg w-70 py-1 border-2 rounded-none focus:outline-none border-[#41403E] bg-white placeholder:text-[#959190]"
+                            className="flex-1 pl-20 pr-4 text-lg py-1 border-2 rounded-none focus:outline-none border-[#41403E] bg-white placeholder:text-[#959190] max-w-[60vw]"
                         />
                         <button
                             type="submit"
