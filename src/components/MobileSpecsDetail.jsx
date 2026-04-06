@@ -383,14 +383,12 @@ const MobileSpecsDetail = ({ productData, onCommentsClick }) => {
                     <div className="flex items-center gap-2 justify-center">
                       <img src={cameraIcon} alt="" />
                       <div className="">
-                        <div className="font-semibold text-2xl">
+                        <div className="font-semibold text-xl sm:text-2xl">
                           {device.specs.camera.split(/(MP)/i).map((part, i) =>
                             part.toUpperCase() === 'MP' ? (
-                              <span key={i} className="font-normal text-xs sm:text-sm">
-                                MP
-                              </span>
+                              <span key={i} className="font-normal text-xs sm:text-sm">MP</span>
                             ) : (
-                              part
+                              part.trim()
                             )
                           )}
                         </div>

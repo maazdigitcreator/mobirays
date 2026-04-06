@@ -42,8 +42,8 @@ const MobileMenu = ({
 
     return (
         <>
-            {/* Overlay */}
-            <div className="fixed inset-0 bg-[#00000087] z-[60] transition-opacity duration-300 opacity-100 starting:opacity-0" />
+            {/* Overlay - click outside to close */}
+            <div onClick={onClose} className="fixed inset-0 bg-[#00000087] z-[60] transition-opacity duration-300 opacity-100 starting:opacity-0" />
 
             {/* Sidebar Drawer from Right */}
             <div

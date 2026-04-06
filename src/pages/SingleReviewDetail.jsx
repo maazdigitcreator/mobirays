@@ -733,14 +733,14 @@ const SingleReviewDetail = () => {
                         </div>
                       </form>
 
-                      <div className="flex sm:flex-row gap-4 justify-between sm:justify-end items-center mt-2 mb-10 sm:mb-0">
+                      <div className="flex flex-row gap-3 justify-between sm:justify-end items-center mt-2 mb-10 sm:mb-0">
                         <Link
                           to="/reviews"
-                          className="flex items-center justify-center border-2 border-[#0580A5] text-black sm:px-6 px-4 py-2 rounded-full hover:bg-[#0580A5] hover:text-white transition-colors text-base cursor-pointer"
+                          className="flex items-center justify-center border-2 border-[#0580A5] text-black sm:px-6 px-3 py-2 rounded-full hover:bg-[#0580A5] hover:text-white transition-colors text-sm sm:text-base cursor-pointer whitespace-nowrap"
                         >
                           Read All Reviews&gt;&gt;
                         </Link>
-                        <button className="border-2 border-[#0580A5] text-black sm:px-6 px-4 py-2 rounded-full hover:bg-[#0580A5] hover:text-white transition-colors text-base cursor-pointer">
+                        <button className="border-2 border-[#0580A5] text-black sm:px-6 px-3 py-2 rounded-full hover:bg-[#0580A5] hover:text-white transition-colors text-sm sm:text-base cursor-pointer whitespace-nowrap">
                           Post a Suggestion&gt;&gt;
                         </button>
                       </div>
