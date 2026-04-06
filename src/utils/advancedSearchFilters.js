@@ -1,4 +1,15 @@
+import {
+  getAdvancedSearchConfiguredFieldType,
+  isAdvancedSearchAttributeInCategory,
+} from "./advancedSearchConfig";
+
 const normalizeText = (value) => String(value || "").trim();
+
+const normalizeKey = (value) =>
+  normalizeText(value)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
 
 const normalizeCategoryId = (value) => {
   const normalizedValue = normalizeText(value);
@@ -18,22 +29,35 @@ const normalizeSearchText = (value) =>
     .trim();
 
 export const RANGE_FIELD_CONFIGS = {
-  price: { prefix: "$", step: 50 },
-  year: { step: 1 },
-  years: { step: 1 },
-  weight: { step: 1 },
-  height: { step: 1 },
-  width: { step: 1 },
-  thickness: { step: 1 },
+  general_price: { prefix: "$", step: 50 },
+  general_year: { step: 1 },
+  general_years: { step: 1 },
+  body_weight: { step: 1 },
+  body_height: { step: 1 },
+  body_width: { step: 1 },
+  body_thickness: { step: 1 },
 };
 
 export const getRangeFieldConfig = (attribute) => {
-  const fieldKey = normalizeText(attribute?.fieldKey).toLowerCase();
-  return RANGE_FIELD_CONFIGS[fieldKey] || { prefix: "", step: 1 };
+  const lookupKeys = [
+    normalizeKey(`${attribute?.sectionTitle}_${attribute?.name}`),
+    normalizeKey(attribute?.name),
+    normalizeKey(attribute?.fieldKey),
+  ].filter(Boolean);
+
+  const matchedKey = lookupKeys.find((key) => RANGE_FIELD_CONFIGS[key]);
+  return matchedKey ? RANGE_FIELD_CONFIGS[matchedKey] : { prefix: "", step: 1 };
 };
 
 export const getResolvedFieldType = (attribute) => {
-  if (Array.isArray(attribute?.values) && attribute.values.length > 0) {
+  const configuredFieldType =
+    getAdvancedSearchConfiguredFieldType(attribute) || attribute?.inputType;
+
+  if (configuredFieldType) {
+    return configuredFieldType;
+  }
+
+  if (Array.isArray(attribute?.options) && attribute.options.length > 0) {
     return "multi_select";
   }
 
@@ -190,8 +214,16 @@ export const runAdvancedSearch = (allProducts, attributes, filters) => {
 export const getAdvancedSearchAttributesMissingCategoryIds = (
   attributes,
   filters,
+  { activeCategoryId = null } = {},
 ) =>
   attributes.filter((attribute) => {
+    if (
+      activeCategoryId !== null &&
+      !isAdvancedSearchAttributeInCategory(attribute, activeCategoryId)
+    ) {
+      return false;
+    }
+
     const filterValue =
       filters[attribute.fieldKey] ?? buildInitialFilterValue(attribute);
 
@@ -208,10 +240,21 @@ export const getAdvancedSearchAttributesMissingCategoryIds = (
     return brandCategoryIds.length === 0;
   });
 
-export const buildAdvancedSearchRequestPayload = (attributes, filters) => {
+export const buildAdvancedSearchRequestPayload = (
+  attributes,
+  filters,
+  { activeCategoryId = null, includeEmptyActiveCategory = false } = {},
+) => {
   const categories = new Map();
 
   attributes.forEach((attribute) => {
+    if (
+      activeCategoryId !== null &&
+      !isAdvancedSearchAttributeInCategory(attribute, activeCategoryId)
+    ) {
+      return;
+    }
+
     const filterValue =
       filters[attribute.fieldKey] ?? buildInitialFilterValue(attribute);
 
@@ -224,12 +267,18 @@ export const buildAdvancedSearchRequestPayload = (attributes, filters) => {
           .map((value) => normalizeCategoryId(value))
           .filter(Boolean)
       : [];
+    const resolvedCategoryIds =
+      activeCategoryId === null
+        ? brandCategoryIds
+        : brandCategoryIds.filter(
+            (categoryId) => Number(categoryId) === Number(activeCategoryId),
+          );
 
-    if (brandCategoryIds.length === 0) {
+    if (resolvedCategoryIds.length === 0) {
       return;
     }
 
-    brandCategoryIds.forEach((categoryId) => {
+    resolvedCategoryIds.forEach((categoryId) => {
       if (!categories.has(categoryId)) {
         categories.set(categoryId, {
           id: categoryId,
@@ -237,11 +286,27 @@ export const buildAdvancedSearchRequestPayload = (attributes, filters) => {
         });
       }
 
-      categories.get(categoryId).filters[attribute.attributeId] = filterValue;
+      const payloadKey = attribute.payloadKey || attribute.attributeId;
+      categories.get(categoryId).filters[payloadKey] = filterValue;
     });
   });
 
-  return Array.from(categories.values()).filter(
+  const resolvedCategories = Array.from(categories.values()).filter(
     (category) => Object.keys(category.filters).length > 0,
   );
+
+  if (
+    resolvedCategories.length === 0 &&
+    includeEmptyActiveCategory &&
+    activeCategoryId !== null
+  ) {
+    return [
+      {
+        id: activeCategoryId,
+        filters: {},
+      },
+    ];
+  }
+
+  return resolvedCategories;
 };
