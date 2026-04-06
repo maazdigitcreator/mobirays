@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import compareIcon from "../assets/compareIcon.png"
 import commentsIcon from "../assets/commentsIcon.png"
 import picturesIcon from "../assets/picturesIcon.png"
@@ -6,6 +7,7 @@ import allBrandsBanner from "../assets/allBrandsBanner.png"
 import shareIcon from "../assets/shareIcon.png"
 
 const AllBrandsHero = ({ title = "All Brands", backgroundImage }) => {
+    const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
 
     const handleSearch = (e) => {
@@ -31,11 +33,11 @@ const AllBrandsHero = ({ title = "All Brands", backgroundImage }) => {
                     </div>
 
                     {/* Right side - Share Icon */}
-                    <div className="h-full flex gap-20 justify-between">
+                    {/* <div className="h-full flex gap-20 justify-between">
                         <button className="hover:cursor-pointer flex items-center transition-colors w-fit pb-5 sm:pb-7 ">
                             <img src={shareIcon} width={25} alt="" />
                         </button>
-                    </div>
+                    </div> */}
                 </div>
             </div>
 
@@ -50,7 +52,7 @@ const AllBrandsHero = ({ title = "All Brands", backgroundImage }) => {
                                 if (!img) return "";
                                 if (img.startsWith("http")) return img;
                                 const apiBase = "https://mobirays.voucherndeals.com";
-                                // Ensure we don't double up on storage/
+                                
                                 const cleanPath = img.replace(/^\/?storage\//, '');
                                 return `${apiBase}/storage/${cleanPath}`;
                             };
@@ -92,8 +94,8 @@ const AllBrandsHero = ({ title = "All Brands", backgroundImage }) => {
                 {/* Bottom Section - Search Bar and Icons */}
                 <div className="absolute bg-white/60 bottom-0 left-0 right-0 flex flex-col sm:flex-row items-center justify-between gap-4 p-4 sm:px-4 sm:py-5 ">
                     {/* Search Bar - Left Side */}
-                    <form onSubmit={handleSearch} className="flex gap-1 shadow-lg backdrop-blur-sm relative">
-                        {/* Google Logo inside input */}
+                    {/* <form onSubmit={handleSearch} className="flex gap-1 shadow-lg backdrop-blur-sm relative">
+                    
                         <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center pointer-events-none z-10">
                             <span className="font-semibold text-lg">
                                 <span className="text-[#4285F4]">G</span>
@@ -117,19 +119,21 @@ const AllBrandsHero = ({ title = "All Brands", backgroundImage }) => {
                         >
                             Search
                         </button>
-                    </form>
+                    </form> */}
 
-                    {/* Icons Row - Right Side */}
-                    <div className="flex w-full justify-evenly gap-5 items-center">
-                        <button className="">
-                            <img src={compareIcon} alt="Compare" className="w-8 h-8 sm:w-10 sm:h-10 invert cursor-pointer" />
+                    <div className="flex w-full justify-end gap-5 items-center">
+                        <button 
+                            onClick={() => navigate('/comparison')}
+                            className="cursor-pointer"
+                        >
+                            <img src={compareIcon} alt="Compare" className="w-8 h-8 sm:w-10 sm:h-10 invert" />
                         </button>
-                        <button className="">
+                        {/* <button className="">
                             <img src={commentsIcon} alt="Comments" className="w-8 h-8 sm:w-10 sm:h-10 invert cursor-pointer" />
                         </button>
                         <button className="">
                             <img src={picturesIcon} alt="Pictures" className="w-8 h-8 sm:w-10 sm:h-10 invert cursor-pointer" />
-                        </button>
+                        </button> */}
                     </div>
                 </div>
             </div>

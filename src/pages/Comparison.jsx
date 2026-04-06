@@ -214,7 +214,7 @@ const Comparison = () => {
                 </div>
 
                 {/* Main Content Column */}
-                <div className="w-full lg:w-2/3">
+                <div className="w-full lg:w-3/4">
 
                     <HeroBanner />
                     <div className="relative w-full mb-2 overflow-hidden">

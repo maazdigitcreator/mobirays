@@ -8,14 +8,26 @@ const DeviceComparisonCard = ({ device }) => {
     if (!device) return null;
 
     const handleSpecsClick = () => {
-        if (device.slug && device.originalData) {
-            navigate(`/${device.slug}`, {
+        if (device.id && device.slug && device.originalData) {
+            navigate(`/product/${device.id}/${device.slug}`, {
                 state: {
                     product: device.originalData
                 }
             });
         }
     };
+
+    const handleOpinionsClick = () => {
+        if (device.id && device.slug && device.originalData) {
+            navigate(`/product/${device.id}/${device.slug}`, {
+                state: {
+                    product: device.originalData,
+                    scrollTo: 'comments'
+                }
+            });
+        }
+    };
+
 
     return (
         <div>
@@ -39,7 +51,10 @@ const DeviceComparisonCard = ({ device }) => {
 
 
                     <div className="flex flex-col gap-1 col-span-6">
-                        <button className="w-full bg-[#0580A5] text-white py-1 sm:py-2 px-2 text-start text-[8px] sm:text-xs hover:bg-[#046a8a] transition-colors cursor-pointer ">
+                        <button
+                            onClick={handleOpinionsClick}
+                            className="w-full bg-[#0580A5] text-white py-1 sm:py-2 px-2 text-start text-[8px] sm:text-xs hover:bg-[#046a8a] transition-colors cursor-pointer "
+                        >
                             REVIEW
                         </button>
                         <button
@@ -48,7 +63,10 @@ const DeviceComparisonCard = ({ device }) => {
                         >
                             SPECIFICATIONS
                         </button>
-                        <button className="w-full bg-[#EEEEEE] text-[#0580A5] py-1 sm:py-2 px-2 text-start text-[8px] sm:text-xs hover:bg-gray-200 transition-colors cursor-pointer">
+                        <button
+                            onClick={handleOpinionsClick}
+                            className="w-full bg-[#EEEEEE] text-[#0580A5] py-1 sm:py-2 px-2 text-start text-[8px] sm:text-xs hover:bg-gray-200 transition-colors cursor-pointer"
+                        >
                             READ OPINIONS
                         </button>
                     </div>

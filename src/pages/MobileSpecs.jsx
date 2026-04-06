@@ -292,11 +292,19 @@ const MobileSpecs = () => {
     } = useProductPageReviews(productData?.id);
 
     useEffect(() => {
-        topRef.current?.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-        });
-    }, [resolvedProductId]);
+        if (location.state?.scrollTo === 'comments') {
+            commentsSectionRef.current?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+            });
+        } else {
+            topRef.current?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+            });
+        }
+    }, [resolvedProductId, location.state?.scrollTo]);
+
 
     // Define related news and reviews with unique names to avoid shadowing components
     const filteredRelatedNews = useMemo(() => {
@@ -691,10 +699,10 @@ const MobileSpecs = () => {
 
                             {/* Title Box */}
                             <div
-                                className="latest-news-clip lg:latest-products-clip bg-[#0580A5] text-white w-fit sm:h-10 sm:h-12 flex items-center justify-center relative z-10"
+                                className="latest-news-clip lg:latest-products-clip bg-[#0580A5] text-white w-fit h-22 sm:h-12 flex items-center justify-center relative z-10"
                                 style={{
                                     clipPath: "polygon(0% 100%, 0px 0%, calc(100% - 60px) 0%, 100% 100%)",
-                                    paddingLeft: "0px",
+                                    paddingLeft: "10px",
                                     paddingRight: "60px"
                                 }}
                             >

@@ -6,6 +6,8 @@ import {
     HardDrive,
     Settings,
     DollarSign,
+    Database,
+    MonitorSmartphone,
 } from 'lucide-react';
 import { useSidebarFilters } from '../../hooks/useSidebarFilters';
 
@@ -17,6 +19,8 @@ const FILTER_ICONS = {
     storage: HardDrive,
     os: Settings,
     price: DollarSign,
+    memory: Database,
+    display: MonitorSmartphone,
 };
 
 const SidebarFilters = () => {

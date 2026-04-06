@@ -31,6 +31,8 @@ const SingleNewsDetail = () => {
   const [newsData, setNewsData] = useState(location.state?.newsData || null);
   const [pageBanners, setPageBanners] = useState({});
   const reviewFormRef = useRef(null);
+  const commentsSectionRef = useRef(null);
+
 
   const [reviewForm, setReviewForm] = useState({
     title: "",
@@ -213,6 +215,12 @@ const SingleNewsDetail = () => {
             bannerImage={newsData?.image || contactBanner}
             date={formattedDate || "06-Sep-2025"}
             commentsCount={discussionStats.totalDiscussions}
+            onCommentsClick={() =>
+              commentsSectionRef.current?.scrollIntoView({ behavior: "smooth" })
+            }
+            onPostCommentClick={() =>
+              reviewFormRef.current?.scrollIntoView({ behavior: "smooth" })
+            }
           />
           {/* Content will be added here dynamically */}
           <div>
@@ -242,13 +250,16 @@ const SingleNewsDetail = () => {
 
               <div>
                 <div>
-                  <div className="relative w-full flex items-end justify-center lg:justify-start mb-5 mt-10">
+                  <div
+                    ref={commentsSectionRef}
+                    className="relative w-full flex items-end justify-center lg:justify-start mb-5 mt-10"
+                  >
                     {/* Horizontal Line Background */}
                     <div className="absolute bottom-0 left-0 w-full h-[10px] sm:h-[16px] bg-[#0580A5]"></div>
 
                     {/* Title Box */}
                     <div
-                      className="latest-news-clip lg:latest-products-clip bg-[#0580A5] text-white w-fit h-10 sm:h-12 flex items-center justify-center relative z-10"
+                      className="latest-news-clip lg:latest-products-clip bg-[#0580A5] text-white w-fit h-auto py-2 flex items-center justify-center relative z-10"
                       style={{
                         clipPath:
                           "polygon(0% 100%, 0px 0%, calc(100% - 60px) 0%, 100% 100%)",

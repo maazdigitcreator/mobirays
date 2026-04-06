@@ -1,6 +1,28 @@
 import React from 'react'
 import specsTableHeading from '../assets/specsTableHead.png'
 
+// Helper to format text so long words break with a visible dash at line end
+// Uses \u00AD soft-hyphen (renders as "-" only at break point)
+const formatText = (text) => {
+    if (typeof text !== 'string') return text;
+    // Insert soft hyphen every 5 chars inside long words to help with breaking
+    return text.split(' ').map(word => {
+        if (word.length > 5) {
+            let out = '';
+            for (let i = 0; i < word.length; i++) {
+                out += word[i];
+                // Insert soft hyphen after every 5th char (not at last char)
+                if ((i + 1) % 5 === 0 && i + 1 < word.length) {
+                    out += '\u00AD';
+                }
+            }
+            return out;
+        }
+        return word;
+    }).join(' ');
+};
+
+
 const SpecificationsTable = ({ productData }) => {
     // Get more_specifications from API
     const moreSpecs = productData?.more_specifications || [];
@@ -89,9 +111,9 @@ const SpecificationsTable = ({ productData }) => {
                 {specifications.map((section, sectionIndex) => (
                     <div key={sectionIndex} className="flex gap-1">
                         {/* Category Column - Left side (spans all rows) */}
-                        <div className="w-[20%] flex-shrink-0  border-2 border-[#0580A5] flex items-center justify-center">
-                            <span className="text-black font-semibold text-sm sm:text-xl text-center px-1 break-words sm:break-words w-full">
-                                {section.category}
+                        <div className="w-[20%] flex-shrink-0  border-2 border-[#0580A5] flex items-center justify-center overflow-hidden">
+                            <span className="text-black font-semibold text-sm sm:text-xl text-center px-1 break-words w-full block" style={{ hyphens: 'manual', wordWrap: 'break-word' }}>
+                                {formatText(section.category)}
                             </span>
                         </div>
 
@@ -103,8 +125,8 @@ const SpecificationsTable = ({ productData }) => {
                                     className="flex gap-1 relative"
                                 >
                                     {/* Label Cell - White background with border */}
-                                    <div className="w-[100px] sm:w-[130px] flex-shrink-0 text-black px-2 py-1.5 flex items-center border-2 border-[#0580A5]">
-                                        <span className="text-xs sm:text-lg font-semibold">{spec.label}</span>
+                                    <div className="w-[100px] sm:w-[130px] flex-shrink-0 text-black px-2 py-1.5 flex items-center border-2 border-[#0580A5] overflow-hidden">
+                                        <span className="text-xs sm:text-lg font-semibold break-words w-full block" style={{ hyphens: 'manual', wordWrap: 'break-word' }}>{formatText(spec.label)}</span>
                                     </div>
 
                                     {/* Sloped Connector - Diagonal line connecting label to value */}
@@ -138,8 +160,8 @@ const SpecificationsTable = ({ productData }) => {
                                     </div>
 
                                     {/* Value Cell - White background */}
-                                    <div className="flex border border-2 border-[#0580A5] px-3 py-0 flex items-center mt-3 h-[100%] w-[100%] left-44.5">
-                                        <span className="text-black text-xs sm:text-base font-medium">{spec.value}</span>
+                                    <div className="flex border border-2 border-[#0580A5] px-3 py-0 flex items-center mt-3 h-[100%] w-[100%] left-44.5 overflow-hidden">
+                                        <span className="text-black text-xs sm:text-base font-medium break-words w-full block" style={{ hyphens: 'manual', wordWrap: 'break-word' }}>{formatText(spec.value)}</span>
                                     </div>
                                 </div>
                             ))}

@@ -234,7 +234,7 @@ const MobileSpecsDetail = ({ productData, onCommentsClick }) => {
           {/* Left side - Device name with slanted edge */}
           <div className="absolute -bottom-1 left-0 w-full h-[10px] sm:h-[16px] bg-[#0580A5]"></div>
 
-          <div className="relative w-full flex items-end">
+          <div className="relative pr-2 sm:pr-0 w-full flex items-end">
             {/* Horizontal Line Background */}
 
             {/* Title Box */}
@@ -299,25 +299,24 @@ const MobileSpecsDetail = ({ productData, onCommentsClick }) => {
                 </span>
               </div>
             </button>
-            <div ref={shareMenuRef} className="flex items-start gap-2">
+            <div ref={shareMenuRef} className="relative flex items-center">
               {isShareMenuOpen && (
-                <div className="flex mt-1 gap-2 animate-fade-in">
+                <div className="absolute right-0 top-full mt-2 flex gap-3 animate-fade-in bg-white/95 p-3 shadow-xl rounded-xl border border-[#0580A5]/20 backdrop-blur-sm z-30 ring-1 ring-black/5">
                   <button
                     type="button"
                     onClick={() => handleShare("facebook")}
-                    className="text-[#1877F2] hover:opacity-70 cursor-pointer"
+                    className="text-[#1877F2] hover:scale-110 active:scale-95 transition-transform cursor-pointer p-1"
                     aria-label="Share on Facebook"
                   >
-
-                    <FaFacebookF className="text-sm lg:text-[25px]" />
+                    <FaFacebookF className="text-xl sm:text-2xl" />
                   </button>
                   <button
                     type="button"
                     onClick={() => handleShare("x")}
-                    className="text-black hover:opacity-70 cursor-pointer text-base font-bold leading-none"
+                    className="text-black hover:scale-110 active:scale-95 transition-transform cursor-pointer p-1"
                     aria-label="Share on X"
                   >
-                    <FaXTwitter className="text-sm lg:text-[25px]" />
+                    <FaXTwitter className="text-xl sm:text-2xl" />
                   </button>
                 </div>
               )}
@@ -384,8 +383,16 @@ const MobileSpecsDetail = ({ productData, onCommentsClick }) => {
                     <div className="flex items-center gap-2 justify-center">
                       <img src={cameraIcon} alt="" />
                       <div className="">
-                        <div className="font-semibold text-base sm:text-2xl">
-                          {device.specs.camera}
+                        <div className="font-semibold text-2xl">
+                          {device.specs.camera.split(/(MP)/i).map((part, i) =>
+                            part.toUpperCase() === 'MP' ? (
+                              <span key={i} className="font-normal text-xs sm:text-sm">
+                                MP
+                              </span>
+                            ) : (
+                              part
+                            )
+                          )}
                         </div>
                       </div>
                     </div>

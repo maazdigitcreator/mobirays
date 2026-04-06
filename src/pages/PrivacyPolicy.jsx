@@ -5,7 +5,7 @@ const PrivacyPolicy = () => {
     return (
         <div className="w-full">
             {/* Privacy Policy Banner */}
-            <div className="relative w-full flex items-end justify-center lg:justify-start mb-2 mt-1">
+            <div className="relative w-full flex items-end justify-start lg:justify-start mb-2 mt-1">
                 {/* Horizontal Line Background */}
                 <div className="absolute bottom-0 left-0 w-full h-[10px] sm:h-[16px] bg-[#0580A5]"></div>
 
@@ -23,10 +23,10 @@ const PrivacyPolicy = () => {
                 </div>
             </div>
             <div className="w-full mb-12">
-                <img src={aboutBanner} alt="Privacy Policy" className="w-full h-[65vh] object-cover object-top" />
+                <img src={aboutBanner} alt="Privacy Policy" className="w-full h-[250px] sm:h-[65vh] object-cover object-top" />
             </div>
             <div className="w-full flex justify-center px-4 md:px-8 mb-4 lg:px-0">
-                <div className="text-black leading-relaxed space-y-6 text-[24px]">
+                <div className="text-black leading-relaxed space-y-6 sm:text-[24px] text-base">
 
                     <p>
                         At Mobirays, we are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website.

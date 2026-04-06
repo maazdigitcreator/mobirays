@@ -68,11 +68,11 @@ const Dictionary = () => {
                                 </div>
 
                                 {/* Right side - Share Icon */}
-                                <div className="h-full flex gap-20 justify-between">
+                                {/* <div className="h-full flex gap-20 justify-between">
                                     <button className="hover:cursor-pointer flex items-center transition-colors w-fit sm:pb-7 pb-5  ">
                                         <img src={shareIcon} width={25} alt="" />
                                     </button>
-                                </div>
+                                </div> */}
                             </div>
                         </div>
 

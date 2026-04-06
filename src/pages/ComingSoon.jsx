@@ -110,7 +110,7 @@ const ComingSoon = () => {
 
                         {/* Phones Section */}
                         <div>
-                            <LatestProducts title="Latest Phones" products={getPaginatedData(phones, phonesPage)} itemImage={mobileImg} />
+                            <LatestProducts title="Coming Soon Phones" products={getPaginatedData(phones, phonesPage)} itemImage={mobileImg} />
                             {phones.length > itemsPerPage && (
                                 <Pagination
                                     currentPage={phonesPage}
@@ -124,7 +124,7 @@ const ComingSoon = () => {
 
                         {/* Tablets Section */}
                         <div className='mt-10'>
-                            <LatestProducts title="Latest Tabs" products={getPaginatedData(tablets, tabletsPage)} itemImage={tabImg} />
+                            <LatestProducts title="Coming Soon Tabs" products={getPaginatedData(tablets, tabletsPage)} itemImage={tabImg} />
                             {tablets.length > itemsPerPage && (
                                 <Pagination
                                     currentPage={tabletsPage}
@@ -138,7 +138,7 @@ const ComingSoon = () => {
 
                         {/* Smartwatches Section */}
                         <div className='mt-10'>
-                            <LatestProducts title="Latest Smartwatches" products={getPaginatedData(watches, watchesPage)} itemImage={watchImg} />
+                            <LatestProducts title="Coming Soon Smartwatches" products={getPaginatedData(watches, watchesPage)} itemImage={watchImg} />
                             {watches.length > itemsPerPage && (
                                 <Pagination
                                     currentPage={watchesPage}
