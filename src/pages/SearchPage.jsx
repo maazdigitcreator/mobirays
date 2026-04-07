@@ -25,6 +25,7 @@ import { useAdvancedSearchAttributes } from '../hooks/useAdvancedSearchAttribute
 import {
     buildAdvancedSearchRequestPayload,
     getAdvancedSearchAttributesMissingCategoryIds,
+    runAdvancedSearch,
 } from '../utils/advancedSearchFilters';
 import { decodeAdvancedSearchQuery } from '../utils/advancedSearchQuery';
 import { filterProductsByCategory } from '../utils/filterHelpers';
@@ -229,14 +230,21 @@ const SearchPage = () => {
     const searchResults = useMemo(() => {
         if (isFilteredView) {
             if (advancedStatus.loaded) {
+                // Apply local refinement (critical for split dimension filters)
+                const refinedProducts = runAdvancedSearch(
+                    advancedProducts,
+                    attributes,
+                    appliedFilters,
+                );
+
                 // Categorize matched products using existing helper
-                const filteredPhones = filterProductsByCategory(advancedProducts, 'Phones');
-                const filteredTablets = filterProductsByCategory(advancedProducts, 'Tablets');
-                const filteredWatches = filterProductsByCategory(advancedProducts, 'Smartwatches');
+                const filteredPhones = filterProductsByCategory(refinedProducts, 'Phones');
+                const filteredTablets = filterProductsByCategory(refinedProducts, 'Tablets');
+                const filteredWatches = filterProductsByCategory(refinedProducts, 'Smartwatches');
 
                 // Products that don't match any known category — still show them in phones
                 const categorizedIds = new Set([...filteredPhones, ...filteredTablets, ...filteredWatches].map(p => p.id));
-                const uncategorized = advancedProducts.filter(p => !categorizedIds.has(p.id));
+                const uncategorized = refinedProducts.filter(p => !categorizedIds.has(p.id));
 
                 return {
                     phones: [...filteredPhones, ...uncategorized],

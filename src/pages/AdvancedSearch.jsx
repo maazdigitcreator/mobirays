@@ -24,6 +24,7 @@ import {
   getRangeFieldConfig,
   getResolvedFieldType,
   isFilterActive,
+  runAdvancedSearch,
 } from "../utils/advancedSearchFilters";
 import {
   decodeAdvancedSearchQuery,
@@ -102,7 +103,7 @@ const parseCategoryId = (value) => {
   return Number.isFinite(parsedValue) ? parsedValue : null;
 };
 
-const DEFAULT_ADVANCED_SEARCH_CATEGORY_ID = ADVANCED_SEARCH_TABS[0]?.id ?? 3;
+const DEFAULT_ADVANCED_SEARCH_CATEGORY_ID = 1;
 
 const normalizeSearchText = (value) =>
   String(value || "")
@@ -177,11 +178,11 @@ const MultiSelectField = ({
   const displayValue =
     value.length > 0
       ? value
-          .map((selectedValue) => {
-            const normalizedValue = String(selectedValue);
-            return optionLookup.get(normalizedValue) || normalizedValue;
-          })
-          .join(", ")
+        .map((selectedValue) => {
+          const normalizedValue = String(selectedValue);
+          return optionLookup.get(normalizedValue) || normalizedValue;
+        })
+        .join(", ")
       : "";
 
   return (
@@ -200,7 +201,7 @@ const MultiSelectField = ({
             return nextValue;
           })
         }
-        className="flex w-full items-center border border-[#0580A5] bg-white disabled:cursor-default disabled:opacity-60"
+        className="relative flex w-full items-center border border-[#0580A5] bg-white disabled:cursor-default disabled:opacity-60"
       >
         <span className="whitespace-nowrap px-3 py-[8px] text-md uppercase tracking-wide">
           {label}:
@@ -213,7 +214,7 @@ const MultiSelectField = ({
         </span>
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute right-[10px] top-1/2 h-3 w-3 -translate-y-1/2 bg-no-repeat"
+          className="pointer-events-none absolute right-[10px] top-[50%] h-3 w-3 bg-no-repeat"
           style={{
             backgroundImage:
               "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234a5568' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E\")",
@@ -255,11 +256,10 @@ const MultiSelectField = ({
                   >
                     <span className="pr-3">{option.label}</span>
                     <span
-                      className={`flex h-4 w-4 items-center justify-center border text-[10px] ${
-                        isSelected
-                          ? "border-[#0580A5] bg-[#0580A5] text-white"
-                          : "border-gray-400 bg-white text-transparent"
-                      }`}
+                      className={`flex h-4 w-4 items-center justify-center border text-[10px] ${isSelected
+                        ? "border-[#0580A5] bg-[#0580A5] text-white"
+                        : "border-gray-400 bg-white text-transparent"
+                        }`}
                     >
                       ✓
                     </span>
@@ -298,9 +298,8 @@ const CheckboxRow = ({ label, checked, onChange }) => (
       {label}:
     </span>
     <div
-      className={`flex h-[18px] w-[18px] items-center justify-center border-2 transition-colors ${
-        checked ? "border-[#0580A5] bg-[#0580A5]" : "border-gray-400 bg-white"
-      }`}
+      className={`flex h-[18px] w-[18px] items-center justify-center border-2 transition-colors ${checked ? "border-[#0580A5] bg-[#0580A5]" : "border-gray-400 bg-white"
+        }`}
     >
       {checked && (
         <svg
@@ -544,13 +543,6 @@ const AdvancedSearch = () => {
       }, {}),
     [filters, visibleAttributes],
   );
-  const advancedRequestCategories = useMemo(
-    () =>
-      buildAdvancedSearchRequestPayload(visibleAttributes, filters, {
-        activeCategoryId,
-      }),
-    [activeCategoryId, filters, visibleAttributes],
-  );
   const missingCategoryAttributes = useMemo(
     () =>
       getAdvancedSearchAttributesMissingCategoryIds(visibleAttributes, filters, {
@@ -558,7 +550,42 @@ const AdvancedSearch = () => {
       }),
     [activeCategoryId, filters, visibleAttributes],
   );
-  const resultCount = previewStatus.count;
+
+  const advancedRequestCategories = useMemo(
+    () =>
+      buildAdvancedSearchRequestPayload(visibleAttributes, filters, {
+        activeCategoryId,
+      }),
+    [activeCategoryId, filters, visibleAttributes],
+  );
+
+  const localResultCount = useMemo(() => {
+    if (attributesStatus.loading) {
+      return 0;
+    }
+
+    if (totalSelectedFilters === 0) {
+      return baseCategoryResultCount;
+    }
+
+    const categoryProducts = filterProductsByCategory(
+      allProducts,
+      activeTab?.label,
+    );
+    return runAdvancedSearch(categoryProducts, visibleAttributes, filters)
+      .length;
+  }, [
+    activeTab?.label,
+    allProducts,
+    attributesStatus.loading,
+    baseCategoryResultCount,
+    filters,
+    totalSelectedFilters,
+    visibleAttributes,
+  ]);
+
+  const resultCount =
+    totalSelectedFilters === 0 ? baseCategoryResultCount : localResultCount;
 
   useEffect(() => {
     if (attributesStatus.loading) {
@@ -720,51 +747,54 @@ const AdvancedSearch = () => {
           <HeroBanner />
 
           <div className="mb-0 overflow-visible bg-white">
-            <div className="relative mb-4 flex w-full items-end">
-              <div className="absolute bottom-0 left-0 h-[10px] w-full bg-[#0580A5] sm:h-[16px]"></div>
-              <div className="latest-products-clip relative z-10 flex h-10 w-fit items-center bg-[#0580A5] text-white sm:h-14">
-                <h2 className="pl-2 text-[18px] sm:pl-4 sm:text-[26px]">
-                  Advanced Search
-                </h2>
-              </div>
-            </div>
+            <div className="relative mb-3 flex w-full items-end gap-1">
+              {attributesStatus.error && (
+                <div className="mx-2 mb-4 border border-red-300 bg-red-100 px-3 py-2 text-sm text-red-700">
+                  {attributesStatus.error}
+                </div>
+              )}
 
-            {attributesStatus.error && (
-              <div className="mx-2 mb-4 border border-red-300 bg-red-100 px-3 py-2 text-sm text-red-700">
-                {attributesStatus.error}
-              </div>
-            )}
+              {!attributesStatus.error && previewStatus.error && (
+                <div className="mx-2 mb-4 border border-red-300 bg-red-100 px-3 py-2 text-sm text-red-700">
+                  {previewStatus.error}
+                </div>
+              )}
 
-            {!attributesStatus.error && previewStatus.error && (
-              <div className="mx-2 mb-4 border border-red-300 bg-red-100 px-3 py-2 text-sm text-red-700">
-                {previewStatus.error}
-              </div>
-            )}
+              {!attributesStatus.error && (
+                <div className="overflow-x-auto">
+                  <div className="flex min-w-max items-end gap-1">
+                    {ADVANCED_SEARCH_TABS.filter(
+                      (tab) => tab.id !== activeCategoryId,
+                    ).map((tab) => {
+                      const isActive = tab.id === activeCategoryId;
 
-            {!attributesStatus.error && (
-              <div className="mb-4 overflow-x-auto px-2">
-                <div className="flex min-w-max items-end gap-1 border-b-[6px] border-[#0580A5] pb-1">
-                  {ADVANCED_SEARCH_TABS.map((tab) => {
-                    const isActive = tab.id === activeCategoryId;
-
-                    return (
-                      <button
-                        key={tab.id}
-                        type="button"
-                        onClick={() => setActiveCategoryId(tab.id)}
-                        className={`px-4 py-2 text-sm font-medium uppercase tracking-wide transition-colors sm:text-base ${
-                          isActive
+                      return (
+                        <button
+                          key={tab.id}
+                          type="button"
+                          onClick={() => setActiveCategoryId(tab.id)}
+                          className={`px-2 sm:px-4 cursor-pointer flex items-center justify-center h-10 sm:h-14 text-sm font-medium tracking-wide transition-colors sm:text-xl ${isActive
                             ? "bg-[#0580A5] text-white"
-                            : "bg-[#8cc9dc] text-[#034D63] hover:bg-[#70bad1]"
-                        }`}
-                      >
-                        {tab.label}
-                      </button>
-                    );
-                  })}
+                            : "bg-[#0580A5] text-white hover:text-[#034D63] hover:bg-[#70bad1]"
+                            }`}
+                        >
+                          {tab.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              <div className="relative flex-1">
+                <div className="absolute bottom-0 left-0 h-[10px] w-full bg-[#0580A5] sm:h-[16px]"></div>
+                <div className="latest-products-clip relative z-10 flex h-10 w-fit items-center bg-[#0580A5] text-white sm:h-14">
+                  <h2 className="pl-2 font-medium text-sm sm:pl-4 sm:text-xl">
+                    {activeTab?.label} Discover
+                  </h2>
                 </div>
               </div>
-            )}
+            </div>
 
             {!attributesStatus.error && attributesStatus.loading && (
               <div className="px-4 py-8 text-center text-gray-500">
@@ -777,7 +807,7 @@ const AdvancedSearch = () => {
               visibleSections.map((section) => (
                 <div key={section.title}>
                   <SectionHeader title={section.title} />
-                  <div className="space-y-1.5 px-2 py-5 pb-10">
+                  <div className="space-y-1.5 px-2 py-5 pb-10 text-sm">
                     <div
                       className={getSectionGridClass(
                         section.title,

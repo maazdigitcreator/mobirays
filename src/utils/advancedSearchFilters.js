@@ -133,6 +133,32 @@ const buildProductNumbers = (product) =>
     .map(Number)
     .filter((value) => Number.isFinite(value));
 
+const parseProductDimensions = (product) => {
+  const dimensionsStr =
+    product?.specifications?.body ||
+    product?.specifications?.dimensions ||
+    product?.dimensions ||
+    product?.body ||
+    "";
+
+  if (!dimensionsStr) {
+    return { body_height: null, body_width: null, body_thickness: null };
+  }
+
+  // Common patterns: "146.7 x 71.5 x 7.8 mm", "160.8 x 78.1 x 7.7 mm (6.33 x 3.07 x 0.30 in)"
+  const numbers = dimensionsStr.match(/\d+(\.\d+)?/g);
+
+  if (!numbers || numbers.length < 3) {
+    return { body_height: null, body_width: null, body_thickness: null };
+  }
+
+  return {
+    body_height: Number(numbers[0]),
+    body_width: Number(numbers[1]),
+    body_thickness: Number(numbers[2]),
+  };
+};
+
 const matchesSingleAttributeValue = (productText, selectedValue) =>
   productText.includes(normalizeSearchText(selectedValue));
 
@@ -159,6 +185,29 @@ const matchesAttributeValue = (product, attribute, selectedValue) => {
     }
 
     const numbers = buildProductNumbers(product);
+
+    if (
+      attribute.fieldKey === "body_height" ||
+      attribute.fieldKey === "body_width" ||
+      attribute.fieldKey === "body_thickness"
+    ) {
+      const dimensions = parseProductDimensions(product);
+      const value = dimensions[attribute.fieldKey];
+
+      if (value === null) {
+        return true;
+      }
+
+      if (minValue !== null && value < minValue) {
+        return false;
+      }
+
+      if (maxValue !== null && value > maxValue) {
+        return false;
+      }
+
+      return true;
+    }
 
     if (numbers.length === 0) {
       return true;
