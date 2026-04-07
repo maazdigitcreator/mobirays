@@ -1,6 +1,14 @@
 {
   "rewrites": [
     {
+      "source": "/api/v1/:path*",
+      "destination": "https://mobirays.voucherndeals.com/api/v1/:path*"
+    },
+    {
+      "source": "/storage/:path*",
+      "destination": "https://mobirays.voucherndeals.com/storage/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
