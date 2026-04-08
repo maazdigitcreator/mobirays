@@ -57,6 +57,16 @@ export const getResolvedFieldType = (attribute) => {
     return configuredFieldType;
   }
 
+  // Detect boolean fields (Checkbox)
+  if (Array.isArray(attribute?.options) && attribute.options.length === 2) {
+    const labels = attribute.options.map((opt) =>
+      String(opt.label).toLowerCase(),
+    );
+    if (labels.includes("true") && labels.includes("false")) {
+      return "checkbox";
+    }
+  }
+
   if (Array.isArray(attribute?.options) && attribute.options.length > 0) {
     return "multi_select";
   }
@@ -79,6 +89,10 @@ export const buildInitialFilterValue = (attribute) => {
     return { min: "", max: "" };
   }
 
+  if (fieldType === "checkbox") {
+    return "";
+  }
+
   return "";
 };
 
@@ -91,6 +105,10 @@ export const isFilterActive = (attribute, filterValue) => {
 
   if (fieldType === "range") {
     return Boolean(filterValue?.min || filterValue?.max);
+  }
+
+  if (fieldType === "checkbox") {
+    return filterValue === "True";
   }
 
   return Boolean(normalizeText(filterValue));
@@ -174,6 +192,15 @@ const matchesAttributeValue = (product, attribute, selectedValue) => {
     return selectedValue.some((value) =>
       matchesSingleAttributeValue(productText, value),
     );
+  }
+
+  if (fieldType === "checkbox") {
+    if (selectedValue !== "True") {
+      return true;
+    }
+
+    const productValues = flattenProductValues(product);
+    return productValues.some((v) => normalizeSearchText(v) === "true");
   }
 
   if (fieldType === "range") {

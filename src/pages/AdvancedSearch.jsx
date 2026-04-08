@@ -851,6 +851,17 @@ const AdvancedSearch = () => {
                               }
                               placeholder={attribute.placeholder || "Type here"}
                             />
+                          ) : getResolvedFieldType(attribute) === "checkbox" ? (
+                            <CheckboxRow
+                              label={attribute.name}
+                              checked={filters[attribute.fieldKey] === "True"}
+                              onChange={(checked) =>
+                                setFilterValue(
+                                  attribute.fieldKey,
+                                  checked ? "True" : "",
+                                )
+                              }
+                            />
                           ) : (
                             <MultiSelectField
                               label={attribute.name}
