@@ -11,6 +11,7 @@ import Banner1 from '../assets/homeBannerSM1.png'
 import Banner2 from '../assets/homeBannerSM2.png'
 import homeBanner3 from '../assets/homeBanner3.png'
 
+let cachedData = null;
 
 const Videos = () => {
     const [searchQuery, setSearchQuery] = useState('')
@@ -20,8 +21,14 @@ const Videos = () => {
     const [selectedVideo, setSelectedVideo] = useState(null)
     const [pageBanners, setPageBanners] = useState({});
 
-    // Fetch banners from API
     useEffect(() => {
+        if (cachedData) {
+            setVideos(cachedData.videos);
+            setPageBanners(cachedData.banners);
+            setLoading(false);
+            return;
+        }
+
         const fetchBanners = async () => {
             try {
                 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://mobirays.voucherndeals.com';
@@ -33,32 +40,45 @@ const Videos = () => {
                     const b = allBanners.find(b => b.location === loc);
                     if (b) map[loc] = b;
                 });
-                setPageBanners(map);
+                return map;
             } catch (error) {
                 console.error("Error fetching video banners:", error);
+                return {};
             }
         };
-        fetchBanners();
-    }, []);
 
-    // Fetch videos from API
-    useEffect(() => {
         const fetchVideos = async () => {
             try {
-                setLoading(true)
-                const response = await fetch('https://mobirays.voucherndeals.com/api/v1/videos/allVideos?per_page=100')
-                if (!response.ok) throw new Error('Failed to fetch videos')
-                const json = await response.json()
-                setVideos(json.data || [])
+                const response = await fetch('https://mobirays.voucherndeals.com/api/v1/videos/allVideos?per_page=100');
+                if (!response.ok) throw new Error('Failed to fetch videos');
+                const json = await response.json();
+                return json.data || [];
             } catch (err) {
-                console.error('Error fetching videos:', err)
-                setError(err.message)
-            } finally {
-                setLoading(false)
+                console.error('Error fetching videos:', err);
+                setError(err.message);
+                return [];
             }
-        }
-        fetchVideos()
-    }, [])
+        };
+
+        const fetchData = async () => {
+            setLoading(true);
+            const [fetchedBanners, fetchedVideos] = await Promise.all([
+                fetchBanners(),
+                fetchVideos()
+            ]);
+            
+            cachedData = {
+                banners: fetchedBanners,
+                videos: fetchedVideos
+            };
+
+            setPageBanners(fetchedBanners);
+            setVideos(fetchedVideos);
+            setLoading(false);
+        };
+
+        fetchData();
+    }, []);
 
     // Format views number (e.g. 105396 -> 105K)
     const formatViews = (views) => {
@@ -244,7 +264,7 @@ const Videos = () => {
             {/* Error State */}
             {error && !loading && (
                 <div className="text-center py-20 text-red-500">
-                    <p>Videos load karne mein error aaya: {error}</p>
+                    <p>Error Loading Videos {error}</p>
                 </div>
             )}
 

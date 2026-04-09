@@ -215,6 +215,8 @@ const normalizeSections = (payload) =>
     })
     .filter(Boolean);
 
+let cachedSections = null;
+
 export const useAdvancedSearchAttributes = () => {
   const [sections, setSections] = useState([]);
   const [status, setStatus] = useState({
@@ -224,6 +226,12 @@ export const useAdvancedSearchAttributes = () => {
 
   useEffect(() => {
     let isMounted = true;
+
+    if (cachedSections) {
+      setSections(cachedSections);
+      setStatus({ loading: false, error: "" });
+      return;
+    }
 
     const fetchAttributes = async () => {
       setStatus({
@@ -241,6 +249,7 @@ export const useAdvancedSearchAttributes = () => {
           return;
         }
 
+        cachedSections = normalizedSections;
         setSections(normalizedSections);
         setStatus({
           loading: false,

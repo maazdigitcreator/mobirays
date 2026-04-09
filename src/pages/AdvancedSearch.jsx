@@ -32,6 +32,18 @@ import {
 } from "../utils/advancedSearchQuery";
 import { filterProductsByCategory } from "../utils/filterHelpers";
 
+const OS_VERSION_MAP = {
+  "Android": ["Any Version", "Android 16", "Android 15", "Android 14", "Android 13", "Android 12", "Android 11", "Android 10", "Android 9.0 Pie", "Android 8.1 Oreo", "Android 8.0 Oreo", "Android 7.1 Nougat", "Android 7.0 Nougat", "Android 6.0 Marshmallow", "Android 5.1 Lollipop", "Android 5.0 Lollipop", "Android 4.4 KitKat", "Android 4.1-4.3 Jelly Bean", "Android 4.0 Ice Cream Sandwich", "Android 3.x Honeycomb", "Android 2.3 Gingerbread", "Android 2.2 Froyo", "Android 2.0-2.1 Eclair", "Android 1.6 Donut"],
+  "iOS": ["Any version", "iOS 18", "iOS 17", "iOS 16", "iOS 15", "iOS 14", "iOS 13", "iOS 12", "iOS 11", "iOS 10", "iOS 9", "iOS 8", "iOS 7", "iOS 6", "iOS 5", "iOS 4"],
+  "KaiOS": ["Any version", "KaiOS 2.5", "KaiOS 3.1"],
+  "Windows Phone": ["Any version", "Windows 10", "Windows Phone 8.1", "Windows Phone 8.0", "Windows Phone 7.8", "Windows Phone 7.5 Refresh/Tango", "Windows Phone 7.5 Mango", "Windows Phone 7.0"],
+  "Symbian": ["Any version", "Nokia Belle", "Symbian Anna", "Symbian^3", "Symbian S60 5th ed"],
+  "RIM": ["Any version", "BlackBerry OS 10", "BlackBerry OS 9", "BlackBerry OS 8", "BlackBerry OS 7"],
+  "Bada": ["Any version", "Bada v2.x", "Bada v1.x"],
+  "Firefox": ["Any version", "Firefox OS 2.1", "Firefox OS 2.0", "Firefox OS 1.4", "Firefox OS 1.3", "Firefox OS 1.1", "Firefox OS 1.0"],
+  "Feature phones": ["Any Version"]
+};
+
 const SectionHeader = ({ title }) => (
   <div
     className="px-4 py-2.5 text-xl font-medium text-white"
@@ -135,6 +147,8 @@ const MultiSelectField = ({
   onToggle,
   options,
   disabled = false,
+  isSingleSelect = false,
+  disabledText = "No values available",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -210,7 +224,7 @@ const MultiSelectField = ({
           className="flex-1 truncate px-3 py-[8px] text-left text-md"
           style={{ paddingRight: "30px" }}
         >
-          {disabled ? "No values available" : displayValue || "\u00a0"}
+          {disabled ? disabledText : displayValue || "\u00a0"}
         </span>
         <span
           aria-hidden="true"
@@ -251,7 +265,10 @@ const MultiSelectField = ({
                   <button
                     key={`${option.label}-${String(option.value)}`}
                     type="button"
-                    onClick={() => onToggle(option.value)}
+                    onClick={() => {
+                        onToggle(option.value);
+                        if (isSingleSelect) setIsOpen(false);
+                    }}
                     className="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-[#EDF6F9]"
                   >
                     <span className="pr-3">{option.label}</span>
@@ -509,6 +526,23 @@ const AdvancedSearch = () => {
     () => visibleSections.flatMap((section) => section.attributes),
     [visibleSections],
   );
+
+  const osFieldKey = useMemo(() => visibleAttributes.find(a => a.name.toLowerCase() === 'os')?.fieldKey, [visibleAttributes]);
+  const minOsFieldKey = useMemo(() => visibleAttributes.find(a => a.name.toLowerCase().includes('mini os version') || a.name.toLowerCase().includes('min os version'))?.fieldKey, [visibleAttributes]);
+
+  const selectedOsValues = osFieldKey ? filters[osFieldKey] : null;
+  const currentOsStr = Array.isArray(selectedOsValues) && selectedOsValues.length > 0 ? selectedOsValues[0] : "";
+  
+  const prevOsRef = useRef(currentOsStr);
+  useEffect(() => {
+    if (minOsFieldKey && currentOsStr !== prevOsRef.current) {
+      prevOsRef.current = currentOsStr;
+      if (filters[minOsFieldKey] && filters[minOsFieldKey].length > 0) {
+        setFilters(prev => ({ ...prev, [minOsFieldKey]: [] }));
+      }
+    }
+  }, [currentOsStr, minOsFieldKey, filters]);
+
   const baseCategoryResultCount = useMemo(
     () => filterProductsByCategory(allProducts, activeTab?.label).length,
     [activeTab?.label, allProducts],
@@ -685,14 +719,20 @@ const AdvancedSearch = () => {
     }));
   };
 
-  const toggleMultiSelectValue = (fieldKey, value) => {
+  const toggleMultiSelectValue = (fieldKey, value, isSingleSelect = false) => {
     setFilters((currentFilters) => {
       const currentValues = Array.isArray(currentFilters[fieldKey])
         ? currentFilters[fieldKey]
         : [];
-      const nextValues = currentValues.includes(value)
-        ? currentValues.filter((item) => item !== value)
-        : [...currentValues, value];
+      
+      let nextValues;
+      if (isSingleSelect) {
+        nextValues = currentValues.includes(value) ? [] : [value];
+      } else {
+        nextValues = currentValues.includes(value)
+          ? currentValues.filter((item) => item !== value)
+          : [...currentValues, value];
+      }
 
       return {
         ...currentFilters,
@@ -862,20 +902,53 @@ const AdvancedSearch = () => {
                                 )
                               }
                             />
-                          ) : (
-                            <MultiSelectField
-                              label={attribute.name}
-                              value={filters[attribute.fieldKey] ?? []}
-                              onToggle={(value) =>
-                                toggleMultiSelectValue(
-                                  attribute.fieldKey,
-                                  value,
-                                )
-                              }
-                              options={attribute.options}
-                              disabled={attribute.options.length === 0}
-                            />
-                          )}
+                          ) : (() => {
+                            const isOs = attribute.name.toLowerCase() === 'os';
+                            const isMinOs = attribute.name.toLowerCase().includes('mini os version') || attribute.name.toLowerCase().includes('min os version');
+                            const isSingleSelect = isOs || isMinOs;
+
+                            let displayOptions = attribute.options;
+                            let localDisabled = attribute.options.length === 0;
+
+                            if (isMinOs) {
+                                if (!currentOsStr) {
+                                    localDisabled = true;
+                                    displayOptions = [];
+                                } else {
+                                    const mapKey = Object.keys(OS_VERSION_MAP).find(k => k.toLowerCase() === String(currentOsStr).toLowerCase());
+                                    if (mapKey) {
+                                        const allowedVersions = OS_VERSION_MAP[mapKey].map(v => v.toLowerCase());
+                                        displayOptions = attribute.options
+                                          .filter(opt => allowedVersions.includes(String(opt.label).toLowerCase()))
+                                          .sort((a, b) => {
+                                              const idxA = allowedVersions.indexOf(String(a.label).toLowerCase());
+                                              const idxB = allowedVersions.indexOf(String(b.label).toLowerCase());
+                                              return idxA - idxB;
+                                          });
+                                    } else {
+                                        displayOptions = [];
+                                    }
+                                }
+                            }
+
+                            return (
+                                <MultiSelectField
+                                  label={attribute.name}
+                                  value={filters[attribute.fieldKey] ?? []}
+                                  onToggle={(value) =>
+                                    toggleMultiSelectValue(
+                                      attribute.fieldKey,
+                                      value,
+                                      isSingleSelect
+                                    )
+                                  }
+                                  options={displayOptions}
+                                  disabled={localDisabled || displayOptions.length === 0}
+                                  isSingleSelect={isSingleSelect}
+                                  disabledText={isMinOs && !currentOsStr ? "Select an OS First" : "No values available"}
+                                />
+                            );
+                          })()}
                         </div>
                       ))}
                     </div>

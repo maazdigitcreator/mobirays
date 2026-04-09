@@ -362,8 +362,36 @@ export const buildAdvancedSearchRequestPayload = (
         });
       }
 
+      const categoryData = categories.get(categoryId);
+      const isNetworkSection =
+        normalizeSearchText(attribute.sectionTitle) === "network";
+
+      if (isNetworkSection) {
+        if (!categoryData.filters.network) {
+          categoryData.filters.network = {};
+        }
+
+        const name = attribute.name?.toUpperCase() || "";
+        let networkKey = "";
+
+        if (name.includes("5G")) {
+          networkKey = "5G";
+        } else if (name.includes("4G")) {
+          networkKey = "4G";
+        } else if (name.includes("3G")) {
+          networkKey = "3G";
+        } else if (name.includes("2G")) {
+          networkKey = "2G";
+        }
+
+        if (networkKey) {
+          categoryData.filters.network[networkKey] = filterValue;
+          return;
+        }
+      }
+
       const payloadKey = attribute.payloadKey || attribute.attributeId;
-      categories.get(categoryId).filters[payloadKey] = filterValue;
+      categoryData.filters[payloadKey] = filterValue;
     });
   });
 

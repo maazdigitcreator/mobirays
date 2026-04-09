@@ -11,6 +11,8 @@ import mobileImg from '../assets/mobileImg.jpg';
 import tabImg from '../assets/tabImg.jpg';
 import watchImg from '../assets/watchImg.png';
 
+let cachedData = null;
+
 const WhatsNew = () => {
     // State for data
     const [phones, setPhones] = useState([]);
@@ -26,16 +28,26 @@ const WhatsNew = () => {
 
     const itemsPerPage = 24; // 4 rows * 6 columns
 
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://mobirays.voucherndeals.com';
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'https://mobirays.voucherndeals.com';
 
     useEffect(() => {
-        const fetchItems = async (url, setter) => {
+        if (cachedData) {
+            setPhones(cachedData.phones);
+            setTablets(cachedData.tablets);
+            setWatches(cachedData.watches);
+            setPageBanners(cachedData.banners);
+            setLoading(false);
+            return;
+        }
+
+        const fetchItems = async (url) => {
             try {
                 const res = await fetch(url);
                 const data = await res.json();
-                if (data?.data) setter(mapProducts(data.data));
+                return data?.data ? mapProducts(data.data) : [];
             } catch (e) {
                 console.error(`Error fetching ${url}:`, e);
+                return [];
             }
         };
 
@@ -49,20 +61,33 @@ const WhatsNew = () => {
                     const b = allBanners.find(b => b.location === loc);
                     if (b) bannerMap[loc] = b;
                 });
-                setPageBanners(bannerMap);
+                return bannerMap;
             } catch (e) {
                 console.error("Error fetching banners:", e);
+                return {};
             }
         };
 
         const fetchData = async () => {
             setLoading(true);
-            await Promise.all([
-                fetchItems(`${apiBaseUrl}/api/v1/products/phoneWhatsNew`, setPhones),
-                fetchItems(`${apiBaseUrl}/api/v1/products/tabletWhatsNew`, setTablets),
-                fetchItems(`${apiBaseUrl}/api/v1/products/watchesWhatsNew`, setWatches),
+            const [fetchedPhones, fetchedTablets, fetchedWatches, fetchedBanners] = await Promise.all([
+                fetchItems(`${apiBaseUrl}/api/v1/products/phoneWhatsNew`),
+                fetchItems(`${apiBaseUrl}/api/v1/products/tabletWhatsNew`),
+                fetchItems(`${apiBaseUrl}/api/v1/products/watchesWhatsNew`),
                 fetchBanners()
             ]);
+
+            cachedData = {
+                phones: fetchedPhones,
+                tablets: fetchedTablets,
+                watches: fetchedWatches,
+                banners: fetchedBanners
+            };
+
+            setPhones(fetchedPhones);
+            setTablets(fetchedTablets);
+            setWatches(fetchedWatches);
+            setPageBanners(fetchedBanners);
             setLoading(false);
         };
 
