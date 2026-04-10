@@ -29,9 +29,10 @@ const Videos = () => {
             return;
         }
 
+        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "";
+
         const fetchBanners = async () => {
             try {
-                const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://mobirays.voucherndeals.com';
                 const response = await fetch(`${apiBaseUrl}/api/v1/banner?per_page=100`);
                 const result = await response.json();
                 const allBanners = Array.isArray(result.data) ? result.data : [];
@@ -49,7 +50,7 @@ const Videos = () => {
 
         const fetchVideos = async () => {
             try {
-                const response = await fetch('https://mobirays.voucherndeals.com/api/v1/videos/allVideos?per_page=100');
+                const response = await fetch(`${apiBaseUrl}/api/v1/videos/allVideos?per_page=100`);
                 if (!response.ok) throw new Error('Failed to fetch videos');
                 const json = await response.json();
                 return json.data || [];
