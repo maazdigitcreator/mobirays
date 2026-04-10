@@ -169,6 +169,17 @@ const normalizeAttributes = (attributes, sectionTitle, sectionCategoryIds) =>
         }
       }
 
+      if (normalizedPayloadKey === "resolution") {
+        const normalizedSection = sectionTitle?.trim().toLowerCase();
+        if (normalizedSection === "display") {
+          normalizedPayloadKey = "display_resolution";
+        } else if (normalizedSection === "main camera") {
+          normalizedPayloadKey = "main_camera_resolution";
+        } else if (normalizedSection === "selfie camera") {
+          normalizedPayloadKey = "selfie_camera_resolution";
+        }
+      }
+
       return {
         attributeId,
         fieldKey,

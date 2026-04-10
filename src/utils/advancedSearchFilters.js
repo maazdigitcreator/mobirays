@@ -177,8 +177,40 @@ const parseProductDimensions = (product) => {
   };
 };
 
-const matchesSingleAttributeValue = (productText, selectedValue) =>
-  productText.includes(normalizeSearchText(selectedValue));
+const getAttributeValueFromProduct = (product, attribute) => {
+  const payloadKey = attribute.payloadKey || attribute.attributeId;
+  const attributeName = normalizeSearchText(attribute.name);
+
+  // 1. Check top-level or specifications object
+  const directValue =
+    product[payloadKey] ??
+    product.specifications?.[payloadKey] ??
+    product.specifications?.[attribute.fieldKey];
+
+  if (directValue !== undefined && directValue !== null) {
+    return directValue;
+  }
+
+  // 2. Check more_specifications array
+  if (Array.isArray(product.more_specifications)) {
+    const matchedSpec = product.more_specifications.find(
+      (spec) =>
+        normalizeSearchText(spec.attribute) === attributeName ||
+        normalizeSearchText(spec.value) === attributeName,
+    );
+    if (matchedSpec) {
+      return matchedSpec.description || matchedSpec.value;
+    }
+  }
+
+  return null;
+};
+
+const matchesSingleAttributeValue = (targetText, selectedValue) => {
+  const normalizedTarget = normalizeSearchText(targetText);
+  const normalizedSelected = normalizeSearchText(selectedValue);
+  return normalizedTarget.includes(normalizedSelected);
+};
 
 const matchesAttributeValue = (product, attribute, selectedValue) => {
   const fieldType = getResolvedFieldType(attribute);
@@ -188,10 +220,17 @@ const matchesAttributeValue = (product, attribute, selectedValue) => {
       return true;
     }
 
-    const productText = buildSearchableProductText(product);
-    return selectedValue.some((value) =>
-      matchesSingleAttributeValue(productText, value),
-    );
+    const value = getAttributeValueFromProduct(product, attribute);
+    if (value === null) {
+      // Fallback to broad search only if targeted search fails
+      const productText = buildSearchableProductText(product);
+      return selectedValue.some((v) =>
+        matchesSingleAttributeValue(productText, v),
+      );
+    }
+
+    const valueText = String(value);
+    return selectedValue.some((v) => matchesSingleAttributeValue(valueText, v));
   }
 
   if (fieldType === "checkbox") {
@@ -199,8 +238,17 @@ const matchesAttributeValue = (product, attribute, selectedValue) => {
       return true;
     }
 
-    const productValues = flattenProductValues(product);
-    return productValues.some((v) => normalizeSearchText(v) === "true");
+    const value = getAttributeValueFromProduct(product, attribute);
+    if (value === null) {
+      return false; // If we can't find the field, it's not "True"
+    }
+
+    const normalizedValue = normalizeSearchText(value);
+    return (
+      normalizedValue === "true" ||
+      normalizedValue === "yes" ||
+      normalizedValue === "1"
+    );
   }
 
   if (fieldType === "range") {
@@ -363,32 +411,6 @@ export const buildAdvancedSearchRequestPayload = (
       }
 
       const categoryData = categories.get(categoryId);
-      const isNetworkSection =
-        normalizeSearchText(attribute.sectionTitle) === "network";
-
-      if (isNetworkSection) {
-        if (!categoryData.filters.network) {
-          categoryData.filters.network = {};
-        }
-
-        const name = attribute.name?.toUpperCase() || "";
-        let networkKey = "";
-
-        if (name.includes("5G")) {
-          networkKey = "5G";
-        } else if (name.includes("4G")) {
-          networkKey = "4G";
-        } else if (name.includes("3G")) {
-          networkKey = "3G";
-        } else if (name.includes("2G")) {
-          networkKey = "2G";
-        }
-
-        if (networkKey) {
-          categoryData.filters.network[networkKey] = filterValue;
-          return;
-        }
-      }
 
       const payloadKey = attribute.payloadKey || attribute.attributeId;
       categoryData.filters[payloadKey] = filterValue;
