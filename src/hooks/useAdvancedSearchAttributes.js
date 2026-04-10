@@ -163,9 +163,9 @@ const normalizeAttributes = (attributes, sectionTitle, sectionCategoryIds) =>
       if (normalizedPayloadKey === "ois") {
         const normalizedSection = sectionTitle?.trim().toLowerCase();
         if (normalizedSection === "main camera") {
-          normalizedPayloadKey = "maincameraois";
+          normalizedPayloadKey = "main_camera_ois";
         } else if (normalizedSection === "selfie camera") {
-          normalizedPayloadKey = "selfiecameraois";
+          normalizedPayloadKey = "selfie_camera_ois";
         }
       }
 
