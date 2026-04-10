@@ -66,7 +66,7 @@ const Videos = () => {
                 fetchBanners(),
                 fetchVideos()
             ]);
-            
+
             cachedData = {
                 banners: fetchedBanners,
                 videos: fetchedVideos

@@ -158,7 +158,16 @@ const normalizeAttributes = (attributes, sectionTitle, sectionCategoryIds) =>
         return null;
       }
 
-      const normalizedPayloadKey = name?.trim().toLowerCase() || name;
+      let normalizedPayloadKey = name?.trim().toLowerCase() || name;
+
+      if (normalizedPayloadKey === "ois") {
+        const normalizedSection = sectionTitle?.trim().toLowerCase();
+        if (normalizedSection === "main camera") {
+          normalizedPayloadKey = "maincameraois";
+        } else if (normalizedSection === "selfie camera") {
+          normalizedPayloadKey = "selfiecameraois";
+        }
+      }
 
       return {
         attributeId,

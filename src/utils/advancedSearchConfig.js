@@ -28,12 +28,15 @@ const RANGE_FIELD_KEYS = new Set([
   "display_density",
   "display_refresh_rate",
   "main_camera_resolution",
+  "main_camera_resolution_camera",
   "main_camera_f_number",
   "main_camera_video",
   "front_camera_resolution",
+  "front_camera_resolution_camera",
   "battery_capacity",
   "battery_wired_charging",
   "battery_wireless_charging",
+  "resolution_camera",
 ]);
 
 const TEXT_FIELD_KEYS = new Set(["body_color"]);
