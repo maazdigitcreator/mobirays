@@ -256,7 +256,7 @@ const Comparison = () => {
                                         />
                                         <button
                                             onClick={() => handleSearch(index)}
-                                            className="col-span-4 bg-[#0580A5] text-white py-1 text-xs sm:text-sm font-semibold hover:bg-[#046a8a] transition-colors cursor-pointer"
+                                            className="col-span-4 bg-[#0580A5] text-white py-1 text-[8px] sm:text-sm font-semibold hover:bg-[#046a8a] transition-colors cursor-pointer"
                                         >
                                             SEARCH
                                         </button>

@@ -357,8 +357,8 @@ export const getAdvancedSearchAttributesMissingCategoryIds = (
 
     const brandCategoryIds = Array.isArray(attribute.brandCategoryIds)
       ? attribute.brandCategoryIds
-          .map((value) => normalizeCategoryId(value))
-          .filter(Boolean)
+        .map((value) => normalizeCategoryId(value))
+        .filter(Boolean)
       : [];
 
     return brandCategoryIds.length === 0;
@@ -388,15 +388,15 @@ export const buildAdvancedSearchRequestPayload = (
 
     const brandCategoryIds = Array.isArray(attribute.brandCategoryIds)
       ? attribute.brandCategoryIds
-          .map((value) => normalizeCategoryId(value))
-          .filter(Boolean)
+        .map((value) => normalizeCategoryId(value))
+        .filter(Boolean)
       : [];
     const resolvedCategoryIds =
       activeCategoryId === null
         ? brandCategoryIds
         : brandCategoryIds.filter(
-            (categoryId) => Number(categoryId) === Number(activeCategoryId),
-          );
+          (categoryId) => Number(categoryId) === Number(activeCategoryId),
+        );
 
     if (resolvedCategoryIds.length === 0) {
       return;
