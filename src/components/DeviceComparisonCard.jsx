@@ -83,7 +83,12 @@ const DeviceComparisonCard = ({ device }) => {
 
                     <div className="text-sm flex items-center gap-2 justify-between">
                         <span className="font-bold text-xs sm:text-sm text-[#0580A5]">{device.price}</span>
-                        <div className="text-[10px] sm:text-xs text-[#0580A5] uppercase font-bold cursor-pointer">
+                        <div 
+                            onClick={() => {
+                                document.getElementById('pricing-section')?.scrollIntoView({ behavior: 'smooth' });
+                            }}
+                            className="text-[10px] sm:text-xs text-[#0580A5] uppercase font-bold cursor-pointer hover:text-[#046a8a] transition-colors"
+                        >
                             ALL PRICES
                         </div>
                     </div>

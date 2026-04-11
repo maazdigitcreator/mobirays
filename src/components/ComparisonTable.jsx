@@ -118,7 +118,7 @@ const ComparisonTable = ({ devices }) => {
                         ))}
 
                         {/* Pricing Rows */}
-                        <div className="flex gap-1 mt-1">
+                        <div id="pricing-section" className="flex gap-1 mt-1">
                             {/* Category Column */}
                             <div className="w-[20%] flex-shrink-0 border-2 border-[#0580A5] flex items-center justify-center overflow-hidden">
                                 <span className="text-black font-semibold text-xs sm:text-xl text-center px-1 w-full block break-words" style={{ hyphens: 'auto', wordWrap: 'break-word' }}>
