@@ -77,8 +77,36 @@ const SearchModal = ({ isOpen, onClose, searchQuery }) => {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {/* Devices Column */}
+                            <div className="md:border-r border-gray-200 md:pr-6">
+                                <h3 className="text-xs font-bold text-gray-600 mb-3 pb-2 border-b border-gray-300">DEVICES</h3>
+                                <div className="space-y-2">
+                                    {filteredDevices.map((device) => {
+                                        return (
+                                            <Link
+                                                key={device.id}
+                                                to={getProductDetailPath(device)}
+                                                state={{ product: device }}
+                                                onClick={onClose}
+                                                className="flex items-start gap-2 hover:bg-gray-50 p-1.5 rounded transition-colors"
+                                            >
+                                                <img src={device.image || mobileImg} alt={device.name} className="w-12 h-12 object-contain rounded flex-shrink-0" />
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-xs font-medium text-gray-800 leading-tight">{device.name}</p>
+                                                </div>
+                                            </Link>
+                                        )
+                                    })}
+                                </div>
+                                {filteredDevices.length > 0 && (
+                                    <Link to={`/search?q=${searchTerm}`} onClick={onClose} className="flex items-center justify-center gap-1 mt-3 text-xs text-cyan-600 hover:text-cyan-700 font-medium">
+                                        MORE DEVICE RESULTS <ArrowRight size={12} />
+                                    </Link>
+                                )}
+                            </div>
+
                             {/* Reviews Column */}
-                            <div className="border-r border-gray-200 pr-6">
+                            <div className="md:border-r border-gray-200 md:pr-6">
                                 <h3 className="text-xs font-bold text-gray-600 mb-3 pb-2 border-b border-gray-300">REVIEWS</h3>
                                 <div className="space-y-2">
                                     {filteredReviews.map((review) => {
@@ -104,34 +132,6 @@ const SearchModal = ({ isOpen, onClose, searchQuery }) => {
                                 {filteredReviews.length > 0 && (
                                     <Link to={`/reviews?q=${searchTerm}`} onClick={onClose} className="flex items-center justify-center gap-1 mt-3 text-xs text-cyan-600 hover:text-cyan-700 font-medium">
                                         MORE REVIEW RESULTS <ArrowRight size={12} />
-                                    </Link>
-                                )}
-                            </div>
-
-                            {/* Devices Column */}
-                            <div className="border-r border-gray-200 pr-6">
-                                <h3 className="text-xs font-bold text-gray-600 mb-3 pb-2 border-b border-gray-300">DEVICES</h3>
-                                <div className="space-y-2">
-                                    {filteredDevices.map((device) => {
-                                        return (
-                                            <Link
-                                                key={device.id}
-                                                to={getProductDetailPath(device)}
-                                                state={{ product: device }}
-                                                onClick={onClose}
-                                                className="flex items-start gap-2 hover:bg-gray-50 p-1.5 rounded transition-colors"
-                                            >
-                                                <img src={device.image || mobileImg} alt={device.name} className="w-12 h-12 object-contain rounded flex-shrink-0" />
-                                                <div className="flex-1 min-w-0">
-                                                    <p className="text-xs font-medium text-gray-800 leading-tight">{device.name}</p>
-                                                </div>
-                                            </Link>
-                                        )
-                                    })}
-                                </div>
-                                {filteredDevices.length > 0 && (
-                                    <Link to={`/search?q=${searchTerm}`} onClick={onClose} className="flex items-center justify-center gap-1 mt-3 text-xs text-cyan-600 hover:text-cyan-700 font-medium">
-                                        MORE DEVICE RESULTS <ArrowRight size={12} />
                                     </Link>
                                 )}
                             </div>
