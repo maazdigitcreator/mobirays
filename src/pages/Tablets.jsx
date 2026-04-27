@@ -18,11 +18,17 @@ import SidebarBanner3 from '../components/SidebarSections/SidebarBanner3';
 import BannerAd from '../components/BannerAd';
 import { filterProductsByCategory } from '../utils/filterHelpers';
 import { useData } from '../context/useData';
+import useMetadata from '../hooks/useMetadata';
 
 const END_POINT = '/api/v1/products/tabletComingsoon';
 const Tablets = () => {
     const location = useLocation();
     const { allProducts: cachedProducts, allBanners } = useData();
+
+    useMetadata(
+        "Latest Tablets | Mobirays",
+        "Explore the latest tablets specifications and prices in Pakistan on Mobirays."
+    );
 
     // Filter for Tablets from cached data
     const allProducts = React.useMemo(() => {

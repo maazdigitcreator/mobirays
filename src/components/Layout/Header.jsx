@@ -106,7 +106,10 @@ const Header = () => {
                             {isSearchModalOpen && !isMobileMenuOpen && (
                                 <SearchModal
                                     isOpen={isSearchModalOpen}
-                                    onClose={() => setIsSearchModalOpen(false)}
+                                    onClose={(clear = false) => {
+                                        setIsSearchModalOpen(false);
+                                        if (clear) setSearchQuery("");
+                                    }}
                                     searchQuery={searchQuery}
                                 />
                             )}
@@ -266,7 +269,10 @@ const Header = () => {
                             {isSearchModalOpen && !isMobileMenuOpen && (
                                 <SearchModal
                                     isOpen={isSearchModalOpen}
-                                    onClose={() => setIsSearchModalOpen(false)}
+                                    onClose={(clear = false) => {
+                                        setIsSearchModalOpen(false);
+                                        if (clear) setSearchQuery("");
+                                    }}
                                     searchQuery={searchQuery}
                                 />
                             )}

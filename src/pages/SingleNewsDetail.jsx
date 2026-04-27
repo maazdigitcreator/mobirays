@@ -21,6 +21,7 @@ import SidebarBanner2 from "../components/SidebarSections/SidebarBanner2";
 import SidebarLatestModels from "../components/SidebarSections/SidebarLatestModels";
 import SidebarBrands from "../components/SidebarSections/SidebarBrands";
 import BannerAd from "../components/BannerAd";
+import useMetadata from "../hooks/useMetadata";
 
 const SingleNewsDetail = () => {
   const { newsSlug } = useParams();
@@ -52,6 +53,11 @@ const SingleNewsDetail = () => {
     stats: discussionStats,
     refreshDiscussions,
   } = useNewsDiscussions(newsData?.id);
+
+  useMetadata(
+    newsData?.name ? `${newsData.name} | News | Mobirays` : null,
+    newsData?.description?.substring(0, 160) || null
+  );
 
   // Sync newsData with URL slug
   useEffect(() => {

@@ -15,6 +15,7 @@ import SidebarLatestModels from '../components/SidebarSections/SidebarLatestMode
 import { useData } from '../context/useData';
 import SidebarBrands from '../components/SidebarSections/SidebarBrands';
 import BannerAd from '../components/BannerAd'
+import useMetadata from '../hooks/useMetadata'
 
 const Reviews = () => {
     const location = useLocation();
@@ -22,8 +23,13 @@ const Reviews = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 9;
 
-    // Use cached reviews data
-    const reviews = cachedReviews;
+    useMetadata(
+        "Tech Reviews | Mobirays",
+        "Read comprehensive reviews of the latest smartphones, tablets, and gadgets on Mobirays."
+    );
+
+    // Use cached reviews data and sort by latest first
+    const reviews = [...cachedReviews].sort((a, b) => new Date(b.created_at || b.updated_at) - new Date(a.created_at || a.updated_at));
 
     // Apply search filter if query exists
     const params = new URLSearchParams(location.search);

@@ -157,7 +157,7 @@ const LatestProducts = ({ title, products, itemImage, limit, useDummyData = fals
                                         <img src={product.image || itemImage || MobileImg} alt="" />
                                     </div>
                                 </div>
-                                <h3 className="text-[18px] leading-tight uppercase text-[#1E1E1E] line-clamp-2 overflow-hidden">
+                                <h3 className="text-[18px] leading-tight uppercase text-[#1E1E1E] line-clamp-2 overflow-hidden text-center">
                                     {product.name}
                                 </h3>
                             </div>

@@ -7,7 +7,7 @@ import { productService } from "../services/productService";
 import { pageService } from "../services/pageService";
 import { DataContext } from "./dataContextInstance";
 
-const CACHE_KEY = "mobirays_api_cache_v2";
+const CACHE_KEY = "mobirays_api_cache_v4";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const DataProvider = ({ children }) => {
@@ -154,7 +154,11 @@ export const DataProvider = ({ children }) => {
       const rawProducts = [
         ...(firstFilterRes.data || []),
         ...remainingFilterPages.flatMap((r) => r.data || []),
-      ];
+      ].filter(p => {
+        const s = typeof p.status === 'object' ? String(p.status?.value || '') : String(p.status || '');
+        const statusStr = s.trim().toLowerCase();
+        return statusStr !== 'draft' && statusStr !== 'pending' && statusStr !== 'drafts';
+      });
 
       const comingSoonIds = new Set([
         ...(phoneComingsoonData?.data?.map((p) => p.id) || []),
@@ -188,8 +192,16 @@ export const DataProvider = ({ children }) => {
         };
       });
 
-      const news = newsData?.data || [];
-      const reviews = reviewsData?.data || [];
+      const news = (newsData?.data || []).filter(n => {
+        const s = typeof n.status === 'object' ? String(n.status?.value || '') : String(n.status || '');
+        const statusStr = s.trim().toLowerCase();
+        return statusStr !== 'draft' && statusStr !== 'pending' && statusStr !== 'drafts';
+      });
+      const reviews = (reviewsData?.data || []).filter(r => {
+        const s = typeof r.status === 'object' ? String(r.status?.value || '') : String(r.status || '');
+        const statusStr = s.trim().toLowerCase();
+        return statusStr !== 'draft' && statusStr !== 'pending' && statusStr !== 'drafts';
+      });
       const brands = brandsData?.data || [];
       const banners = allBannersData || [];
       const pages = dynamicPagesData || [];

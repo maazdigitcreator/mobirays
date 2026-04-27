@@ -24,7 +24,7 @@ const LatestReviews = ({ title, gridCols, titleAlign = 'center', clipPath, paddi
             setReviews(reviewsData);
             setLoading(false);
         } else if (!dataLoading) {
-            setReviews(allReviews);
+            setReviews([...allReviews].sort((a, b) => new Date(b.created_at || b.updated_at) - new Date(a.created_at || a.updated_at)));
             setLoading(false);
         }
     }, [reviewsData, allReviews, dataLoading]);

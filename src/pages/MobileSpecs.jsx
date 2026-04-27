@@ -24,6 +24,7 @@ import { productReviewService } from '../services/productReviewService'
 import { productService } from '../services/productService'
 import { useProductPageReviews } from '../hooks/useProductPageReviews'
 import BannerAd from '../components/BannerAd'
+import useMetadata from '../hooks/useMetadata'
 
 const PRODUCT_DETAIL_CACHE_KEY = 'mobirays_product_detail_cache_v1';
 const PRODUCT_VISITED_CACHE_KEY = 'mobirays_product_visited_v1';
@@ -105,21 +106,6 @@ const markProductAsVisited = (productId) => {
     }
 };
 
-const setDocumentDescription = (content) => {
-    if (typeof document === 'undefined') {
-        return;
-    }
-
-    let descriptionTag = document.querySelector('meta[name="description"]');
-
-    if (!descriptionTag) {
-        descriptionTag = document.createElement('meta');
-        descriptionTag.setAttribute('name', 'description');
-        document.head.appendChild(descriptionTag);
-    }
-
-    descriptionTag.setAttribute('content', content);
-};
 
 const MobileSpecs = () => {
     const { productId } = useParams();
@@ -221,6 +207,19 @@ const MobileSpecs = () => {
 
                 const nextProduct = response?.data ?? null;
 
+                const s = typeof nextProduct.status === 'object' ? String(nextProduct.status?.value || '') : String(nextProduct.status || '');
+                const statusStr = s.trim().toLowerCase();
+                const isDraft = statusStr === 'draft' || statusStr === 'pending' || statusStr === 'drafts';
+
+                if (nextProduct && isDraft) {
+                    setFetchedProduct(null);
+                    setProductStatus({
+                        loading: false,
+                        error: 'Product is not available.',
+                    });
+                    return;
+                }
+
                 setFetchedProduct(nextProduct);
                 writeCachedProductDetails(nextProduct);
                 if (shouldIncrementView) {
@@ -264,17 +263,10 @@ const MobileSpecs = () => {
 
     const productData = fetchedProduct ?? stateProduct ?? matchedProduct ?? null;
 
-    useEffect(() => {
-        if (!productData?.name) {
-            return;
-        }
-
-        const nextTitle = `${productData.name} - Full Specifications | Mobirays`;
-        const nextDescription = `${productData.name} full specs, price, camera, battery, display and more on Mobirays.`;
-
-        document.title = nextTitle;
-        setDocumentDescription(nextDescription);
-    }, [productData?.name]);
+    useMetadata(
+        productData?.name ? `${productData.name} - Full Specifications | Mobirays` : null,
+        productData?.name ? `${productData.name} full specs, price, camera, battery, display and more on Mobirays.` : null
+    );
 
     const pageBanners = useMemo(() => {
         const map = {};

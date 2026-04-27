@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useData } from "../context/useData";
+import useMetadata from "../hooks/useMetadata";
 import LatestProducts from "../components/LatestProducts";
 import Pagination from "../components/Pagination";
 import ProductsSectionButton from "../components/ProductsSectionButton";
@@ -23,6 +24,7 @@ import BannerAd from "../components/BannerAd";
 import { filterService } from "../services/filterService";
 import { decodeSidebarFilterQuery } from "../utils/sidebarFilters";
 import { filterProductsByCategory } from "../utils/filterHelpers";
+import { buildSearchableProductText, matchesSingleAttributeValue } from "../utils/advancedSearchFilters";
 
 const ITEMS_PER_PAGE = 24;
 const HOME_SECTIONS = [
@@ -55,6 +57,11 @@ const Home = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { allProducts, allBanners } = useData();
+
+  useMetadata(
+    "Home | Mobirays - Latest Phones, Tablets and Smartwatches",
+    "Find the latest phones, tablets, and smartwatches specifications and prices in Pakistan on Mobirays."
+  );
 
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [filteredProductsMeta, setFilteredProductsMeta] = useState(null);
@@ -114,7 +121,25 @@ const Home = () => {
           signal: controller.signal,
         });
         if (controller.signal.aborted) return;
-        setFilteredProducts(Array.isArray(response?.data) ? response.data : []);
+        const published = (Array.isArray(response?.data) ? response.data : []).filter(p => {
+          const s = typeof p.status === 'object' ? String(p.status?.value || '') : String(p.status || '');
+          const statusStr = s.trim().toLowerCase();
+          return statusStr !== 'draft' && statusStr !== 'pending' && statusStr !== 'drafts';
+        });
+
+        // Client-side refinement to ensure strict matching (e.g. OLED not matching AMOLED)
+        const refined = published.filter(product => {
+          const productText = buildSearchableProductText(product);
+          
+          return appliedFilters.every(category => {
+            return Object.entries(category.filters || {}).every(([filterId, values]) => {
+              if (!values || values.length === 0) return true;
+              return values.some(val => matchesSingleAttributeValue(productText, val));
+            });
+          });
+        });
+
+        setFilteredProducts(refined);
         setFilteredProductsMeta(response?.meta ?? null);
         setFilteredProductsStatus({ loading: false, error: "" });
       } catch (err) {
@@ -177,11 +202,12 @@ const Home = () => {
               </div>
             ) : (
               <>
-                {HOME_SECTIONS.map((section, index) => {
+                {HOME_SECTIONS.filter((section) => {
                   const sectionProducts = categorizedProducts[section.id] || [];
-
                   // In filtered view: hide section if empty
-                  if (isFilteredView && sectionProducts.length === 0) return null;
+                  return !(isFilteredView && sectionProducts.length === 0);
+                }).map((section, index) => {
+                  const sectionProducts = categorizedProducts[section.id] || [];
 
                   // In normal view: always show all 3 sections (original behaviour)
                   const displayProducts = isFilteredView

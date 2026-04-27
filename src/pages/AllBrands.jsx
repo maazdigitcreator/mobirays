@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useData } from '../context/useData';
+import useMetadata from '../hooks/useMetadata';
 
 import AllBrandsHero from '../components/AllBrandsHero'
 import BrandsGrid from '../components/BrandsGrid'
@@ -15,6 +16,10 @@ import RelatedNews from '../components/SidebarSections/RelatedNews';
 import BannerAd from '../components/BannerAd';
 
 const AllBrands = () => {
+    useMetadata(
+        "All Brands | Mobirays",
+        "Browse all mobile phone, tablet, and smartwatch brands on Mobirays."
+    );
     const { allBanners } = useData();
     const [pageBanners, setPageBanners] = useState({});
 

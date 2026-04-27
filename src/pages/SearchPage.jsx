@@ -29,6 +29,7 @@ import {
 } from '../utils/advancedSearchFilters';
 import { decodeAdvancedSearchQuery } from '../utils/advancedSearchQuery';
 import { filterProductsByCategory } from '../utils/filterHelpers';
+import useMetadata from '../hooks/useMetadata';
 
 const parseCategoryId = (value) => {
     if (value === null || value === undefined || value === '') {
@@ -68,6 +69,11 @@ const SearchPage = () => {
     );
     const hasAppliedFilters = Object.keys(appliedFilters).length > 0;
     const isFilteredView = isAdvancedSearchMode && !searchQuery;
+
+    useMetadata(
+        isFilteredView ? 'Filtered Products | Mobirays' : `Search results for "${searchQuery}" | Mobirays`,
+        isFilteredView ? 'Advanced filter search results on Mobirays.' : `Explore search results for ${searchQuery} on Mobirays.`
+    );
     const advancedRequestCategories = useMemo(
         () => buildAdvancedSearchRequestPayload(attributes, appliedFilters, {
             activeCategoryId,
@@ -197,7 +203,12 @@ const SearchPage = () => {
                     return;
                 }
 
-                setAdvancedProducts(Array.isArray(response?.data) ? response.data : []);
+                const published = (Array.isArray(response?.data) ? response.data : []).filter(p => {
+                    const s = typeof p.status === 'object' ? String(p.status?.value || '') : String(p.status || '');
+                    const statusStr = s.trim().toLowerCase();
+                    return statusStr !== 'draft' && statusStr !== 'pending' && statusStr !== 'drafts';
+                });
+                setAdvancedProducts(published);
                 setAdvancedStatus({
                     loading: false,
                     error: '',

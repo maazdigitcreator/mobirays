@@ -7,6 +7,7 @@ import LatestReviews from '../components/LatestReviews';
 import HeroBanner from '../components/Layout/HeroBanner';
 import BannerAd from '../components/BannerAd';
 import { useData } from '../context/useData';
+import useMetadata from '../hooks/useMetadata';
 import mobileImg from '../assets/mobileImg.jpg';
 import tabImg from '../assets/tabImg.jpg';
 import watchImg from '../assets/watchImg.png';
@@ -14,6 +15,10 @@ import watchImg from '../assets/watchImg.png';
 let cachedData = null;
 
 const WhatsNew = () => {
+    useMetadata(
+        "What's New | Mobirays",
+        "Stay updated with the latest changes and features on Mobirays."
+    );
     // State for data
     const [phones, setPhones] = useState([]);
     const [tablets, setTablets] = useState([]);
@@ -96,21 +101,27 @@ const WhatsNew = () => {
 
     // Helper to map API data to component expectation
     const mapProducts = (data) => {
-        return data.map(product => ({
-            id: product.id,
-            name: product.name,
-            image: product.image || null,
-            slug: product.slug,
-            isComingSoon: product.is_coming_soon || false,
-            isNew: true, // Mark as new for this page
-            specifications: product.specifications,
-            more_specifications: product.more_specifications,
-            price: product.price,
-            release_date: product.release_date,
-            views: product.views,
-            background_color: product.background_color,
-            shopBy_links: product.shopBy_links,
-        }));
+        return data
+            .filter(product => {
+                const s = typeof product.status === 'object' ? String(product.status?.value || '') : String(product.status || '');
+                const statusStr = s.trim().toLowerCase();
+                return statusStr !== 'draft' && statusStr !== 'pending' && statusStr !== 'drafts';
+            })
+            .map(product => ({
+                id: product.id,
+                name: product.name,
+                image: product.image || null,
+                slug: product.slug,
+                isComingSoon: product.is_coming_soon || false,
+                isNew: true, // Mark as new for this page
+                specifications: product.specifications,
+                more_specifications: product.more_specifications,
+                price: product.price,
+                release_date: product.release_date,
+                views: product.views,
+                background_color: product.background_color,
+                shopBy_links: product.shopBy_links,
+            }));
     };
 
     // Helper to slice data for pagination

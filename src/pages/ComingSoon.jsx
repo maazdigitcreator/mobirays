@@ -9,10 +9,15 @@ import mobileImg from '../assets/mobileImg.jpg';
 import tabImg from '../assets/tabImg.jpg';
 import watchImg from '../assets/watchImg.png';
 import BannerAd from '../components/BannerAd';
+import useMetadata from '../hooks/useMetadata';
 
 let cachedData = null;
 
 const ComingSoon = () => {
+    useMetadata(
+        "Coming Soon Products | Mobirays",
+        "Stay updated with upcoming phones, tablets, and smartwatches on Mobirays."
+    );
     // State for data
     const [phones, setPhones] = useState([]);
     const [tablets, setTablets] = useState([]);
@@ -95,20 +100,26 @@ const ComingSoon = () => {
 
     // Helper to map API data to component expectation
     const mapProducts = (data) => {
-        return data.map(product => ({
-            id: product.id,
-            name: product.name,
-            image: product.image || null,
-            slug: product.slug,
-            isComingSoon: true, // Force true for Coming Soon page items
-            specifications: product.specifications,
-            more_specifications: product.more_specifications,
-            price: product.price,
-            release_date: product.release_date,
-            views: product.views,
-            background_color: product.background_color,
-            shopBy_links: product.shopBy_links,
-        }));
+        return data
+            .filter(product => {
+                const s = typeof product.status === 'object' ? String(product.status?.value || '') : String(product.status || '');
+                const statusStr = s.trim().toLowerCase();
+                return statusStr !== 'draft' && statusStr !== 'pending' && statusStr !== 'drafts';
+            })
+            .map(product => ({
+                id: product.id,
+                name: product.name,
+                image: product.image || null,
+                slug: product.slug,
+                isComingSoon: true, // Force true for Coming Soon page items
+                specifications: product.specifications,
+                more_specifications: product.more_specifications,
+                price: product.price,
+                release_date: product.release_date,
+                views: product.views,
+                background_color: product.background_color,
+                shopBy_links: product.shopBy_links,
+            }));
     };
 
     // Helper to slice data for pagination

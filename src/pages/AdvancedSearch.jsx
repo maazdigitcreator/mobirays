@@ -11,6 +11,7 @@ import SidebarLatestModels from "../components/SidebarSections/SidebarLatestMode
 import SidebarStats from "../components/SidebarSections/SidebarStats";
 import { useData } from "../context/useData";
 import { useAdvancedSearchAttributes } from "../hooks/useAdvancedSearchAttributes";
+import useMetadata from "../hooks/useMetadata";
 import { advancedSearchService } from "../services/advancedSearchService";
 import {
   ADVANCED_SEARCH_TABS,
@@ -266,8 +267,8 @@ const MultiSelectField = ({
                     key={`${option.label}-${String(option.value)}`}
                     type="button"
                     onClick={() => {
-                        onToggle(option.value);
-                        if (isSingleSelect) setIsOpen(false);
+                      onToggle(option.value);
+                      if (isSingleSelect) setIsOpen(false);
                     }}
                     className="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-[#EDF6F9]"
                   >
@@ -451,6 +452,12 @@ const RangeField = ({
 const AdvancedSearch = () => {
   const location = useLocation();
   const navigate = useNavigate();
+
+  useMetadata(
+    "Advanced Search | Mobirays",
+    "Find products with specific features and specifications using our advanced search tool."
+  );
+
   const searchParams = useMemo(
     () => new URLSearchParams(location.search),
     [location.search],
@@ -532,7 +539,7 @@ const AdvancedSearch = () => {
 
   const selectedOsValues = osFieldKey ? filters[osFieldKey] : null;
   const currentOsStr = Array.isArray(selectedOsValues) && selectedOsValues.length > 0 ? selectedOsValues[0] : "";
-  
+
   const prevOsRef = useRef(currentOsStr);
   useEffect(() => {
     if (minOsFieldKey && currentOsStr !== prevOsRef.current) {
@@ -672,10 +679,15 @@ const AdvancedSearch = () => {
           return;
         }
 
+        const publishedCount = (Array.isArray(response?.data) ? response.data : []).filter(p => {
+          const s = typeof p.status === 'object' ? String(p.status?.value || '') : String(p.status || '');
+          const statusStr = s.trim().toLowerCase();
+          return statusStr !== 'draft' && statusStr !== 'pending' && statusStr !== 'drafts';
+        }).length;
         setPreviewStatus({
           loading: false,
           error: "",
-          count: Array.isArray(response?.data) ? response.data.length : 0,
+          count: publishedCount,
         });
       } catch (error) {
         if (controller.signal.aborted) {
@@ -724,7 +736,7 @@ const AdvancedSearch = () => {
       const currentValues = Array.isArray(currentFilters[fieldKey])
         ? currentFilters[fieldKey]
         : [];
-      
+
       let nextValues;
       if (isSingleSelect) {
         nextValues = currentValues.includes(value) ? [] : [value];
@@ -828,7 +840,7 @@ const AdvancedSearch = () => {
 
               <div className="relative flex-1">
                 <div className="absolute bottom-0 left-0 h-[10px] w-full bg-[#0580A5] sm:h-[16px]"></div>
-                <div className="latest-products-clip relative z-10 flex h-10 w-fit items-center bg-[#0580A5] text-white sm:h-14">
+                <div className="latest-products-clip relative z-10 flex h-10 w-fit items-center bg-[#0580A5] text-[#1f4e75] sm:h-14">
                   <h2 className="pl-2 font-medium text-sm sm:pl-4 sm:text-xl">
                     {activeTab?.label} Discover
                   </h2>
@@ -911,42 +923,42 @@ const AdvancedSearch = () => {
                             let localDisabled = attribute.options.length === 0;
 
                             if (isMinOs) {
-                                if (!currentOsStr) {
-                                    localDisabled = true;
-                                    displayOptions = [];
+                              if (!currentOsStr) {
+                                localDisabled = true;
+                                displayOptions = [];
+                              } else {
+                                const mapKey = Object.keys(OS_VERSION_MAP).find(k => k.toLowerCase() === String(currentOsStr).toLowerCase());
+                                if (mapKey) {
+                                  const allowedVersions = OS_VERSION_MAP[mapKey].map(v => v.toLowerCase());
+                                  displayOptions = attribute.options
+                                    .filter(opt => allowedVersions.includes(String(opt.label).toLowerCase()))
+                                    .sort((a, b) => {
+                                      const idxA = allowedVersions.indexOf(String(a.label).toLowerCase());
+                                      const idxB = allowedVersions.indexOf(String(b.label).toLowerCase());
+                                      return idxA - idxB;
+                                    });
                                 } else {
-                                    const mapKey = Object.keys(OS_VERSION_MAP).find(k => k.toLowerCase() === String(currentOsStr).toLowerCase());
-                                    if (mapKey) {
-                                        const allowedVersions = OS_VERSION_MAP[mapKey].map(v => v.toLowerCase());
-                                        displayOptions = attribute.options
-                                          .filter(opt => allowedVersions.includes(String(opt.label).toLowerCase()))
-                                          .sort((a, b) => {
-                                              const idxA = allowedVersions.indexOf(String(a.label).toLowerCase());
-                                              const idxB = allowedVersions.indexOf(String(b.label).toLowerCase());
-                                              return idxA - idxB;
-                                          });
-                                    } else {
-                                        displayOptions = [];
-                                    }
+                                  displayOptions = [];
                                 }
+                              }
                             }
 
                             return (
-                                <MultiSelectField
-                                  label={attribute.name}
-                                  value={filters[attribute.fieldKey] ?? []}
-                                  onToggle={(value) =>
-                                    toggleMultiSelectValue(
-                                      attribute.fieldKey,
-                                      value,
-                                      isSingleSelect
-                                    )
-                                  }
-                                  options={displayOptions}
-                                  disabled={localDisabled || displayOptions.length === 0}
-                                  isSingleSelect={isSingleSelect}
-                                  disabledText={isMinOs && !currentOsStr ? "Select an OS First" : "No values available"}
-                                />
+                              <MultiSelectField
+                                label={attribute.name}
+                                value={filters[attribute.fieldKey] ?? []}
+                                onToggle={(value) =>
+                                  toggleMultiSelectValue(
+                                    attribute.fieldKey,
+                                    value,
+                                    isSingleSelect
+                                  )
+                                }
+                                options={displayOptions}
+                                disabled={localDisabled || displayOptions.length === 0}
+                                isSingleSelect={isSingleSelect}
+                                disabledText={isMinOs && !currentOsStr ? "Select an OS First" : "No values available"}
+                              />
                             );
                           })()}
                         </div>
@@ -969,7 +981,7 @@ const AdvancedSearch = () => {
                 Result
               </span>
               <span className="border-[2px] border-l-2 border-[#0580A5] px-6 sm:px-8 text-xl sm:text-3xl py-2 flex items-center">
-                {previewStatus.loading ? "..." : resultCount.toLocaleString()}
+                {previewStatus.loading ? "..." : previewStatus.count.toLocaleString()}
               </span>
               <button
                 onClick={handleSearch}

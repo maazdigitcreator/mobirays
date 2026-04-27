@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import useMetadata from '../hooks/useMetadata'
 import Sidebar from '../components/Layout/Sidebar'
 import sidebarBanner1 from '../assets/sidebarBanner1.png'
 import HeroBanner from '../components/Layout/HeroBanner'
@@ -14,6 +15,10 @@ import homeBanner3 from '../assets/homeBanner3.png'
 import BannerAd from '../components/BannerAd'
 
 const Dictionary = () => {
+    useMetadata(
+        "Tech Dictionary | Mobirays",
+        "Explore tech terms and definitions in the Mobirays dictionary."
+    );
     const [pageBanners, setPageBanners] = useState({});
 
     useEffect(() => {

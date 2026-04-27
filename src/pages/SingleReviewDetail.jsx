@@ -20,6 +20,7 @@ import { useData } from "../context/useData";
 import { useAuth } from "../context/useAuth";
 import { reviewDiscussionService } from "../services/reviewDiscussionService";
 import { useReviewDiscussions } from "../hooks/useReviewDiscussions";
+import useMetadata from "../hooks/useMetadata";
 
 const SingleReviewDetail = () => {
   const { reviewSlug } = useParams();
@@ -82,6 +83,11 @@ const SingleReviewDetail = () => {
     stats: discussionStats,
     refreshDiscussions,
   } = useReviewDiscussions(reviewData?.id);
+
+  useMetadata(
+    reviewData?.name ? `${reviewData.name} | Review | Mobirays` : null,
+    reviewData?.description?.replace(/<[^>]*>?/gm, '')?.substring(0, 160) || null
+  );
 
   const handleReviewChange = (e) => {
     const { name, value } = e.target;

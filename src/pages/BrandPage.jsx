@@ -12,6 +12,7 @@ import tabImg from '../assets/tabImg.jpg';
 import watchImg from '../assets/watchImg.png';
 import { useData } from '../context/useData';
 import { filterProductsByCategory } from '../utils/filterHelpers';
+import useMetadata from '../hooks/useMetadata';
 
 const BrandPage = () => {
     const { brandSlug } = useParams();
@@ -43,9 +44,16 @@ const BrandPage = () => {
     const brandName = brandInfo
         ? brandInfo.name
         : brandSlug
-            .split('-')
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ');
+            ? brandSlug
+                .split('-')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ')
+            : '';
+
+    useMetadata(
+        `${brandName} | Mobirays`,
+        `Explore the latest ${brandName} products, including phones, tablets, and smartwatches on Mobirays.`
+    );
 
     // Filter all products belonging to this brand using the `brand` field
     const brandProducts = useMemo(() => {

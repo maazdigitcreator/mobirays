@@ -4,8 +4,13 @@ import SidebarBrands from '../components/SidebarSections/SidebarBrands'
 import SidebarFilters from '../components/SidebarSections/SidebarFilters'
 import SidebarBanner1 from '../components/SidebarSections/SidebarBanner1'
 import { contactService } from '../services/contactService'
+import useMetadata from '../hooks/useMetadata'
 
 const Contact = () => {
+    useMetadata(
+        "Contact Us | Mobirays",
+        "Get in touch with Mobirays for feedback, suggestions, or reporting mistakes in our specifications database."
+    );
     const [pageBanners, setPageBanners] = useState({});
     const [form, setForm] = useState({
         name: '',

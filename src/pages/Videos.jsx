@@ -7,6 +7,7 @@ import shareIcon from "../assets/shareIcon.png"
 import Sidebar from '../components/Layout/Sidebar'
 import BannerAd from '../components/BannerAd'
 import { useData } from '../context/useData'
+import useMetadata from '../hooks/useMetadata'
 import Banner1 from '../assets/homeBannerSM1.png'
 import Banner2 from '../assets/homeBannerSM2.png'
 import homeBanner3 from '../assets/homeBanner3.png'
@@ -14,6 +15,10 @@ import homeBanner3 from '../assets/homeBanner3.png'
 let cachedData = null;
 
 const Videos = () => {
+    useMetadata(
+        "Review Videos | Mobirays",
+        "Watch the latest technology review videos on Mobirays."
+    );
     const [searchQuery, setSearchQuery] = useState('')
     const [videos, setVideos] = useState([])
     const [loading, setLoading] = useState(true)

@@ -142,7 +142,7 @@ const flattenProductValues = (value, accumulator = []) => {
   return accumulator;
 };
 
-const buildSearchableProductText = (product) =>
+export const buildSearchableProductText = (product) =>
   normalizeSearchText(flattenProductValues(product).join(" "));
 
 const buildProductNumbers = (product) =>
@@ -206,9 +206,19 @@ const getAttributeValueFromProduct = (product, attribute) => {
   return null;
 };
 
-const matchesSingleAttributeValue = (targetText, selectedValue) => {
+export const matchesSingleAttributeValue = (targetText, selectedValue) => {
   const normalizedTarget = normalizeSearchText(targetText);
   const normalizedSelected = normalizeSearchText(selectedValue);
+
+  if (!normalizedSelected) return true;
+
+  // Specific fix for OLED matching AMOLED:
+  // If "oled" is selected, we ensure it's matched as a whole word.
+  if (normalizedSelected === "oled") {
+    return ` ${normalizedTarget} `.includes(" oled ");
+  }
+
+  // For all other filters, keep the original loose matching logic
   return normalizedTarget.includes(normalizedSelected);
 };
 
@@ -220,17 +230,23 @@ const matchesAttributeValue = (product, attribute, selectedValue) => {
       return true;
     }
 
+    // Resolve IDs to labels if possible to match against product text/specs
+    const labelsToMatch = selectedValue.map(v => {
+      const option = attribute.options?.find(opt => String(opt.value) === String(v));
+      return option ? option.label : v;
+    });
+
     const value = getAttributeValueFromProduct(product, attribute);
     if (value === null) {
       // Fallback to broad search only if targeted search fails
       const productText = buildSearchableProductText(product);
-      return selectedValue.some((v) =>
-        matchesSingleAttributeValue(productText, v),
+      return labelsToMatch.some((l) =>
+        matchesSingleAttributeValue(productText, l),
       );
     }
 
     const valueText = String(value);
-    return selectedValue.some((v) => matchesSingleAttributeValue(valueText, v));
+    return labelsToMatch.some((l) => matchesSingleAttributeValue(valueText, l));
   }
 
   if (fieldType === "checkbox") {

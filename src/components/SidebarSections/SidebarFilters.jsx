@@ -13,13 +13,12 @@ import { useSidebarFilters } from '../../hooks/useSidebarFilters';
 
 const FILTER_ICONS = {
     network: Wifi,
-    ram: Cpu,
     screen: Monitor,
     camera: Camera,
     storage: HardDrive,
     os: Settings,
     price: DollarSign,
-    memory: Database,
+    ram: Database,
     display: MonitorSmartphone,
 };
 

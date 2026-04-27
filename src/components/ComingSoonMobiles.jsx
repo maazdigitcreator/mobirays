@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom' // Added useNavigate
 import MobileImg from '../assets/mobileImg.jpg'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { createSlug } from '../utils/urlHelper' // Import createSlug
+import { getProductDetailPath } from '../utils/productRoutes'
 const END_POINT = '/api/v1/products/phoneComingsoon';
 const ComingSoonMobiles = ({ title, itemImage, endpoint = END_POINT}) => {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -20,7 +20,12 @@ const ComingSoonMobiles = ({ title, itemImage, endpoint = END_POINT}) => {
                 const response = await fetch(`${apiBaseUrl}${endpoint}`);
                 const data = await response.json();
                 if (data && data.data) {
-                    setProducts(data.data);
+                    const published = data.data.filter(p => {
+                        const s = typeof p.status === 'object' ? String(p.status?.value || '') : String(p.status || '');
+                        const statusStr = s.trim().toLowerCase();
+                        return statusStr !== 'draft' && statusStr !== 'pending' && statusStr !== 'drafts';
+                    });
+                    setProducts(published);
                 }
             } catch (error) {
                 console.error('Error fetching coming soon mobiles:', error);
@@ -75,8 +80,7 @@ const ComingSoonMobiles = ({ title, itemImage, endpoint = END_POINT}) => {
     };
 
     const handleProductClick = (product) => {
-        const slug = product.slug || createSlug(product.name);
-        navigate(`/${slug}`, {
+        navigate(getProductDetailPath(product), {
             state: {
                 product: {
                     ...product,

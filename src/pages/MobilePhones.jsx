@@ -18,11 +18,17 @@ import SidebarBanner3 from '../components/SidebarSections/SidebarBanner3';
 import BannerAd from '../components/BannerAd';
 import { filterProductsByCategory } from '../utils/filterHelpers';
 import { useData } from '../context/useData';
+import useMetadata from '../hooks/useMetadata';
 const END_POINT = '/api/v1/products/phoneComingsoon';
 
 const MobilePhones = () => {
     const location = useLocation();
     const { allProducts: cachedProducts, allBanners } = useData();
+
+    useMetadata(
+        "Latest Mobile Phones | Mobirays",
+        "Explore the latest mobile phones specifications and prices in Pakistan on Mobirays."
+    );
 
     // Filter for Mobile Phones from cached data
     const allProducts = React.useMemo(() => {

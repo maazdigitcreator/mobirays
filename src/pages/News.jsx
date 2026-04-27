@@ -18,6 +18,7 @@ import SidebarStats from '../components/SidebarSections/SidebarStats'
 import SidebarLatestModels from '../components/SidebarSections/SidebarLatestModels'
 import { useData } from '../context/useData';
 import BannerAd from '../components/BannerAd'
+import useMetadata from '../hooks/useMetadata'
 
 const News = () => {
     const location = useLocation();
@@ -25,6 +26,11 @@ const News = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 4;
     const [pageBanners, setPageBanners] = useState({});
+
+    useMetadata(
+        "Latest Tech News | Mobirays",
+        "Stay updated with the latest technology news, product launches, and industry trends on Mobirays."
+    );
 
     useEffect(() => {
         if (allBanners.length > 0) {
@@ -37,8 +43,8 @@ const News = () => {
         }
     }, [allBanners]);
 
-    // Use cached news data
-    const newsData = cachedNews;
+    // Use cached news data and sort by latest first
+    const newsData = [...cachedNews].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
     // Apply search filter if query exists
     const params = new URLSearchParams(location.search);

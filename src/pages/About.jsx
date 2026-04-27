@@ -2,8 +2,13 @@ import React, { useState, useEffect } from 'react';
 import aboutBanner from '../assets/aboutBanner.jpg';
 import mobileImg from '../assets/mobileImg.jpg';
 import BannerAd from '../components/BannerAd';
+import useMetadata from '../hooks/useMetadata';
 
 const About = () => {
+    useMetadata(
+        "About Us | Mobirays",
+        "Learn more about Mobirays and our passion for technology discovered through phones, gadgets, and more."
+    );
     const [pageBanners, setPageBanners] = useState({});
 
     useEffect(() => {

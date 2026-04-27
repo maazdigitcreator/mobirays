@@ -87,7 +87,7 @@ const SearchModal = ({ isOpen, onClose, searchQuery }) => {
                                                 key={device.id}
                                                 to={getProductDetailPath(device)}
                                                 state={{ product: device }}
-                                                onClick={onClose}
+                                                onClick={() => onClose(true)}
                                                 className="flex items-start gap-2 hover:bg-gray-50 p-1.5 rounded transition-colors"
                                             >
                                                 <img src={device.image || mobileImg} alt={device.name} className="w-12 h-12 object-contain rounded flex-shrink-0" />
@@ -99,7 +99,7 @@ const SearchModal = ({ isOpen, onClose, searchQuery }) => {
                                     })}
                                 </div>
                                 {filteredDevices.length > 0 && (
-                                    <Link to={`/search?q=${searchTerm}`} onClick={onClose} className="flex items-center justify-center gap-1 mt-3 text-xs text-cyan-600 hover:text-cyan-700 font-medium">
+                                    <Link to={`/search?q=${searchTerm}`} onClick={() => onClose(true)} className="flex items-center justify-center gap-1 mt-3 text-xs text-cyan-600 hover:text-cyan-700 font-medium">
                                         MORE DEVICE RESULTS <ArrowRight size={12} />
                                     </Link>
                                 )}
@@ -116,7 +116,7 @@ const SearchModal = ({ isOpen, onClose, searchQuery }) => {
                                                 key={review.id}
                                                 to={`/review/${slug}`}
                                                 state={{ reviewData: review }}
-                                                onClick={onClose}
+                                                onClick={() => onClose(true)}
                                                 className="flex items-start gap-2 hover:bg-gray-50 p-1.5 rounded transition-colors"
                                             >
                                                 <img src={review.image || mobileImg} alt={review.name} className="w-12 h-12 object-cover rounded flex-shrink-0" />
@@ -130,7 +130,7 @@ const SearchModal = ({ isOpen, onClose, searchQuery }) => {
                                     })}
                                 </div>
                                 {filteredReviews.length > 0 && (
-                                    <Link to={`/reviews?q=${searchTerm}`} onClick={onClose} className="flex items-center justify-center gap-1 mt-3 text-xs text-cyan-600 hover:text-cyan-700 font-medium">
+                                    <Link to={`/reviews?q=${searchTerm}`} onClick={() => onClose(true)} className="flex items-center justify-center gap-1 mt-3 text-xs text-cyan-600 hover:text-cyan-700 font-medium">
                                         MORE REVIEW RESULTS <ArrowRight size={12} />
                                     </Link>
                                 )}
@@ -145,7 +145,7 @@ const SearchModal = ({ isOpen, onClose, searchQuery }) => {
                                             key={newsItem.id}
                                             to={`/news/${newsItem.slug}`}
                                             state={{ newsData: newsItem }}
-                                            onClick={onClose}
+                                            onClick={() => onClose(true)}
                                             className="flex items-start gap-2 hover:bg-gray-50 p-1.5 rounded transition-colors"
                                         >
                                             <img src={newsItem.image || mobileImg} alt={newsItem.name} className="w-12 h-12 object-cover rounded flex-shrink-0" />
@@ -156,7 +156,7 @@ const SearchModal = ({ isOpen, onClose, searchQuery }) => {
                                     ))}
                                 </div>
                                 {filteredNews.length > 0 && (
-                                    <Link to={`/news?q=${searchTerm}`} onClick={onClose} className="flex items-center justify-center gap-1 mt-3 text-xs text-cyan-600 hover:text-cyan-700 font-medium">
+                                    <Link to={`/news?q=${searchTerm}`} onClick={() => onClose(true)} className="flex items-center justify-center gap-1 mt-3 text-xs text-cyan-600 hover:text-cyan-700 font-medium">
                                         MORE NEWS RESULTS <ArrowRight size={12} />
                                     </Link>
                                 )}

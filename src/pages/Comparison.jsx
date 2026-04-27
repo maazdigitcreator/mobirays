@@ -6,7 +6,12 @@ import DeviceComparisonCard from '../components/DeviceComparisonCard';
 import ComparisonTable from '../components/ComparisonTable';
 import HeroBanner from '../components/Layout/HeroBanner';
 import SidebarBanner1 from '../components/SidebarSections/SidebarBanner1';
+import useMetadata from '../hooks/useMetadata';
 const Comparison = () => {
+    useMetadata(
+        "Product Comparison | Mobirays",
+        "Compare specifications of different phones, tablets, and smartwatches."
+    );
     // Sample device data - replace with API data later
     const location = useLocation();
 

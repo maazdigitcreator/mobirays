@@ -1,7 +1,12 @@
 import React from 'react';
+import useMetadata from '../hooks/useMetadata';
 import aboutBanner from '../assets/aboutBanner.jpg';
 
 const PrivacyPolicy = () => {
+    useMetadata(
+        "Privacy Policy | Mobirays",
+        "Read the privacy policy for the Mobirays platform."
+    );
     return (
         <div className="w-full">
             {/* Privacy Policy Banner */}

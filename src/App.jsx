@@ -31,6 +31,7 @@ import { AuthProvider } from './context/AuthContext';
 import privateRoutes from './routes/PrivateRoutes';
 import { useAnnouncement } from './hooks/useAnnouncement';
 import AnnouncementModal from './components/AnnouncementModal';
+import ScrollToTop from './components/ScrollToTop';
 
 function App() {
   const { announcement, isOpen, closeAnnouncement } = useAnnouncement();
@@ -39,6 +40,7 @@ function App() {
     <AuthProvider>
     <DataProvider>
       <BrowserRouter>
+        <ScrollToTop />
         <Layout>
           <Routes>
             <Route path="/" element={<Home />} />

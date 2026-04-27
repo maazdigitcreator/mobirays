@@ -25,7 +25,7 @@ const LatestNews = ({ title, gridCols, titleAlign = 'center', clipPath, paddingL
             setNews(newsData);
             setLoading(false);
         } else if (!dataLoading) {
-            setNews(allNews);
+            setNews([...allNews].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)));
             setLoading(false);
         }
     }, [newsData, allNews, dataLoading]);

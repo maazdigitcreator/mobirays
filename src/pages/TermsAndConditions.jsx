@@ -1,7 +1,12 @@
 import React from 'react';
+import useMetadata from '../hooks/useMetadata';
 import aboutBanner from '../assets/aboutBanner.jpg';
 
 const TermsAndConditions = () => {
+    useMetadata(
+        "Terms and Conditions | Mobirays",
+        "Read the terms and conditions for using the Mobirays platform."
+    );
     return (
         <div className="w-full">
             {/* Terms Banner */}

@@ -141,8 +141,7 @@ const ReviewedProductsList = ({
                     />
                   </div>
                 </div>
-                <h3 className="sm:text-[18px] leading-tight uppercase text-[#1E1E1E] line-clamp-2 text-center text-xs
-                 text-start overflow-hidden px-2 sm:px-5">
+                <h3 className="sm:text-[18px] leading-tight uppercase text-[#1E1E1E] line-clamp-2 text-center overflow-hidden px-2 sm:px-5">
                   {review.productName}
                 </h3>
               </div>
