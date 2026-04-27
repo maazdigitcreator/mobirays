@@ -243,6 +243,13 @@ const SingleNewsDetail = () => {
                   {newsData?.description ||
                     "Just a day after the One UI 3.0 beta for the original Galaxy $20 trio went public in South Korea, Samsung started rolling it out to users in the US as well. Soon, the update should also reach Europe (Germany, Poland, the UK), India and China."}
                 </p>
+
+                {newsData?.content && (
+                  <div 
+                    className="news-content-body sm:px-4 px-2 py-4 text-gray-800 leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: newsData.content }}
+                  />
+                )}
               </div>
 
               {pageBanners["subnews_banner_1"] && (

@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import MobileImg from "../assets/mobileImg.jpg";
 import { Search, Edit, Trash2 } from "lucide-react";
 import Pagination from "./Pagination";
@@ -30,15 +30,7 @@ const ReviewedProductsList = ({
     handleDelete,
   } = useReviewedProducts(products);
 
-  const handleProductClick = (product) => {
-    if (!product) return;
 
-    navigate(getProductDetailPath(product), {
-      state: {
-        product: product,
-      },
-    });
-  };
 
   return (
     <div className="w-full container">
@@ -129,9 +121,10 @@ const ReviewedProductsList = ({
               className="flex md:flex-row sm:gap-6 gap-1 items-start"
             >
               {/* Left Side: Product Image and Name */}
-              <div
+              <Link
+                to={getProductDetailPath(review.product)}
+                state={{ product: review.product }}
                 className="sm:w-full w-[25%] md:w-1/4 flex flex-col group cursor-pointer"
-                onClick={() => handleProductClick(review.product)}
               >
                 <div className="relative mb-3 flex justify-center items-center p-2 rounded-lg h-auto transition-transform group-hover:scale-105">
                   <div className="w-full h-full flex items-start justify-center text-6xl">
@@ -144,7 +137,7 @@ const ReviewedProductsList = ({
                 <h3 className="sm:text-[18px] leading-tight uppercase text-[#1E1E1E] line-clamp-2 text-center overflow-hidden px-2 sm:px-5">
                   {review.productName}
                 </h3>
-              </div>
+              </Link>
 
               {/* Right Side: Review Content */}
               <div className="w-full md:w-3/4 border-1 sm:border-2 border-[#0580A5] sm:p-4 p-2 relative">

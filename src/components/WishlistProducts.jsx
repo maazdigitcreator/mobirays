@@ -1,5 +1,5 @@
 import React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import MobileImg from '../assets/mobileImg.jpg'
 import { Search } from 'lucide-react'
 import Pagination from './Pagination'
@@ -18,20 +18,7 @@ const WishlistProducts = ({ title = "Product Wishlist", products, itemImage }) =
         handleSearchChange,
     } = useWishlistProducts(products);
 
-    const handleProductClick = (product) => {
-        // Get the actual image being displayed (product.image or itemImage or MobileImg)
-        const productImage = product.image || itemImage || MobileImg;
-        const normalizedProduct = product.product || product;
 
-        navigate(getProductDetailPath(normalizedProduct), {
-            state: {
-                product: {
-                    ...normalizedProduct,
-                    image: productImage
-                }
-            }
-        });
-    };
 
     return (
         <div className="w-full container">
@@ -109,10 +96,16 @@ const WishlistProducts = ({ title = "Product Wishlist", products, itemImage }) =
                 ) : (
                     <div className="grid grid-cols-3 sm:grid-cols-2 px-2 sm:gap-y-10 gap-y-12 md:grid-cols-4 lg:grid-cols-6 gap-4 mt-10">
                         {currentProducts.map((product) => (
-                            <div
+                            <Link
                                 key={product.id}
+                                to={getProductDetailPath(product.product || product)}
+                                state={{
+                                    product: {
+                                        ...(product.product || product),
+                                        image: product.image || itemImage || MobileImg
+                                    }
+                                }}
                                 className="flex flex-col group cursor-pointer gap-y-4 sm:gap-y-0"
-                                onClick={() => handleProductClick(product)}
                             >
                                 <div className="relative mb-3 flex justify-center items-center p-2 bg-blue-50/50 rounded-lg h-48 transition-transform group-hover:scale-105">
                                     {product.isComingSoon && (
@@ -136,7 +129,7 @@ const WishlistProducts = ({ title = "Product Wishlist", products, itemImage }) =
                                 <h3 className="text-[18px] leading-tight uppercase text-[#1E1E1E] line-clamp-2 overflow-hidden text-center">
                                     {product.name}
                                 </h3>
-                            </div>
+                            </Link>
                         ))}
                     </div>
                 )}

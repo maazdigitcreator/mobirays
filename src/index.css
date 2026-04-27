@@ -48,4 +48,21 @@
     .animate-fade-in {
         animation: fade-in 0.2s ease-out;
     }
+
+    .news-content-body p {
+        margin-bottom: 1.25rem;
+        font-size: 1.1rem;
+    }
+
+    .news-content-body h3 {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        color: #0580A5;
+    }
+
+    .news-content-body shortcode {
+        display: none;
+    }
 }

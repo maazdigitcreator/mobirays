@@ -47,12 +47,6 @@ const SearchPage = () => {
     const resultsRef = useRef(null);
 
     const [pageBanners, setPageBanners] = useState({});
-    const [advancedProducts, setAdvancedProducts] = useState([]);
-    const [advancedStatus, setAdvancedStatus] = useState({
-        loading: false,
-        error: '',
-        loaded: false,
-    });
     const searchParams = useMemo(
         () => new URLSearchParams(location.search),
         [location.search],
@@ -159,103 +153,28 @@ const SearchPage = () => {
         };
     }, [allNews, allProducts, allReviews]);
 
-    useEffect(() => {
-        if (!isFilteredView) {
-            return;
-        }
-
-        if (hasAppliedFilters && advancedFiltersMissingCategoryIds.length > 0) {
-            setAdvancedProducts([]);
-            setAdvancedStatus({
-                loading: false,
-                error: 'Selected filters are missing brand_category_id.',
-                loaded: false,
-            });
-            return;
-        }
-
-        if (hasAppliedFilters && attributes.length > 0 && advancedRequestCategories.length === 0) {
-            setAdvancedProducts([]);
-            setAdvancedStatus({
-                loading: false,
-                error: 'Advanced search request is missing category mapping.',
-                loaded: false,
-            });
-            return;
-        }
-
-        const controller = new AbortController();
-
-        const fetchAdvancedResults = async () => {
-            setAdvancedStatus({
-                loading: true,
-                error: '',
-                loaded: false,
-            });
-
-            try {
-                const response = await advancedSearchService.getData({
-                    categories: advancedRequestCategories,
-                    signal: controller.signal,
-                });
-
-                if (controller.signal.aborted) {
-                    return;
-                }
-
-                const published = (Array.isArray(response?.data) ? response.data : []).filter(p => {
-                    const s = typeof p.status === 'object' ? String(p.status?.value || '') : String(p.status || '');
-                    const statusStr = s.trim().toLowerCase();
-                    return statusStr !== 'draft' && statusStr !== 'pending' && statusStr !== 'drafts';
-                });
-                setAdvancedProducts(published);
-                setAdvancedStatus({
-                    loading: false,
-                    error: '',
-                    loaded: true,
-                });
-            } catch (error) {
-                if (controller.signal.aborted) {
-                    return;
-                }
-
-                setAdvancedProducts([]);
-                setAdvancedStatus({
-                    loading: false,
-                    error:
-                        error?.data?.message ||
-                        error?.message ||
-                        'Failed to load filtered products.',
-                    loaded: false,
-                });
-            }
-        };
-
-        void fetchAdvancedResults();
-
-        return () => {
-            controller.abort();
-        };
-    }, [advancedFiltersMissingCategoryIds.length, advancedRequestCategories, attributes.length, hasAppliedFilters, isFilteredView]);
+    // Advanced Search now runs locally on the allProducts catalog for perfect pagination and performance
+    const localAdvancedProducts = useMemo(() => {
+        if (!isFilteredView || allProducts.length === 0) return [];
+        
+        return runAdvancedSearch(
+            allProducts,
+            attributes,
+            appliedFilters,
+        );
+    }, [isFilteredView, allProducts, attributes, appliedFilters]);
 
     const searchResults = useMemo(() => {
         if (isFilteredView) {
-            if (advancedStatus.loaded) {
-                // Apply local refinement (critical for split dimension filters)
-                const refinedProducts = runAdvancedSearch(
-                    advancedProducts,
-                    attributes,
-                    appliedFilters,
-                );
-
+            if (allProducts.length > 0) {
                 // Categorize matched products using existing helper
-                const filteredPhones = filterProductsByCategory(refinedProducts, 'Phones');
-                const filteredTablets = filterProductsByCategory(refinedProducts, 'Tablets');
-                const filteredWatches = filterProductsByCategory(refinedProducts, 'Smartwatches');
+                const filteredPhones = filterProductsByCategory(localAdvancedProducts, 'Phones');
+                const filteredTablets = filterProductsByCategory(localAdvancedProducts, 'Tablets');
+                const filteredWatches = filterProductsByCategory(localAdvancedProducts, 'Smartwatches');
 
                 // Products that don't match any known category — still show them in phones
                 const categorizedIds = new Set([...filteredPhones, ...filteredTablets, ...filteredWatches].map(p => p.id));
-                const uncategorized = refinedProducts.filter(p => !categorizedIds.has(p.id));
+                const uncategorized = localAdvancedProducts.filter(p => !categorizedIds.has(p.id));
 
                 return {
                     phones: [...filteredPhones, ...uncategorized],
@@ -287,8 +206,7 @@ const SearchPage = () => {
             reviews: [],
         };
     }, [
-        advancedProducts,
-        advancedStatus.loaded,
+        localAdvancedProducts,
         allProducts.length,
         filterResults,
         isFilteredView,
@@ -304,7 +222,7 @@ const SearchPage = () => {
         }
     }, [loading, searchQuery, isFilteredView]);
 
-    if (loading || advancedStatus.loading) {
+    if (loading) {
         return <div className="text-center py-20">{isFilteredView ? 'Loading filtered results...' : `Searching for "${searchQuery}"...`}</div>;
     }
 
@@ -331,12 +249,6 @@ const SearchPage = () => {
                     {/* Main Content Column */}
                     <div className="w-full lg:w-3/4">
                         <HeroBanner />
-
-                        {isFilteredView && advancedRequestCategories.length > 0 && advancedStatus.error && (
-                            <div className="mb-4 border border-red-300 bg-red-100 px-4 py-3 text-sm text-red-700">
-                                {advancedStatus.error}
-                            </div>
-                        )}
 
                         <div className="mb-4" ref={resultsRef}>
                             <h1 className="text-2xl font-bold px-4">

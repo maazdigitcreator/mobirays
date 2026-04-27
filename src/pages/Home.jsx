@@ -93,6 +93,86 @@ const Home = () => {
     return map;
   }, [allBanners]);
 
+  // Check if OLED (but not AMOLED) is among the active filter values
+  const isOledFilterActive = React.useMemo(() => {
+    return appliedFilters.some(cat =>
+      Object.values(cat.filters || {}).some(values =>
+        Array.isArray(values) && values.some(v => String(v).toLowerCase() === 'oled')
+      )
+    );
+  }, [appliedFilters]);
+
+  const fetchFiltered = async (categories, page = 1) => {
+    setFilteredProductsStatus({ loading: true, error: "" });
+    try {
+      if (isOledFilterActive) {
+        // OLED special case: fetch ALL results, filter AMOLED locally, paginate manually
+        // First fetch page 1 to know total pages
+        const firstResponse = await filterService.applyFilters({
+          categories,
+          page: 1,
+          perPage: 100, // Fetch larger batches for efficiency
+        });
+
+        let allResults = [...(firstResponse.data || [])];
+        const totalPages = firstResponse.meta?.last_page || 1;
+
+        // Fetch remaining pages if needed
+        for (let p = 2; p <= totalPages; p++) {
+          const nextResponse = await filterService.applyFilters({
+            categories,
+            page: p,
+            perPage: 100,
+          });
+          allResults = [...allResults, ...(nextResponse.data || [])];
+        }
+
+        // Filter out AMOLED, keep only pure OLED
+        const oledOnly = allResults.filter(product => {
+          const productText = buildSearchableProductText(product);
+          return matchesSingleAttributeValue(productText, 'oled');
+        });
+
+        // Manual pagination
+        const totalItems = oledOnly.length;
+        const lastPage = Math.max(1, Math.ceil(totalItems / ITEMS_PER_PAGE));
+        const safePage = Math.min(page, lastPage);
+        const start = (safePage - 1) * ITEMS_PER_PAGE;
+        const pageSlice = oledOnly.slice(start, start + ITEMS_PER_PAGE);
+
+        setFilteredProducts(pageSlice);
+        setFilteredProductsMeta({
+          total: totalItems,
+          per_page: ITEMS_PER_PAGE,
+          current_page: safePage,
+          last_page: lastPage,
+        });
+      } else {
+        // Normal filters: use API exactly as original
+        const response = await filterService.applyFilters({
+          categories,
+          page,
+          perPage: ITEMS_PER_PAGE,
+        });
+        setFilteredProducts(response.data || []);
+        setFilteredProductsMeta(response.meta);
+      }
+    } catch (error) {
+      setFilteredProductsStatus({
+        loading: false,
+        error: error.message || "Failed to load filtered products.",
+      });
+    } finally {
+      setFilteredProductsStatus((prev) => ({ ...prev, loading: false }));
+    }
+  };
+
+  useEffect(() => {
+    if (isFilteredView) {
+      fetchFiltered(appliedFilters, filteredPage);
+    }
+  }, [isFilteredView, appliedFilters, filteredPage]);
+
   const categorizedProducts = React.useMemo(() => {
     const sourceProducts = isFilteredView ? filteredProducts : allProducts;
 
@@ -104,61 +184,6 @@ const Home = () => {
       return acc;
     }, {});
   }, [allProducts, filteredProducts, isFilteredView]);
-
-  // Filtered view — call filter API with body when filters are applied
-  useEffect(() => {
-    if (!isFilteredView) return;
-
-    const controller = new AbortController();
-
-    const fetchFiltered = async () => {
-      setFilteredProductsStatus({ loading: true, error: "" });
-      try {
-        const response = await filterService.applyFilters({
-          categories: appliedFilters,
-          page: filteredPage,
-          perPage: ITEMS_PER_PAGE,
-          signal: controller.signal,
-        });
-        if (controller.signal.aborted) return;
-        const published = (Array.isArray(response?.data) ? response.data : []).filter(p => {
-          const s = typeof p.status === 'object' ? String(p.status?.value || '') : String(p.status || '');
-          const statusStr = s.trim().toLowerCase();
-          return statusStr !== 'draft' && statusStr !== 'pending' && statusStr !== 'drafts';
-        });
-
-        // Client-side refinement to ensure strict matching (e.g. OLED not matching AMOLED)
-        const refined = published.filter(product => {
-          const productText = buildSearchableProductText(product);
-          
-          return appliedFilters.every(category => {
-            return Object.entries(category.filters || {}).every(([filterId, values]) => {
-              if (!values || values.length === 0) return true;
-              return values.some(val => matchesSingleAttributeValue(productText, val));
-            });
-          });
-        });
-
-        setFilteredProducts(refined);
-        setFilteredProductsMeta(response?.meta ?? null);
-        setFilteredProductsStatus({ loading: false, error: "" });
-      } catch (err) {
-        if (controller.signal.aborted) return;
-        setFilteredProducts([]);
-        setFilteredProductsMeta(null);
-        setFilteredProductsStatus({
-          loading: false,
-          error:
-            err?.data?.message ||
-            err?.message ||
-            "Failed to load filtered products.",
-        });
-      }
-    };
-
-    void fetchFiltered();
-    return () => controller.abort();
-  }, [appliedFilters, filteredPage, isFilteredView]);
 
   const handleFilteredPageChange = (page) => {
     const params = new URLSearchParams(location.search);

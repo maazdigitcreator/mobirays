@@ -32,6 +32,7 @@ import privateRoutes from './routes/PrivateRoutes';
 import { useAnnouncement } from './hooks/useAnnouncement';
 import AnnouncementModal from './components/AnnouncementModal';
 import ScrollToTop from './components/ScrollToTop';
+import ScrollToTopButton from './components/ScrollToTopButton';
 
 function App() {
   const { announcement, isOpen, closeAnnouncement } = useAnnouncement();
@@ -41,6 +42,7 @@ function App() {
     <DataProvider>
       <BrowserRouter>
         <ScrollToTop />
+        <ScrollToTopButton />
         <Layout>
           <Routes>
             <Route path="/" element={<Home />} />

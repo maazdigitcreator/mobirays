@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 
 import SidebarIntro from '../SidebarSections/SidebarIntro';
 import SidebarBrands from '../SidebarSections/SidebarBrands';
@@ -11,6 +12,14 @@ import SidebarBanner3 from '../SidebarSections/SidebarBanner3';
 
 const MobileSidebar = ({ isOpen, onClose }) => {
     const sidebarRef = useRef(null);
+    const location = useLocation();
+
+    // Close sidebar on route change
+    useEffect(() => {
+        if (isOpen) {
+            onClose();
+        }
+    }, [location.pathname, location.search]);
 
     // Handle click outside to close
     useEffect(() => {

@@ -11,7 +11,6 @@ const ComingSoonMobiles = ({ title, itemImage, endpoint = END_POINT}) => {
     const [isMobile, setIsMobile] = useState(false);
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const navigate = useNavigate(); // Hook for navigation
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -79,16 +78,7 @@ const ComingSoonMobiles = ({ title, itemImage, endpoint = END_POINT}) => {
         }
     };
 
-    const handleProductClick = (product) => {
-        navigate(getProductDetailPath(product), {
-            state: {
-                product: {
-                    ...product,
-                    image: product.image || itemImage || MobileImg
-                }
-            }
-        });
-    };
+
 
     if (loading) {
         return <div className="text-center py-10">Loading...</div>;
@@ -130,10 +120,16 @@ const ComingSoonMobiles = ({ title, itemImage, endpoint = END_POINT}) => {
                         style={!isMobile ? { transform: `translateX(-${currentIndex * (100 / itemsToShow)}%)` } : {}}
                     >
                         {products.map((product) => (
-                            <div
+                            <Link
                                 key={product.id}
+                                to={getProductDetailPath(product)}
+                                state={{
+                                    product: {
+                                        ...product,
+                                        image: product.image || itemImage || MobileImg
+                                    }
+                                }}
                                 className="w-[calc(100%/3-11px)] shrink-0 md:w-[calc(100%/4-12px)] lg:w-[calc(100%/6-14px)] flex flex-col group cursor-pointer mt-12 snap-center"
-                                onClick={() => handleProductClick(product)}
                             >
                                 <div className="relative mb-3 flex justify-center items-center p-2 bg-blue-50/50 rounded-lg h-48 transition-transform group-hover:scale-105">
                                     {/* Coming Soon Badge */}
@@ -157,7 +153,7 @@ const ComingSoonMobiles = ({ title, itemImage, endpoint = END_POINT}) => {
                                 <h3 className="text-sm text-gray-700 font-medium leading-tight group-hover:text-[#0580A5] text-center uppercase line-clamp-2 overflow-hidden px-2">
                                     {product.name}
                                 </h3>
-                            </div>
+                            </Link>
                         ))}
                     </div>
                 </div>

@@ -12,7 +12,27 @@ const MobileMenu = ({
     const menuRef = useRef(null);
     const location = useLocation();
     const [miscOpen, setMiscOpen] = React.useState(false);
+
+    // Auto close on route change
+    React.useEffect(() => {
+        if (isOpen) {
+            onClose();
+        }
+    }, [location.pathname, location.search]);
     const { dynamicPages } = useData();
+
+    // Prevent background scroll when menu is open
+    React.useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [isOpen]);
 
     if (!isOpen) return null;
 
