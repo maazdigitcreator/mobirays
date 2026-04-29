@@ -226,7 +226,7 @@ const Header = () => {
                 </div>
 
                 <div className="px-4 py-3 sm:bg-white search-container bg-[#0891b2] max-w-100vw">
-                    <div className="flex gap-4 items-center justify-between">
+                    <div className="flex gap-2 sm:gap-4 items-center justify-between">
                         {/* Search Input - Same as Desktop */}
                         <div className="relative flex-1">
                             <div className="flex items-center border bg-white border-[#0891b2] overflow-hidden sm:w-full">
