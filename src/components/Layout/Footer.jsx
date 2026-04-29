@@ -76,7 +76,7 @@ const Footer = () => {
                     <button
                         type="submit"
                         disabled={status === 'loading'}
-                        className="bg-cyan-600 hover:bg-cyan-700 text-white px-6 py-2.5 rounded font-medium transition-colors min-w-[120px] flex items-center justify-center disabled:opacity-60"
+                        className="bg-cyan-600 hover:bg-cyan-700 text-white sm:px-6 px-2 py-2.5 rounded font-medium transition-colors text-sm sm:text-base flex items-center justify-center disabled:opacity-60"
                     >
                         {status === 'loading' ? (
                             <span className="flex items-center gap-2">

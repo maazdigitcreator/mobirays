@@ -554,11 +554,11 @@ const MobileSpecs = () => {
                                                     <div className="border-2 border-[#0580A5] rounded-l-full px-5 py-2 flex items-center justify-center">
                                                         <span className="font-semibold text-black">${item.price}</span>
                                                     </div>
-                                                    <div className="border-2 border-[#0580A5] bg-white px-6 py-2 min-w-[140px] flex items-center justify-center">
+                                                    <div className="border-2 border-[#0580A5] bg-white min-w-[140px] flex items-center justify-center">
                                                         <img
                                                             src={item.image}
                                                             alt="Store logo"
-                                                            className="h-6 object-contain"
+                                                            className="object-contain"
                                                         />
                                                     </div>
                                                     <a
@@ -580,11 +580,11 @@ const MobileSpecs = () => {
                                                     <div className="border-2 border-[#0580A5] rounded-l-full px-5 py-2 flex items-center justify-center">
                                                         <span className="font-semibold text-gray-800">${item.price}</span>
                                                     </div>
-                                                    <div className="border-2 border-[#0580A5] bg-white px-6 py-2 min-w-[140px] flex items-center justify-center">
+                                                    <div className="border-2 border-[#0580A5] bg-white min-w-[140px] flex items-center justify-center">
                                                         <img
                                                             src={item.image}
                                                             alt="Store logo"
-                                                            className="h-6 object-contain"
+                                                            className="object-contain"
                                                         />
                                                     </div>
                                                     <a

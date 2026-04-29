@@ -373,11 +373,11 @@ const SingleReviewDetail = () => {
                                     {item.price ? `$${item.price}` : "N/A"}
                                   </span>
                                 </div>
-                                <div className="border-2 border-[#0580A5] bg-white px-6 py-2 min-w-[140px] flex items-center justify-center">
+                                <div className="border-2 border-[#0580A5] bg-white min-w-[140px] flex items-center justify-center">
                                   <img
                                     src={getImageUrl(item.image || item.logo)}
                                     alt={item.name || "Shop"}
-                                    className="h-8 object-contain"
+                                    className="object-contain"
                                   />
                                 </div>
                                 <a
@@ -404,11 +404,11 @@ const SingleReviewDetail = () => {
                                     {item.price ? `$${item.price}` : "N/A"}
                                   </span>
                                 </div>
-                                <div className="border-2 border-[#0580A5] bg-white px-6 py-2 min-w-[140px] flex items-center justify-center">
+                                <div className="border-2 border-[#0580A5] bg-white min-w-[140px] flex items-center justify-center">
                                   <img
                                     src={getImageUrl(item.image || item.logo)}
                                     alt={item.name || "Shop"}
-                                    className="h-8 object-contain"
+                                    className="object-contain"
                                   />
                                 </div>
                                 <a
