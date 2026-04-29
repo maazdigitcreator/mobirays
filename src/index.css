@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+
 @layer utilities {
     .latest-products-clip {
         clip-path: polygon(0% 0%, calc(100% - 40px) 0%, 100% 100%, 0% 100%);
@@ -11,6 +12,10 @@
             clip-path: polygon(0% 0%, calc(100% - 70px) 0%, 100% 100%, 0% 100%);
             padding-right: 70px;
         }
+    }
+
+    body {
+        overflow-x: hidden;
     }
 
     .latest-news-clip {
@@ -41,8 +46,15 @@
     }
 
     @keyframes fade-in {
-        from { opacity: 0; transform: translateX(8px); }
-        to   { opacity: 1; transform: translateX(0); }
+        from {
+            opacity: 0;
+            transform: translateX(8px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
     }
 
     .animate-fade-in {
