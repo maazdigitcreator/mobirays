@@ -203,7 +203,7 @@ const Header = () => {
                         <div className="flex items-center gap-2 border-2 border-[#0580A5] px-2 py-1">
                             <User size={22} className="text-[#0580A5]" />
                             <Link className="text-[#0580A5] text-xs font-medium max-w-[70px] truncate" to="/wishlist">
-                            Dashboard
+                                Dashboard
                             </Link>
                             <button
                                 onClick={handleLogout}
@@ -261,7 +261,7 @@ const Header = () => {
                                     className="flex gap-2 sm:px-4 cursor-pointer px-2 border-2  border-[#fff] py-1 bg-[#0891b2] hover:bg-[#0e7490] text-white  text-base items-center transition-colors"
                                 >
                                     <Search size={18} className="text-white scale-x-[-1]" />
-                                    Search
+
                                 </button>
                             </div>
 
