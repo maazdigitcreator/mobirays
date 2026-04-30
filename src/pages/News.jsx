@@ -26,6 +26,7 @@ const News = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 4;
     const [pageBanners, setPageBanners] = useState({});
+    const paginatedSectionRef = React.useRef(null);
 
     useMetadata(
         "Latest Tech News | Mobirays",
@@ -241,7 +242,7 @@ const News = () => {
                     {/* Last 4 News with Pagination */}
                     {currentPaginatedNews.length > 0 && (
                         <>
-                            <div>
+                            <div ref={paginatedSectionRef}>
                                 {currentPaginatedNews.map((newsItem) => (
                                     <Link
                                         key={newsItem.id}
@@ -264,6 +265,7 @@ const News = () => {
                                     currentPage={currentPage}
                                     totalPages={totalPages}
                                     onPageChange={handlePageChange}
+                                    scrollTargetRef={paginatedSectionRef}
                                 />
                             )}
                         </>

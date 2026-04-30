@@ -29,6 +29,9 @@ const ComingSoon = () => {
     const [phonesPage, setPhonesPage] = useState(1);
     const [tabletsPage, setTabletsPage] = useState(1);
     const [watchesPage, setWatchesPage] = useState(1);
+    const phonesRef = React.useRef(null);
+    const tabletsRef = React.useRef(null);
+    const watchesRef = React.useRef(null);
 
     const itemsPerPage = 24; // 4 rows * 6 columns
 
@@ -145,13 +148,14 @@ const ComingSoon = () => {
 
 
                         {/* Phones Section */}
-                        <div>
+                        <div ref={phonesRef}>
                             <LatestProducts title="Coming Soon Phones" products={getPaginatedData(phones, phonesPage)} itemImage={mobileImg} />
                             {phones.length > itemsPerPage && (
                                 <Pagination
                                     currentPage={phonesPage}
                                     totalPages={Math.ceil(phones.length / itemsPerPage)}
                                     onPageChange={setPhonesPage}
+                                    scrollTargetRef={phonesRef}
                                 />
                             )}
                         </div>
@@ -159,13 +163,14 @@ const ComingSoon = () => {
                         {pageBanners['comingsoon_banner_1'] && <BannerAd banner={pageBanners['comingsoon_banner_1']} className='mt-7 h-[200px] w-auto sm:w-full hidden sm:block' />}
 
                         {/* Tablets Section */}
-                        <div className='mt-10'>
+                        <div className='mt-10' ref={tabletsRef}>
                             <LatestProducts title="Coming Soon Tabs" products={getPaginatedData(tablets, tabletsPage)} itemImage={tabImg} />
                             {tablets.length > itemsPerPage && (
                                 <Pagination
                                     currentPage={tabletsPage}
                                     totalPages={Math.ceil(tablets.length / itemsPerPage)}
                                     onPageChange={setTabletsPage}
+                                    scrollTargetRef={tabletsRef}
                                 />
                             )}
                         </div>
@@ -173,13 +178,14 @@ const ComingSoon = () => {
                         {pageBanners['comingsoon_banner_2'] && <BannerAd banner={pageBanners['comingsoon_banner_2']} className='mt-7 h-[200px] w-auto sm:w-full hidden sm:block' />}
 
                         {/* Smartwatches Section */}
-                        <div className='mt-10'>
+                        <div className='mt-10' ref={watchesRef}>
                             <LatestProducts title="Coming Soon Smartwatches" products={getPaginatedData(watches, watchesPage)} itemImage={watchImg} />
                             {watches.length > itemsPerPage && (
                                 <Pagination
                                     currentPage={watchesPage}
                                     totalPages={Math.ceil(watches.length / itemsPerPage)}
                                     onPageChange={setWatchesPage}
+                                    scrollTargetRef={watchesRef}
                                 />
                             )}
                         </div>

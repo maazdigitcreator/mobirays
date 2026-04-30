@@ -59,8 +59,9 @@ const Reviews = () => {
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
-        window.scrollTo(0, 0);
     };
+
+    const reviewsSectionRef = React.useRef(null);
 
     const { allBanners } = useData();
     const [pageBanners, setPageBanners] = useState({});
@@ -112,7 +113,7 @@ const Reviews = () => {
                             )}
 
                             {/* Single continuous grid — banners injected as full-width rows at positions 3 and 6 */}
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-3 mb-4">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-3 mb-4" ref={reviewsSectionRef}>
                                 {displayedReviews.slice(0, 9).flatMap((review, idx) => {
                                     const rating = (parseFloat(review.rating) || 0);
                                     const slug = review.name ? review.name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '') : 'review';
@@ -152,6 +153,7 @@ const Reviews = () => {
                                     currentPage={currentPage}
                                     totalPages={totalPages}
                                     onPageChange={handlePageChange}
+                                    scrollTargetRef={reviewsSectionRef}
                                 />
                             </div>
                         </>

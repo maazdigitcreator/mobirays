@@ -20,6 +20,9 @@ const BrandPage = () => {
     const [phonesPage, setPhonesPage] = useState(1);
     const [tabletsPage, setTabletsPage] = useState(1);
     const [watchesPage, setWatchesPage] = useState(1);
+    const phonesRef = React.useRef(null);
+    const tabletsRef = React.useRef(null);
+    const watchesRef = React.useRef(null);
     const itemsPerPage = 48;
 
     const bannerMap = useMemo(() => {
@@ -130,7 +133,7 @@ const BrandPage = () => {
 
                         {/* Phones Section */}
                         {allPhones.length > 0 && (
-                            <div>
+                            <div ref={phonesRef}>
                                 <LatestProducts
                                     title={`${brandName} Phones`}
                                     itemImage={mobileImg}
@@ -141,6 +144,7 @@ const BrandPage = () => {
                                         currentPage={phonesPage}
                                         totalPages={phonePages}
                                         onPageChange={setPhonesPage}
+                                        scrollTargetRef={phonesRef}
                                     />
                                 )}
                             </div>
@@ -150,7 +154,7 @@ const BrandPage = () => {
 
                         {/* Tablets Section */}
                         {tablets.length > 0 && (
-                            <div className='mt-10'>
+                            <div className='mt-10' ref={tabletsRef}>
                                 <LatestProducts
                                     title={`${brandName} Tabs`}
                                     itemImage={tabImg}
@@ -161,6 +165,7 @@ const BrandPage = () => {
                                         currentPage={tabletsPage}
                                         totalPages={tabletPages}
                                         onPageChange={setTabletsPage}
+                                        scrollTargetRef={tabletsRef}
                                     />
                                 )}
                             </div>
@@ -170,7 +175,7 @@ const BrandPage = () => {
 
                         {/* Smartwatches Section */}
                         {watches.length > 0 && (
-                            <div className='mt-10'>
+                            <div className='mt-10' ref={watchesRef}>
                                 <LatestProducts
                                     title={`${brandName} Smartwatches`}
                                     itemImage={watchImg}
@@ -181,6 +186,7 @@ const BrandPage = () => {
                                         currentPage={watchesPage}
                                         totalPages={watchPages}
                                         onPageChange={setWatchesPage}
+                                        scrollTargetRef={watchesRef}
                                     />
                                 )}
                             </div>

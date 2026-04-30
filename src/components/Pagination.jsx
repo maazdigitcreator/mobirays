@@ -1,7 +1,7 @@
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+const Pagination = ({ currentPage, totalPages, onPageChange, scrollTargetRef }) => {
     const [isMobile, setIsMobile] = React.useState(typeof window !== 'undefined' ? window.innerWidth < 768 : false);
 
     React.useEffect(() => {
@@ -9,6 +9,16 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
+
+    const handlePageChangeWithScroll = (page) => {
+        if (page === currentPage) return;
+        onPageChange(page);
+        if (scrollTargetRef?.current) {
+            setTimeout(() => {
+                scrollTargetRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 50);
+        }
+    };
 
     const maxVisible = isMobile ? 3 : 9;
     const pages = [];
@@ -35,7 +45,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
                         {visiblePages.map((page) => (
                             <button
                                 key={page}
-                                onClick={() => onPageChange(page)}
+                                onClick={() => handlePageChangeWithScroll(page)}
                                 className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-white text-base sm:text-lg font-bold transition-colors cursor-pointer flex-shrink-0 ${currentPage === page
                                     ? 'bg-[#4B4B4B]'
                                     : 'bg-[#0084A9] hover:bg-[#007090]'
@@ -49,7 +59,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
 
                 <div className="flex gap-1 sm:gap-1.5 flex-shrink-0">
                     <button
-                        onClick={() => onPageChange(Math.max(1, currentPage - 1))}
+                        onClick={() => handlePageChangeWithScroll(Math.max(1, currentPage - 1))}
                         disabled={currentPage === 1}
                         className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-white transition-colors cursor-pointer ${currentPage === 1
                             ? 'bg-[#B4D1D8] cursor-not-allowed'
@@ -59,7 +69,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
                         <ChevronLeft size={isMobile ? 20 : 28} strokeWidth={3} />
                     </button>
                     <button
-                        onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
+                        onClick={() => handlePageChangeWithScroll(Math.min(totalPages, currentPage + 1))}
                         disabled={currentPage === totalPages}
                         className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-white transition-colors cursor-pointer ${currentPage === totalPages
                             ? 'bg-[#B4D1D8] cursor-not-allowed'

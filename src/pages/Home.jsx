@@ -185,6 +185,8 @@ const Home = () => {
     }, {});
   }, [allProducts, filteredProducts, isFilteredView]);
 
+  const filteredSectionRef = React.useRef(null);
+
   const handleFilteredPageChange = (page) => {
     const params = new URLSearchParams(location.search);
     params.set("page", String(page));
@@ -212,7 +214,7 @@ const Home = () => {
           </div>
 
           {/* Main Content Column */}
-          <div className="w-full lg:w-3/4">
+          <div className="w-full lg:w-3/4" ref={filteredSectionRef}>
             <HeroBanner />
 
             {isFilteredView && filteredProductsStatus.error && (
@@ -274,6 +276,7 @@ const Home = () => {
                     currentPage={filteredProductsMeta.current_page}
                     totalPages={filteredProductsMeta.last_page}
                     onPageChange={handleFilteredPageChange}
+                    scrollTargetRef={filteredSectionRef}
                   />
                 )}
               </>

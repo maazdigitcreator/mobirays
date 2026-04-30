@@ -10,6 +10,7 @@ const LatestProducts = ({ title, products, itemImage, limit, useDummyData = fals
     const { allProducts: cachedProducts } = useData();
     const [apiProducts, setApiProducts] = React.useState([]);
     const [currentPage, setCurrentPage] = React.useState(1);
+    const sectionRef = React.useRef(null);
 
     // Dummy data for tabs and smartwatches (fallback)
     const dummyProducts = [
@@ -100,7 +101,7 @@ const LatestProducts = ({ title, products, itemImage, limit, useDummyData = fals
     }
 
     return (
-        <div className="w-full container">
+        <div className="w-full container" ref={sectionRef}>
             <div className="relative w-full flex items-end">
                 {/* Horizontal Line Background */}
                 <div className="absolute bottom-0 left-0 w-full h-[10px] sm:h-[16px] bg-[#0580A5]"></div>
@@ -175,6 +176,7 @@ const LatestProducts = ({ title, products, itemImage, limit, useDummyData = fals
                         currentPage={currentPage}
                         totalPages={totalPages}
                         onPageChange={setCurrentPage}
+                        scrollTargetRef={sectionRef}
                     />
                 )}
             </div>

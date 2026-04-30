@@ -18,10 +18,12 @@ const WishlistProducts = ({ title = "Product Wishlist", products, itemImage }) =
         handleSearchChange,
     } = useWishlistProducts(products);
 
+    const sectionRef = React.useRef(null);
+
 
 
     return (
-        <div className="w-full container">
+        <div className="w-full container" ref={sectionRef}>
             <div>
             {/* Desktop & Mobile Responsive Header */}
             <div className="w-full mb-9">
@@ -141,6 +143,7 @@ const WishlistProducts = ({ title = "Product Wishlist", products, itemImage }) =
                     currentPage={currentPage}
                     totalPages={totalPages}
                     onPageChange={setCurrentPage}
+                    scrollTargetRef={sectionRef}
                 />
             )}
         </div>

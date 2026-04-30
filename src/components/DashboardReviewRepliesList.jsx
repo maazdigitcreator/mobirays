@@ -24,8 +24,9 @@ const DashboardReviewRepliesList = ({
   handleDelete,
   basePath = "review",
 }) => {
+  const sectionRef = React.useRef(null);
   return (
-    <div className="w-full container">
+    <div className="w-full container" ref={sectionRef}>
       {/* Desktop & Mobile Responsive Header */}
       <div className="w-full mb-9">
           {/* DESKTOP LAYOUT */}
@@ -206,6 +207,7 @@ const DashboardReviewRepliesList = ({
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={setCurrentPage}
+          scrollTargetRef={sectionRef}
         />
       )}
 

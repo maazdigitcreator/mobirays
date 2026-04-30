@@ -30,6 +30,9 @@ const WhatsNew = () => {
     const [phonesPage, setPhonesPage] = useState(1);
     const [tabletsPage, setTabletsPage] = useState(1);
     const [watchesPage, setWatchesPage] = useState(1);
+    const phonesRef = React.useRef(null);
+    const tabletsRef = React.useRef(null);
+    const watchesRef = React.useRef(null);
 
     const itemsPerPage = 24; // 4 rows * 6 columns
 
@@ -146,37 +149,40 @@ const WhatsNew = () => {
                         <HeroBanner />
 
                         {/* Phones Section */}
-                        <div>
+                        <div ref={phonesRef}>
                             <LatestProducts title="Latest Phones" products={getPaginatedData(phones, phonesPage)} itemImage={mobileImg} />
                             {/* Pagination (Optional: Verify if API supports pagination, keeping simplistic for now) */}
                             {phones.length > itemsPerPage && <Pagination
                                 currentPage={phonesPage}
                                 totalPages={Math.ceil(phones.length / itemsPerPage)} // Dummy total for now as API might not return pagination meta
                                 onPageChange={setPhonesPage}
+                                scrollTargetRef={phonesRef}
                             />}
                         </div>
 
                         {pageBanners['whatsnew_banner_1'] && <div className='mt-7 hidden sm:block'><BannerAd banner={pageBanners['whatsnew_banner_1']} className='h-[200px] sm:w-full' /></div>}
 
                         {/* Tablets Section */}
-                        <div className='mt-10'>
+                        <div className='mt-10' ref={tabletsRef}>
                             <LatestProducts title="Latest Tabs" products={getPaginatedData(tablets, tabletsPage)} itemImage={tabImg} />
                             {tablets.length > itemsPerPage && <Pagination
                                 currentPage={tabletsPage}
                                 totalPages={Math.ceil(tablets.length / itemsPerPage)}
                                 onPageChange={setTabletsPage}
+                                scrollTargetRef={tabletsRef}
                             />}
                         </div>
 
                         {pageBanners['whatsnew_banner_2'] && <div className='mt-7 hidden sm:block'><BannerAd banner={pageBanners['whatsnew_banner_2']} className='h-[200px] sm:w-full' /></div>}
 
                         {/* Smartwatches Section */}
-                        <div className='mt-10'>
+                        <div className='mt-10' ref={watchesRef}>
                             <LatestProducts title="Latest Smartwatches" products={getPaginatedData(watches, watchesPage)} itemImage={watchImg} />
                             {watches.length > itemsPerPage && <Pagination
                                 currentPage={watchesPage}
                                 totalPages={Math.ceil(watches.length / itemsPerPage)}
                                 onPageChange={setWatchesPage}
+                                scrollTargetRef={watchesRef}
                             />}
                         </div>
 
