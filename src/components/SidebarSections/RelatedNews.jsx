@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../../config/api';
 import { Link } from 'react-router-dom';
 import { FaRegCommentDots } from 'react-icons/fa';
 import LatestNewsImg from '../../assets/LatestNewsImg.png';
@@ -11,8 +12,7 @@ const RelatedNews = ({ productName }) => {
     useEffect(() => {
         const fetchNews = async () => {
             try {
-                const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://mobirays.voucherndeals.com';
-                const response = await fetch(`${apiBaseUrl}/api/v1/posts`);
+                const response = await fetch(`${API_BASE_URL}/api/v1/posts`);
                 const data = await response.json();
                 if (data && data.data) {
                     setNews(data.data);

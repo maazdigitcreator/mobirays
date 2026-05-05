@@ -16,6 +16,7 @@ import SidebarBanner2 from "../components/SidebarSections/SidebarBanner2";
 import SidebarLatestModels from "../components/SidebarSections/SidebarLatestModels";
 import SidebarBrands from "../components/SidebarSections/SidebarBrands";
 import React, { useMemo, useRef, useState } from "react";
+import { API_BASE_URL } from "../config/api";
 import { useData } from "../context/useData";
 import { useAuth } from "../context/useAuth";
 import { reviewDiscussionService } from "../services/reviewDiscussionService";
@@ -337,7 +338,7 @@ const SingleReviewDetail = () => {
                   <div className="mt-5 px-2 sm:px-4">
                     {/* Shop Data */}
                     {(() => {
-                      const apiBase = "https://mobirays.voucherndeals.com";
+                      const apiBase = API_BASE_URL;
                       const shopData = reviewData?.product_links || [];
 
                       const getImageUrl = (img) => {
@@ -368,7 +369,7 @@ const SingleReviewDetail = () => {
                                 key={index}
                                 className="flex items-stretch justify-center lg:justify-end gap-2"
                               >
-                                <div className="border-2 border-[#0580A5] rounded-l-full px-5 py-2 flex items-center justify-center min-w-[100px]">
+                                <div className="border-2 border-[#0580A5] rounded-l-full px-5 sm:py-2 py-0 flex items-center justify-center min-w-[100px]">
                                   <span className="font-semibold text-black">
                                     {item.price ? `$${item.price}` : "N/A"}
                                   </span>
@@ -384,7 +385,7 @@ const SingleReviewDetail = () => {
                                   href={item.link}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="bg-[#0580A5] text-white px-6 py-2 hover:bg-[#046a8a] transition-colors cursor-pointer text-sm rounded-r-full flex items-center justify-center"
+                                  className="bg-[#0580A5] text-white px-6 sm:py-2 py-0 hover:bg-[#046a8a] transition-colors cursor-pointer text-sm rounded-r-full flex items-center justify-center"
                                 >
                                   GO TO BUYING
                                 </a>
@@ -399,7 +400,7 @@ const SingleReviewDetail = () => {
                                 key={index}
                                 className="flex items-stretch gap-2 sm:justify-start justify-center lg:justify-start"
                               >
-                                <div className="border-2 border-[#0580A5] rounded-l-full px-5 py-2 flex items-center justify-center min-w-[100px]">
+                                <div className="border-2 border-[#0580A5] rounded-l-full px-5 sm:py-2 py-0 flex items-center justify-center min-w-[100px]">
                                   <span className="font-semibold text-gray-800">
                                     {item.price ? `$${item.price}` : "N/A"}
                                   </span>
@@ -415,7 +416,7 @@ const SingleReviewDetail = () => {
                                   href={item.link}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="bg-[#0580A5] text-white px-6 py-2 hover:bg-[#046a8a] transition-colors cursor-pointer text-sm rounded-r-full flex items-center justify-center"
+                                  className="bg-[#0580A5] text-white px-6 sm:py-2 py-0 hover:bg-[#046a8a] transition-colors cursor-pointer text-sm rounded-r-full flex items-center justify-center"
                                 >
                                   GO TO BUYING
                                 </a>

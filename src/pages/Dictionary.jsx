@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { API_BASE_URL } from '../config/api'
 import { Link } from 'react-router-dom'
 import useMetadata from '../hooks/useMetadata'
 import Sidebar from '../components/Layout/Sidebar'
@@ -24,8 +25,7 @@ const Dictionary = () => {
     useEffect(() => {
         const fetchBanners = async () => {
             try {
-                const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://mobirays.voucherndeals.com';
-                const response = await fetch(`${apiBaseUrl}/api/v1/banner?per_page=100`);
+                const response = await fetch(`${API_BASE_URL}/api/v1/banner?per_page=100`);
                 const result = await response.json();
                 const allBanners = Array.isArray(result.data) ? result.data : [];
                 const map = {};
@@ -91,7 +91,7 @@ const Dictionary = () => {
                                         const getImgUrl = (img) => {
                                             if (!img) return "";
                                             if (img.startsWith("http")) return img;
-                                            const apiBase = "https://mobirays.voucherndeals.com";
+                                            const apiBase = API_BASE_URL;
                                             const cleanPath = img.replace(/^\/?storage\//, '');
                                             return `${apiBase}/storage/${cleanPath}`;
                                         };

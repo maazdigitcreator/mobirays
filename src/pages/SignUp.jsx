@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { API_BASE_URL } from '../config/api'
 import { useNavigate, Link } from 'react-router-dom'
 import Sidebar3 from '../components/Layout/Sidebar3'
 import AllBrandsHero from '../components/AllBrandsHero'
@@ -47,8 +48,7 @@ const SignUp = () => {
     useEffect(() => {
         const fetchBanners = async () => {
             try {
-                const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://mobirays.voucherndeals.com';
-                const response = await fetch(`${apiBaseUrl}/api/v1/banner?per_page=100`);
+                const response = await fetch(`${API_BASE_URL}/api/v1/banner?per_page=100`);
                 const result = await response.json();
                 const allBanners = Array.isArray(result.data) ? result.data : [];
                 const map = {};

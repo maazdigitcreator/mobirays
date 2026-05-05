@@ -1,4 +1,4 @@
-const API_BASE = "https://mobirays.voucherndeals.com";
+const API_BASE = process.env.VITE_API_BASE_URL;
 
 const CRAWLER_UA =
   /facebookexternalhit|Facebot|facebookcatalog|Twitterbot|LinkedInBot|WhatsApp|TelegramBot|Slackbot|Pinterest|Discordbot|vkShare|SkypeUriPreview|Googlebot|bingbot|W3C_Validator/i;

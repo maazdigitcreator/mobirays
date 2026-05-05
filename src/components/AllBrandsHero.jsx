@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { API_BASE_URL } from '../config/api'
 import { useNavigate } from 'react-router-dom'
 import compareIcon from "../assets/compareIcon.png"
 import commentsIcon from "../assets/commentsIcon.png"
@@ -51,7 +52,7 @@ const AllBrandsHero = ({ title = "All Brands", backgroundImage }) => {
                             const getImgUrl = (img) => {
                                 if (!img) return "";
                                 if (img.startsWith("http")) return img;
-                                const apiBase = "https://mobirays.voucherndeals.com";
+                                const apiBase = API_BASE_URL;
                                 
                                 const cleanPath = img.replace(/^\/?storage\//, '');
                                 return `${apiBase}/storage/${cleanPath}`;

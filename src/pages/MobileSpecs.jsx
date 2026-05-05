@@ -551,7 +551,7 @@ const MobileSpecs = () => {
                                         <div className="space-y-3">
                                             {leftColumn.map((item, index) => (
                                                 <div key={index} className="flex items-stretch justify-center lg:justify-end gap-2">
-                                                    <div className="border-2 border-[#0580A5] rounded-l-full px-5 py-2 flex items-center justify-center">
+                                                    <div className="border-2 border-[#0580A5] rounded-l-full px-5 sm:py-2 py-0 flex items-center justify-center">
                                                         <span className="font-semibold text-black">${item.price}</span>
                                                     </div>
                                                     <div className="border-2 border-[#0580A5] bg-white min-w-[140px] flex items-center justify-center">
@@ -565,7 +565,7 @@ const MobileSpecs = () => {
                                                         href={item.link}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="bg-[#0580A5] text-white px-6 py-2 hover:bg-[#046a8a] transition-colors cursor-pointer text-sm rounded-r-full flex items-center justify-center"
+                                                        className="bg-[#0580A5] text-white px-6 sm:py-2 py-0 hover:bg-[#046a8a] transition-colors cursor-pointer text-sm rounded-r-full flex items-center justify-center"
                                                     >
                                                         GO TO BUYING
                                                     </a>
@@ -577,7 +577,7 @@ const MobileSpecs = () => {
                                         <div className="space-y-3">
                                             {rightColumn.map((item, index) => (
                                                 <div key={index} className="flex items-stretch gap-2 sm:justify-start justify-center lg:justify-start">
-                                                    <div className="border-2 border-[#0580A5] rounded-l-full px-5 py-2 flex items-center justify-center">
+                                                    <div className="border-2 border-[#0580A5] rounded-l-full px-5 sm:py-2 py-0 flex items-center justify-center">
                                                         <span className="font-semibold text-gray-800">${item.price}</span>
                                                     </div>
                                                     <div className="border-2 border-[#0580A5] bg-white min-w-[140px] flex items-center justify-center">
@@ -591,7 +591,7 @@ const MobileSpecs = () => {
                                                         href={item.link}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="bg-[#0580A5] text-white px-6 py-2 hover:bg-[#046a8a] transition-colors cursor-pointer text-sm rounded-r-full flex items-center justify-center"
+                                                        className="bg-[#0580A5] text-white px-6 sm:py-2 py-0 hover:bg-[#046a8a] transition-colors cursor-pointer text-sm rounded-r-full flex items-center justify-center"
                                                     >
                                                         GO TO BUYING
                                                     </a>

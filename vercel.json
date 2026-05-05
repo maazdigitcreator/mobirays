@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://mobirays.voucherndeals.com/api/:path*"
+      "destination": "https://admin.mobirays.com/api/:path*"
     },
     {
       "source": "/storage/:path*",
-      "destination": "https://mobirays.voucherndeals.com/storage/:path*"
+      "destination": "https://admin.mobirays.com/storage/:path*"
     },
     {
       "source": "/((?!api/|storage/).*)",

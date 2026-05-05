@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../config/api';
 import { useLocation } from 'react-router-dom';
 import { useData } from '../context/useData';
 import SidebarBrands from '../components/SidebarSections/SidebarBrands';
@@ -20,8 +21,7 @@ const Comparison = () => {
     useEffect(() => {
         const fetchBanner = async () => {
             try {
-                const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://mobirays.voucherndeals.com';
-                const response = await fetch(`${apiBaseUrl}/api/v1/banner`);
+                const response = await fetch(`${API_BASE_URL}/api/v1/banner`);
                 const result = await response.json();
                 const allBanners = Array.isArray(result.data) ? result.data : [];
                 const banner = allBanners.find(b => b.location === 'comparison_banner_1');

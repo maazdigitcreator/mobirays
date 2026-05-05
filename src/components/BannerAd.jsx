@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { API_BASE_URL } from '../config/api';
 
 const BannerAd = ({ banner, className = "" }) => {
     if (!banner) return null;
@@ -18,7 +19,7 @@ const BannerAd = ({ banner, className = "" }) => {
     const getImgUrl = (img) => {
         if (!img) return "";
         if (img.startsWith("http")) return img;
-        const apiBase = "https://mobirays.voucherndeals.com";
+        const apiBase = API_BASE_URL;
         const cleanPath = img.replace(/^\/?storage\//, '');
         return `${apiBase}/storage/${cleanPath}`;
     };

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../config/api';
 import LatestProducts from '../components/LatestProducts';
 import Sidebar from '../components/Layout/Sidebar';
 import Pagination from '../components/Pagination';
@@ -35,7 +36,6 @@ const ComingSoon = () => {
 
     const itemsPerPage = 24; // 4 rows * 6 columns
 
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'https://mobirays.voucherndeals.com';
 
     useEffect(() => {
         if (cachedData) {
@@ -60,7 +60,7 @@ const ComingSoon = () => {
 
         const fetchBanners = async () => {
             try {
-                const res = await fetch(`${apiBaseUrl}/api/v1/banner`);
+                const res = await fetch(`${API_BASE_URL}/api/v1/banner`);
                 const data = await res.json();
                 const allBanners = Array.isArray(data.data) ? data.data : [];
                 const bannerMap = {};
@@ -78,9 +78,9 @@ const ComingSoon = () => {
         const fetchData = async () => {
             setLoading(true);
             const [fetchedPhones, fetchedTablets, fetchedWatches, fetchedBanners] = await Promise.all([
-                fetchItems(`${apiBaseUrl}/api/v1/products/phoneComingsoon`),
-                fetchItems(`${apiBaseUrl}/api/v1/products/tabletComingsoon`),
-                fetchItems(`${apiBaseUrl}/api/v1/products/watchesComingsoon`),
+                fetchItems(`${API_BASE_URL}/api/v1/products/phoneComingsoon`),
+                fetchItems(`${API_BASE_URL}/api/v1/products/tabletComingsoon`),
+                fetchItems(`${API_BASE_URL}/api/v1/products/watchesComingsoon`),
                 fetchBanners()
             ]);
             

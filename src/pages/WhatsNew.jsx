@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../config/api';
 import LatestProducts from '../components/LatestProducts';
 import Sidebar from '../components/Layout/Sidebar';
 import Pagination from '../components/Pagination';
@@ -36,7 +37,6 @@ const WhatsNew = () => {
 
     const itemsPerPage = 24; // 4 rows * 6 columns
 
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'https://mobirays.voucherndeals.com';
 
     useEffect(() => {
         if (cachedData) {
@@ -61,7 +61,7 @@ const WhatsNew = () => {
 
         const fetchBanners = async () => {
             try {
-                const res = await fetch(`${apiBaseUrl}/api/v1/banner`);
+                const res = await fetch(`${API_BASE_URL}/api/v1/banner`);
                 const data = await res.json();
                 const allBanners = Array.isArray(data.data) ? data.data : [];
                 const bannerMap = {};
@@ -79,9 +79,9 @@ const WhatsNew = () => {
         const fetchData = async () => {
             setLoading(true);
             const [fetchedPhones, fetchedTablets, fetchedWatches, fetchedBanners] = await Promise.all([
-                fetchItems(`${apiBaseUrl}/api/v1/products/phoneWhatsNew`),
-                fetchItems(`${apiBaseUrl}/api/v1/products/tabletWhatsNew`),
-                fetchItems(`${apiBaseUrl}/api/v1/products/watchesWhatsNew`),
+                fetchItems(`${API_BASE_URL}/api/v1/products/phoneWhatsNew`),
+                fetchItems(`${API_BASE_URL}/api/v1/products/tabletWhatsNew`),
+                fetchItems(`${API_BASE_URL}/api/v1/products/watchesWhatsNew`),
                 fetchBanners()
             ]);
 

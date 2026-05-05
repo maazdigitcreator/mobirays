@@ -12,7 +12,8 @@ export default async function handler(req, res) {
 
     try {
         // Fetch from the actual API
-        const response = await fetch('https://mobirays.voucherndeals.com/api/v1/products/allProducts');
+        const API_BASE_URL = process.env.VITE_API_BASE_URL;
+        const response = await fetch(`${API_BASE_URL}/api/v1/products/allProducts`);
         const data = await response.json();
 
         // Return the data

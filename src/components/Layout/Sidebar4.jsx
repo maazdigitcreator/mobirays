@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../../config/api';
 import { Link } from 'react-router-dom';
 import { Smartphone, Laptop, Watch, Headphones, Camera, Gamepad2, Plug, Home, Paperclip, Wifi, Cpu, Monitor, HardDrive, Settings, DollarSign, ChevronDown, ChevronUp } from 'lucide-react';
 import { FaRegCommentDots } from 'react-icons/fa';
@@ -31,8 +32,7 @@ const Sidebar4 = ({ bottomImage }) => {
     useEffect(() => {
         const fetchNews = async () => {
             try {
-                const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://mobirays.voucherndeals.com';
-                const response = await fetch(`${apiBaseUrl}/api/v1/posts`);
+                const response = await fetch(`${API_BASE_URL}/api/v1/posts`);
                 const data = await response.json();
                 if (data && data.data) {
                     setNews(data.data.slice(0, 4)); // Get first 4 news items

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../../config/api';
 import { Link } from 'react-router-dom';
 import SingleReview from '../SingleReview';
 
@@ -9,8 +10,7 @@ const RelatedReviews = ({ productName }) => {
     useEffect(() => {
         const fetchReviews = async () => {
             try {
-                const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://mobirays.voucherndeals.com';
-                const response = await fetch(`${apiBaseUrl}/api/v1/reviews/allReviews`);
+                const response = await fetch(`${API_BASE_URL}/api/v1/reviews/allReviews`);
                 const data = await response.json();
                 if (data && data.data) {
                     setReviews(data.data);
