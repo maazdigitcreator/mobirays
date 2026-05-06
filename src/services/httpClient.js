@@ -14,12 +14,8 @@ export const addResponseInterceptor = (interceptor) => {
 const applyRequestInterceptors = async (config) => {
   let nextConfig = config;
   for (const interceptor of requestInterceptors) {
-    // Allow interceptors to mutate or replace request config.
-    // If nothing is returned, keep the previous config.
     const maybeConfig = await interceptor(nextConfig);
-    if (maybeConfig) {
-      nextConfig = maybeConfig;
-    }
+    if (maybeConfig) nextConfig = maybeConfig;
   }
   return nextConfig;
 };
@@ -28,19 +24,34 @@ const applyResponseInterceptors = async (response, parsedData) => {
   let nextResponse = { response, data: parsedData };
   for (const interceptor of responseInterceptors) {
     const maybeResponse = await interceptor(nextResponse);
-    if (maybeResponse) {
-      nextResponse = maybeResponse;
-    }
+    if (maybeResponse) nextResponse = maybeResponse;
   }
   return nextResponse;
 };
 
+/**
+ * Parse response safely.
+ * If server returns HTML (e.g. a rate-limit error page), we return a structured
+ * error object instead of raw HTML — this prevents "Unexpected token '<'" crashes.
+ */
 const parseResponse = async (response) => {
   const contentType = response.headers.get("content-type") || "";
+
   if (contentType.includes("application/json")) {
     return response.json();
   }
-  return response.text();
+
+  const text = await response.text();
+  // HTML response = server error page (usually rate limit or 500)
+  if (text.trim().startsWith("<")) {
+    return {
+      message: response.status === 429
+        ? "Too Many Attempts."
+        : `Server error (${response.status})`,
+    };
+  }
+
+  return text;
 };
 
 export class HttpError extends Error {
